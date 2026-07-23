@@ -3,44 +3,34 @@ package dev.celestiacraft.deep_tech.common.block.machine.crusher;
 import com.lowdragmc.lowdraglib.gui.factory.BlockEntityUIFactory;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.libs.api.register.block.BasicEntityBlock;
+import dev.celestiacraft.libs.api.register.block.BlockFacing;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import org.jetbrains.annotations.NotNull;
 
 public class CrusherBlock extends BasicEntityBlock {
-	// ✅ 定义方块状态属性（四方向 + 激活状态）
-	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-	public static final BooleanProperty LIT = BooleanProperty.create("lit");
-
 	public CrusherBlock(Properties properties) {
 		super(properties);
-		// ✅ 设置默认状态
-		this.registerDefaultState(this.defaultBlockState()
-				.setValue(FACING, Direction.NORTH)
-				.setValue(LIT, false));
 	}
 
-	// ✅ 注册方块状态属性
 	@Override
-	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING, LIT);
+	protected boolean useLitState() {
+		return true;
+	}
+
+	@Override
+	protected BlockFacing useFacingType() {
+		return BlockFacing.HORIZONTAL;
 	}
 
 	@Override
@@ -54,23 +44,23 @@ public class CrusherBlock extends BasicEntityBlock {
 	}
 
 	@Override
-	public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+	public void onRemove(BlockState state, @NotNull Level level, @NotNull BlockPos pos, BlockState newState, boolean isMoving) {
 		if (!state.is(newState.getBlock())) {
 			BlockEntity be = level.getBlockEntity(pos);
 			if (be instanceof CrusherBlockEntity crusher) {
-				crusher.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
-					for (int i = 0; i < handler.getSlots(); i++) {
-						Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), handler.getStackInSlot(i));
-					}
-				});
+				crusher.getCapability(ForgeCapabilities.ITEM_HANDLER)
+						.ifPresent((handler) -> {
+							for (int i = 0; i < handler.getSlots(); i++) {
+								Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), handler.getStackInSlot(i));
+							}
+						});
 			}
 			super.onRemove(state, level, pos, newState, isMoving);
 		}
 	}
 
 	@Override
-	public InteractionResult use(BlockState state, Level level, BlockPos pos,
-								 Player player, InteractionHand hand, BlockHitResult hit) {
+	public @NotNull InteractionResult use(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull InteractionHand hand, @NotNull BlockHitResult hit) {
 		if (!level.isClientSide) {
 			BlockEntity blockEntity = level.getBlockEntity(pos);
 			if (blockEntity instanceof CrusherBlockEntity crusher && player instanceof ServerPlayer serverPlayer) {
@@ -78,24 +68,5 @@ public class CrusherBlock extends BasicEntityBlock {
 			}
 		}
 		return InteractionResult.SUCCESS;
-	}
-	@Override
-	public BlockState getStateForPlacement(BlockPlaceContext context) {
-
-		return defaultBlockState()
-				.setValue(
-						FACING,
-						context.getHorizontalDirection()
-				);
-	}
-	@Override
-	public BlockState rotate(
-			BlockState state,
-			Rotation rotation
-	){
-		return state.setValue(
-				FACING,
-				rotation.rotate(state.getValue(FACING))
-		);
 	}
 }

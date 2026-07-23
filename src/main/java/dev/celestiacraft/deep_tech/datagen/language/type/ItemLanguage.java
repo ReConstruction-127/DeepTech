@@ -9,5 +9,10 @@ public class ItemLanguage extends LanguageGenerate {
 				"Sculk Chunk",
 				"幽匿碎块"
 		);
+		addItemLanguage(
+				"sculk_alloy",
+				"Sculk Alloy",
+				"幽匿合金"
+		);
 	}
 }

@@ -1,6 +1,7 @@
-package dev.celestiacraft.deep_tech.common.recipe;
+package dev.celestiacraft.deep_tech.common.recipe.crushing;
 
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import lombok.Getter;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -11,15 +12,17 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
-public class CrusherRecipe implements Recipe<Container> {
+@Getter
+public class CrushingRecipe implements Recipe<Container> {
 	private final ResourceLocation id;
 	private final Ingredient input;
 	private final ItemStack output;
 	private final int energyCost;
 	private final int processingTime;
 
-	public CrusherRecipe(
+	public CrushingRecipe(
 			ResourceLocation id,
 			Ingredient input,
 			ItemStack output,
@@ -34,12 +37,12 @@ public class CrusherRecipe implements Recipe<Container> {
 	}
 
 	@Override
-	public boolean matches(Container container, Level level) {
+	public boolean matches(Container container, @NotNull Level level) {
 		return input.test(container.getItem(0));
 	}
 
 	@Override
-	public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+	public @NotNull ItemStack assemble(@NotNull Container container, @NotNull RegistryAccess access) {
 		return output.copy();
 	}
 
@@ -49,43 +52,27 @@ public class CrusherRecipe implements Recipe<Container> {
 	}
 
 	@Override
-	public ItemStack getResultItem(RegistryAccess registryAccess) {
+	public @NotNull ItemStack getResultItem(@NotNull RegistryAccess access) {
 		return output;
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public @NotNull ResourceLocation getId() {
 		return id;
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer() {
-		return DTRecipes.CRUSHER_SERIALIZER.get();
+	public @NotNull RecipeSerializer<?> getSerializer() {
+		return DTRecipes.CRUSHING.getSerializer();
 	}
 
 	@Override
-	public RecipeType<?> getType() {
-		return DTRecipes.CRUSHER_TYPE.get();
-	}
-
-	public Ingredient getInput() {
-		return input;
-	}
-
-	public ItemStack getOutput() {
-		return output;
-	}
-
-	public int getEnergyCost() {
-		return energyCost;
-	}
-
-	public int getProcessingTime() {
-		return processingTime;
+	public @NotNull RecipeType<?> getType() {
+		return DTRecipes.CRUSHING.getRecipeType();
 	}
 
 	@Override
-	public NonNullList<Ingredient> getIngredients() {
+	public @NotNull NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> list = NonNullList.create();
 		list.add(input);
 		return list;

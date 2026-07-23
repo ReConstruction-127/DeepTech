@@ -192,7 +192,7 @@ dependencies {
 	implementation fg.deobf("curse.maven:ldlib-626676:7339338")
 
 	// TEST ONLY CC&A
-	implementation fg.deobf("curse.maven:createaddition-439890:6306951")
+	runtimeOnly fg.deobf("curse.maven:createaddition-439890:6306951")
 
 	// Create + Flywheel + Registrate
 	implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
@@ -299,4 +299,5 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
+	options.compilerArgs << "-parameters"
 }

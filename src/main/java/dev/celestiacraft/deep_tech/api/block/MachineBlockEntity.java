@@ -1,6 +1,7 @@
-package dev.celestiacraft.deep_tech.common.block_entity;
+package dev.celestiacraft.deep_tech.api.block;
 
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
+import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -8,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -17,11 +17,12 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
 @Getter
-public abstract class MachineBlockEntity extends BasicBlockEntity {
+public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T> {
 	public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
@@ -83,27 +84,27 @@ public abstract class MachineBlockEntity extends BasicBlockEntity {
 		@Override
 		public int getSlots() { return inventory.getSlots(); }
 		@Override
-		public ItemStack getStackInSlot(int slot) { return inventory.getStackInSlot(slot); }
+		public @NotNull ItemStack getStackInSlot(int slot) { return inventory.getStackInSlot(slot); }
 		@Override
-		public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+		public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
 			if (slot != 0) return stack;
 			return inventory.insertItem(slot, stack, simulate);
 		}
 		@Override
-		public ItemStack extractItem(int slot, int amount, boolean simulate) {
+		public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
 			if (slot != 1) return ItemStack.EMPTY;
 			return inventory.extractItem(slot, amount, simulate);
 		}
 		@Override
 		public int getSlotLimit(int slot) { return inventory.getSlotLimit(slot); }
 		@Override
-		public boolean isItemValid(int slot, ItemStack stack) {
+		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
 			return slot == 0 && inventory.isItemValid(slot, stack);
 		}
 	});
 
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction side) {
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, Direction side) {
 		if (capability == ForgeCapabilities.ENERGY) {
 			return energyCap.cast();
 		}
@@ -121,7 +122,7 @@ public abstract class MachineBlockEntity extends BasicBlockEntity {
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
+	protected void saveAdditional(@NotNull CompoundTag tag) {
 		super.saveAdditional(tag);
 		tag.put("Inventory", inventory.serializeNBT());
 		tag.putInt("Energy", energy);
@@ -129,7 +130,7 @@ public abstract class MachineBlockEntity extends BasicBlockEntity {
 	}
 
 	@Override
-	public CompoundTag getUpdateTag() {
+	public @NotNull CompoundTag getUpdateTag() {
 		CompoundTag tag = super.getUpdateTag();
 		tag.putInt("Energy", energy);
 		tag.putInt("Progress", progress);
@@ -158,7 +159,7 @@ public abstract class MachineBlockEntity extends BasicBlockEntity {
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
+	public void load(@NotNull CompoundTag tag) {
 		super.load(tag);
 		inventory.deserializeNBT(tag.getCompound("Inventory"));
 		energy = tag.getInt("Energy");
@@ -179,13 +180,5 @@ public abstract class MachineBlockEntity extends BasicBlockEntity {
 
 	public int getMaxEnergyStored() {
 		return maxEnergy;
-	}
-
-	// ✅ 同步方法：发送完整数据到客户端
-	public void sync() {
-		if (level != null && !level.isClientSide) {
-			setChanged();
-			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
-		}
 	}
 }

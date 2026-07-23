@@ -6,6 +6,8 @@ import dev.celestiacraft.deep_tech.api.client.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
 import net.minecraft.core.Direction;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
+import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 
 public class DTBlocks {
@@ -40,10 +42,10 @@ public class DTBlocks {
 				.model(ItemModelGen.withModel("block/machine/machine_crusher_north"))
 				.build()
 				.blockstate((context, provider) -> {
-					var models = provider.models();
+					BlockModelProvider models = provider.models();
 
 					// 为每个方向创建模型
-					var modelOff = models.cube(
+					BlockModelBuilder modelOff = models.cube(
 							"machine_crusher_off",
 
 							provider.modLoc("block/machine/crusher/bottom"),
@@ -54,7 +56,7 @@ public class DTBlocks {
 							provider.modLoc("block/machine/crusher/side_off")
 					);
 
-					var modelOn = models.cube(
+					BlockModelBuilder modelOn = models.cube(
 							"machine_crusher_on",
 
 							provider.modLoc("block/machine/crusher/bottom"),
@@ -65,8 +67,8 @@ public class DTBlocks {
 							provider.modLoc("block/machine/crusher/side_on")
 					);
 					provider.getVariantBuilder(context.get())
-							.forAllStates(state -> {
-								Direction facing = state.getValue(CrusherBlock.FACING);
+							.forAllStates((state) -> {
+								Direction facing = state.getValue(CrusherBlock.HORIZONTAL_FACING);
 								boolean active = state.getValue(CrusherBlock.LIT);
 
 								return ConfiguredModel.builder()
@@ -82,7 +84,3 @@ public class DTBlocks {
 		DeepTech.registerLog("Blocks");
 	}
 }
-
-
-
-

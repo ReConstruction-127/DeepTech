@@ -1,6 +1,8 @@
 package dev.celestiacraft.deep_tech.datagen.language;
 
 import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.datagen.language.type.BlockLanguage;
+import dev.celestiacraft.deep_tech.datagen.language.type.GuiLanguage;
 import dev.celestiacraft.deep_tech.datagen.language.type.ItemLanguage;
 
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ public class LanguageGenerate {
 
 	public static void register() {
 		ItemLanguage.addLang();
+		BlockLanguage.addLang();
+		GuiLanguage.addLang();
 	}
 
 	protected static void addLanguage(String type, String key, String english, String chinese) {
@@ -76,7 +80,7 @@ public class LanguageGenerate {
 		addLanguage("key", key, english, chinese);
 	}
 
-	protected static void addRadialLang(String key, String english, String chinese) {
-		addLanguage("radial", key, english, chinese);
+	protected static void addGuiLang(String key, String english, String chinese) {
+		addLanguage("gui", key, english, chinese);
 	}
 }

@@ -7,14 +7,13 @@ import dev.celestiacraft.libs.api.register.item.BasicItem;
 
 public class DTItems {
 	public static ItemEntry<BasicItem> SCULK_CHUNK;
+	public static ItemEntry<BasicItem> SCULK_ALLOY;
+
 	static {
 		SCULK_CHUNK = DeepTech.REGISTRATE.item("sculk_chunk", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_chunk"))
 				.register();
-	}
 
-	public static ItemEntry<BasicItem> SCULK_ALLOY;
-	static {
 		SCULK_ALLOY = DeepTech.REGISTRATE.item("sculk_alloy", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_alloy"))
 				.register();
