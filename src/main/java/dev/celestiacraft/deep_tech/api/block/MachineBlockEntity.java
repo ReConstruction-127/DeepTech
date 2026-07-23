@@ -181,4 +181,11 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	public int getMaxEnergyStored() {
 		return maxEnergy;
 	}
+	// ========== 手动同步方法 ==========
+	public void sync() {
+		if (level != null && !level.isClientSide) {
+			setChanged();
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+		}
+	}
 }

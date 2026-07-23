@@ -5,8 +5,8 @@
 	},
 	"result": {
 		"item": "minecraft:iron_nugget",
-		"count": 1
+		"count": 12
 	},
-	"energy_cost": 12,
+	"energy_cost": 10,
 	"processing_time": 100
 }

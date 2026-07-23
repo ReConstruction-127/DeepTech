@@ -1,10 +1,10 @@
 {
 	"type": "deep_tech:crushing",
 	"input": {
-		"item": "minecraft:gravel"
+		"item": "minecraft:cobblestone"
 	},
 	"result": {
-		"item": "minecraft:sand",
+		"item": "minecraft:gravel",
 		"count": 1
 	},
 	"energy_cost": 10,

@@ -7,8 +7,10 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
+import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
+import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
@@ -22,6 +24,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> implements IUIHolder.BlockEntityUI {
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -32,9 +35,14 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		this(DTBlockEntities.CRUSHER.get(), pos, state);
 	}
 
+	private int currentProcessingTime = 100;  // ✅ 默认100
+
 	public static CrusherBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		return new CrusherBlockEntity(type, pos, state);
 	}
+
+
+
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
@@ -49,6 +57,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				.orElse(null);
 
 		if (recipe == null) {
+			// 无配方时重置状态
 			if (state.getValue(CrusherBlock.LIT)) {
 				level.setBlock(pos, state.setValue(CrusherBlock.LIT, false), 3);
 			}
@@ -56,8 +65,11 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				entity.progress = 0;
 				entity.setChanged();
 			}
+			// ✅ 重置为默认值
+			currentProcessingTime = 100;
 			return;
 		}
+		currentProcessingTime = recipe.getProcessingTime();
 
 		ItemStack output = recipe.getOutput();
 		int energyCost = recipe.getEnergyCost();
@@ -84,7 +96,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				entity.sync();
 			}
 
-			if (entity.progress >= recipe.getProcessingTime()) {
+			if (entity.progress >= currentProcessingTime) {
 				entity.inventory.getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
 					entity.inventory.setStackInSlot(1, output.copy());
@@ -97,7 +109,10 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 			}
 		}
 	}
-
+	@Override
+	public int getMaxProgress() {
+		return currentProcessingTime;
+	}
 	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(
@@ -133,6 +148,17 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				getMaxEnergyStored()
 		));
 
+		// 在 createUIWidget 中，添加进度条（在输入和输出槽之间）
+		group.addWidget(new ProgressBarWidget(
+				80,                 // x 坐标
+				65,                 // y 坐标
+				16,                 // 宽度
+				16,                 // 高度
+				this::getProgress,  // 当前进度
+				this::getMaxProgress, // 最大进度（需要从配方获取，见下方说明）
+				new ResourceTexture("deep_tech:textures/gui/elements/progress_back.png"),
+				new ResourceTexture("deep_tech:textures/gui/elements/progress_front.png")
+		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
 
