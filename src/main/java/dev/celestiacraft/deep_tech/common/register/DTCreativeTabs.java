@@ -37,10 +37,7 @@ public class DTCreativeTabs {
 	}
 
 	public static Registrate getTab(String name) {
-		return DeepTech.REGISTRATE.defaultCreativeTab(ResourceKey.create(
-				Registries.CREATIVE_MODE_TAB,
-				DeepTech.loadResource(name)
-		));
+		return DeepTech.REGISTRATE.defaultCreativeTab(getTabKey(name));
 	}
 
 	public static ResourceKey<CreativeModeTab> getTabKey(String name) {
@@ -51,7 +48,7 @@ public class DTCreativeTabs {
 	}
 
 	public static void register(IEventBus bus) {
-		DeepTech.registerLog("Creative Tab");
+		DeepTech.registerLog("Creative Tabs");
 		TABS.register(bus);
 	}
 }

@@ -17,6 +17,7 @@ public class AddCreativeTabs {
 
 		if (key.equals(DTCreativeTabs.getTabKey("material"))) {
 			event.accept(DTItems.SCULK_CHUNK.asStack());
+			event.accept(DTItems.SCULK_ALLOY.asStack());
 		}
 
 		if (key.equals(DTCreativeTabs.getTabKey("machine"))) {

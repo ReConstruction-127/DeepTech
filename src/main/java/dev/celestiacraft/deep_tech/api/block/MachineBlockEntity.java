@@ -62,13 +62,24 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		}
 
 		@Override
-		public int getEnergyStored() { return energy; }
+		public int getEnergyStored() {
+			return energy;
+		}
+
 		@Override
-		public int getMaxEnergyStored() { return maxEnergy; }
+		public int getMaxEnergyStored() {
+			return maxEnergy;
+		}
+
 		@Override
-		public boolean canExtract() { return true; }
+		public boolean canExtract() {
+			return true;
+		}
+
 		@Override
-		public boolean canReceive() { return true; }
+		public boolean canReceive() {
+			return true;
+		}
 	};
 
 	@Getter
@@ -82,21 +93,32 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	private final LazyOptional<IEnergyStorage> energyCap = LazyOptional.of(() -> energyStorage);
 	private final LazyOptional<IItemHandler> itemCap = LazyOptional.of(() -> new IItemHandler() {
 		@Override
-		public int getSlots() { return inventory.getSlots(); }
+		public int getSlots() {
+			return inventory.getSlots();
+		}
+
 		@Override
-		public @NotNull ItemStack getStackInSlot(int slot) { return inventory.getStackInSlot(slot); }
+		public @NotNull ItemStack getStackInSlot(int slot) {
+			return inventory.getStackInSlot(slot);
+		}
+
 		@Override
 		public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
 			if (slot != 0) return stack;
 			return inventory.insertItem(slot, stack, simulate);
 		}
+
 		@Override
 		public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
 			if (slot != 1) return ItemStack.EMPTY;
 			return inventory.extractItem(slot, amount, simulate);
 		}
+
 		@Override
-		public int getSlotLimit(int slot) { return inventory.getSlotLimit(slot); }
+		public int getSlotLimit(int slot) {
+			return inventory.getSlotLimit(slot);
+		}
+
 		@Override
 		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
 			return slot == 0 && inventory.isItemValid(slot, stack);
@@ -136,7 +158,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		tag.putInt("Progress", progress);
 		return tag;
 	}
-	// ========== 网络同步（发送 NBT 数据包） ==========
+
 	@Nullable
 	@Override
 	public ClientboundBlockEntityDataPacket getUpdatePacket() {
@@ -180,12 +202,5 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 
 	public int getMaxEnergyStored() {
 		return maxEnergy;
-	}
-	// ========== 手动同步方法 ==========
-	public void sync() {
-		if (level != null && !level.isClientSide) {
-			setChanged();
-			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-		}
 	}
 }

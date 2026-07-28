@@ -17,6 +17,7 @@ import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -24,9 +25,12 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemStackHandler;
 
 public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> implements IUIHolder.BlockEntityUI {
+	private static final int ELEMENTS_TEXTURE_SIZE = 256;
+	private static final ResourceLocation ELEMENTS_TEXTURE =
+			DeepTech.loadResource("textures/gui/elements/elements.png");
+
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
@@ -40,9 +44,6 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 	public static CrusherBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		return new CrusherBlockEntity(type, pos, state);
 	}
-
-
-
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
@@ -75,9 +76,9 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		int energyCost = recipe.getEnergyCost();
 
 		ItemStack currentOutput = entity.inventory.getStackInSlot(1);
-		boolean canOutput = currentOutput.isEmpty() ||
-				(ItemStack.isSameItemSameTags(currentOutput, output) &&
-						currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
+		boolean canOutput = currentOutput.isEmpty()
+				|| (ItemStack.isSameItemSameTags(currentOutput, output)
+				&& currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
 
 		boolean hasEnergy = entity.energy >= energyCost;
 
@@ -109,18 +110,15 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 			}
 		}
 	}
+
 	@Override
 	public int getMaxProgress() {
 		return currentProcessingTime;
 	}
+
 	@Override
 	public ModularUI createUI(Player player) {
-		ModularUI ui = new ModularUI(
-				176,
-				166,
-				this,
-				player
-		);
+		ModularUI ui = new ModularUI(176, 166, this, player);
 
 		ui.widget(createUIWidget(player));
 
@@ -131,7 +129,6 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 	private WidgetGroup createUIWidget(Player player) {
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
 		group.setBackground(new ResourceTexture("deep_tech:textures/gui/crusher.png"));
-
 
 		LabelWidget title = new LabelWidget(
 				8,
@@ -150,14 +147,14 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 		// 在 createUIWidget 中，添加进度条（在输入和输出槽之间）
 		group.addWidget(new ProgressBarWidget(
-				80,                 // x 坐标
-				65,                 // y 坐标
-				16,                 // 宽度
-				16,                 // 高度
-				this::getProgress,  // 当前进度
-				this::getMaxProgress, // 最大进度（需要从配方获取，见下方说明）
-				new ResourceTexture("deep_tech:textures/gui/elements/progress_back.png"),
-				new ResourceTexture("deep_tech:textures/gui/elements/progress_front.png")
+				80,
+				65,
+				16,
+				6,
+				this::getProgress,
+				this::getMaxProgress,
+				elementsTexture(0, 0, 16, 6),
+				elementsTexture(0, 7, 16, 6)
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
@@ -193,10 +190,18 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		return group;
 	}
 
-	private void addPlayerInventory(WidgetGroup group, Player player) {
-		Container inventory =
-				player.getInventory();
+	private static ResourceTexture elementsTexture(int u, int v, int width, int height) {
+		return new ResourceTexture(
+				ELEMENTS_TEXTURE,
+				(float) u / ELEMENTS_TEXTURE_SIZE,
+				(float) v / ELEMENTS_TEXTURE_SIZE,
+				(float) width / ELEMENTS_TEXTURE_SIZE,
+				(float) height / ELEMENTS_TEXTURE_SIZE
+		);
+	}
 
+	private void addPlayerInventory(WidgetGroup group, Player player) {
+		Container inventory = player.getInventory();
 
 		// 主背包 3×9
 

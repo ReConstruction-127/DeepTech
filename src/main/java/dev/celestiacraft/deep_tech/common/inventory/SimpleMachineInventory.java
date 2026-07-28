@@ -4,8 +4,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 public class SimpleMachineInventory implements Container {
 
@@ -31,35 +30,34 @@ public class SimpleMachineInventory implements Container {
     }
 
     @Override
-    public ItemStack getItem(int slot) {
+    public @NotNull ItemStack getItem(int slot) {
         return handler.getStackInSlot(slot);
     }
 
     @Override
-    public ItemStack removeItem(int slot, int amount) {
+    public @NotNull ItemStack removeItem(int slot, int amount) {
         // ✅ 直接提取，不需要额外的 set
         return handler.extractItem(slot, amount, false);
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int slot) {
+    public @NotNull ItemStack removeItemNoUpdate(int slot) {
         ItemStack stack = handler.getStackInSlot(slot);
         handler.setStackInSlot(slot, ItemStack.EMPTY);
         return stack;
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
+    public void setItem(int slot, @NotNull ItemStack stack) {
         handler.setStackInSlot(slot, stack);
     }
 
     @Override
     public void setChanged() {
-        // 不需要操作，ItemStackHandler 有自己的 change 通知
     }
 
     @Override
-    public boolean stillValid(Player player) {
+    public boolean stillValid(@NotNull Player player) {
         return true;
     }
 

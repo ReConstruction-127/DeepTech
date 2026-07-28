@@ -2,7 +2,7 @@ package dev.celestiacraft.deep_tech.common.register;
 
 import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.client.ItemModelGen;
+import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
 import net.minecraft.core.Direction;
