@@ -5,6 +5,7 @@ import dev.celestiacraft.deep_tech.api.register.recipe.RecipeRegistry;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipeSerializer;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -35,11 +36,11 @@ public class DTRecipes {
 			String name,
 			Supplier<? extends RecipeSerializer<T>> serializer
 	) {
-		return new RecipeRegistry<>(TYPES.register(name, () -> {
+		return new RecipeRegistry<>(ResourceLocation.tryParse(name), TYPES.register(name, () -> {
 			return new RecipeType<>() {
 				@Override
 				public String toString() {
-					return DeepTech.MODID + ":" + name;
+					return DeepTech.loadResource(name).toString();
 				}
 			};
 		}), SERIALIZERS.register(name, serializer));
