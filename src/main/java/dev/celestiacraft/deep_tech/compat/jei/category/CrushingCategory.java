@@ -31,11 +31,11 @@ public class CrushingCategory {
 				.setDraw((recipe, view, graphics, mouseX, mouseY) -> {
 					slotDrawable.draw(graphics, 9, 19);
 					slotDrawable.draw(graphics, 109, 19);
-					DTTextures.PROGRESS_FRONT.render(graphics, 52, 21);
+					DTTextures.PROGRESS_FRONT.render(graphics, 52, 26);
 
 					Font font = Minecraft.getInstance().font;
 
-					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " / FE");
+					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");
 					graphics.drawString(font, energyText, 10, 60, 0xFF0095e0, true);
 
 					Component timeText = Component.literal("⏱ " + recipe.getProcessingTime() + " tick");

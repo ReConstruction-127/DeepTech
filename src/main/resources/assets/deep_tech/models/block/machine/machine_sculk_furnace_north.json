@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "deep_tech:block/machine/crusher/top_off",
+    "east": "deep_tech:block/machine/crusher/side_off",
+    "north": "deep_tech:block/machine/crusher/face_off",
+    "south": "deep_tech:block/machine/crusher/side_off",
+    "up": "deep_tech:block/machine/crusher/bottom",
+    "west": "deep_tech:block/machine/crusher/side_off"
+  }
+}

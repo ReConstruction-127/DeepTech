@@ -16,7 +16,6 @@ import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -31,6 +30,14 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
+	}
+
+	public CrusherBlockEntity(BlockPos pos, BlockState state) {
+		this(DTBlockEntities.CRUSHER.get(), pos, state);
+	}
+
+	public static CrusherBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		return new CrusherBlockEntity(type, pos, state);
 	}
 
 	@Override
@@ -107,12 +114,9 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
-
 		ui.widget(createUIWidget(player));
-
 		return ui;
 	}
-
 
 	private WidgetGroup createUIWidget(Player player) {
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
@@ -123,9 +127,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				8,
 				Component.translatable("block.deep_tech.machine_crusher")
 		);
-
 		title.setColor(0xFF5D5F60);
-
 		group.addWidget(title);
 
 		group.addWidget(new EnergyBarWidget(
@@ -135,48 +137,37 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				getMaxEnergyStored()
 		));
 
-		// 在 createUIWidget 中，添加进度条（在输入和输出槽之间）
+		// ✅ 进度条（使用元素纹理）
 		group.addWidget(new ProgressBarWidget(
 				68,                 // x 坐标
-				39,                 // y 坐标
+				44,                 // y 坐标
 				16,                 // 宽度
-				16,                 // 高度
-				this::getProgress,  // 当前进度b
+				6,                  // 高度
+				this::getProgress,
 				this::getMaxProgress,
-				new ResourceTexture("deep_tech:textures/gui/elements/progress_back.png"),
-				new ResourceTexture("deep_tech:textures/gui/elements/progress_front.png")
+				elementsTexture(0, 0, 16, 6),   // 背景
+				elementsTexture(0, 7, 16, 6)    // 前景
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
 
 		SlotWidget input = new SlotWidget();
-
 		input.setContainerSlot(container, 0);
-
 		input.setSelfPosition(new Position(41, 38));
-
-//		input.setBackground(SlotWidget.ITEM_SLOT_TEXTURE);
-
+		input.setBackground((ResourceTexture) null);
 		input.setCanTakeItems(true);
 		input.setCanPutItems(true);
-
 		group.addWidget(input);
 
-
 		SlotWidget output = new SlotWidget();
-
 		output.setContainerSlot(container, 1);
-
 		output.setSelfPosition(new Position(97, 38));
-
-//		output.setBackground(SlotWidget.ITEM_SLOT_TEXTURE);
-
+		output.setBackground((ResourceTexture) null);
 		output.setCanTakeItems(true);
 		output.setCanPutItems(false);
-
 		group.addWidget(output);
-		addPlayerInventory(group, player);
 
+		addPlayerInventory(group, player);
 		return group;
 	}
 
@@ -194,34 +185,26 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		Container inventory = player.getInventory();
 
 		// 主背包 3×9
-
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
 				SlotWidget slot = new SlotWidget();
 				slot.initTemplate();
 				slot.setContainerSlot(inventory, col + row * 9 + 9);
-
 				slot.isPlayerContainer = true;
-
 				slot.setSelfPosition(new Position(7 + col * 18, 81 + row * 18));
 				slot.setBackground((ResourceTexture) null);
-
 				group.addWidget(slot);
 			}
 		}
 
-
 		// 快捷栏 9格
-
 		for (int col = 0; col < 9; col++) {
 			SlotWidget slot = new SlotWidget();
-
 			slot.initTemplate();
 			slot.setContainerSlot(inventory, col);
 			slot.isPlayerContainer = true;
 			slot.setSelfPosition(new Position(7 + col * 18, 139));
 			slot.setBackground((ResourceTexture) null);
-
 			group.addWidget(slot);
 		}
 	}

@@ -43,6 +43,13 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		}
 		RecipeManager manager = level.getRecipeManager();
 
+	@Override
+	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+		registration.addRecipeCatalyst(
+				DTBlocks.MACHINE_CRUSHER.asStack(),
+				DTJeiRecipeType.CRUSHING
+		);
+	}
 		// ✅ 直接获取所有 CrushingRecipe，不需要遍历 Map
 		List<CrushingRecipe> crushing = manager.getAllRecipesFor(DTRecipes.CRUSHING.getRecipeType());
 

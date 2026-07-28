@@ -7,7 +7,6 @@ import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.FurnaceBlock;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
@@ -84,7 +83,7 @@ public class DTBlocks {
 	static {
 		MACHINE_SCULK_FURNACE = DeepTech.REGISTRATE.block("machine_sculk_furnace", SculkFurnaceBlock::new)
 				.item()
-				.model(ItemModelGen.withModel("block/machine/machine_furnace_north"))
+				.model(ItemModelGen.withModel("block/machine/machine_sculk_furnace_north"))
 				.build()
 				.blockstate((context, provider) -> {
 					BlockModelProvider models = provider.models();
