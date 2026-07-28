@@ -7,9 +7,9 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
-import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import lombok.Getter;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
@@ -23,7 +23,9 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
 
+@Getter
 public class CrushingRecipe implements Recipe<Container> {
 	private final ResourceLocation id;
 	private final Ingredient input;
@@ -31,8 +33,13 @@ public class CrushingRecipe implements Recipe<Container> {
 	private final int energyCost;
 	private final int processingTime;
 
-	public CrushingRecipe(ResourceLocation id, Ingredient input, ItemStack output,
-						  int energyCost, int processingTime) {
+	public CrushingRecipe(
+			ResourceLocation id,
+			Ingredient input,
+			ItemStack output,
+			int energyCost,
+			int processingTime
+	) {
 		this.id = id;
 		this.input = input;
 		this.output = output;
@@ -40,20 +47,13 @@ public class CrushingRecipe implements Recipe<Container> {
 		this.processingTime = processingTime;
 	}
 
-	// ========== Getters ==========
-	public Ingredient getInput() { return input; }
-	public ItemStack getOutput() { return output; }
-	public int getEnergyCost() { return energyCost; }
-	public int getProcessingTime() { return processingTime; }
-
-	// ========== Recipe 接口方法 ==========
 	@Override
-	public boolean matches(Container container, Level level) {
+	public boolean matches(Container container, @NotNull Level level) {
 		return input.test(container.getItem(0));
 	}
 
 	@Override
-	public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+	public @NotNull ItemStack assemble(@NotNull Container container, @NotNull RegistryAccess access) {
 		return output.copy();
 	}
 
@@ -63,31 +63,31 @@ public class CrushingRecipe implements Recipe<Container> {
 	}
 
 	@Override
-	public ItemStack getResultItem(RegistryAccess registryAccess) {
+	public @NotNull ItemStack getResultItem(@NotNull RegistryAccess access) {
 		return output;
 	}
 
 	@Override
-	public ResourceLocation getId() {
+	public @NotNull ResourceLocation getId() {
 		return id;
 	}
+
 	@Override
-	public RecipeSerializer<?> getSerializer() {
-		return DTRecipes.CRUSHING.getSerializer();  // ✅ 正确方法
+	public @NotNull RecipeSerializer<?> getSerializer() {
+		return DTRecipes.CRUSHING.getSerializer();
 	}
 
 	@Override
-	public RecipeType<?> getType() {
-		return DTRecipes.CRUSHING.getRecipeType();  // ✅ 正确方法
+	public @NotNull RecipeType<?> getType() {
+		return DTRecipes.CRUSHING.getRecipeType();
 	}
 
 	@Override
-	public NonNullList<Ingredient> getIngredients() {
+	public @NotNull NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> list = NonNullList.create();
 		list.add(input);
 		return list;
 	}
-
 
 	public ModularUI createModularUI(Player player) {
 		ItemStackHandler handler = new ItemStackHandler(2);
@@ -128,7 +128,7 @@ public class CrushingRecipe implements Recipe<Container> {
 		arrowImage.setSize(24, 17);
 
 // 3. 最后设置纹理
-		arrowImage.setImage(new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/arrow.png"));
+		arrowImage.setImage(new ResourceTexture("deep_tech:textures/gui/elements/arrow.png"));
 
 		group.addWidget(arrowImage);
 
