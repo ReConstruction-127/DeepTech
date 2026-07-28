@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,6 +35,16 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	protected final int maxReceive = 100;
 	protected final int maxExtract = 100;
 
+	// 在 MachineBlockEntity 中添加这个方法
+	public void sync() {
+		if (level != null && !level.isClientSide) {
+			setChanged();
+			// 强制发送 BlockEntity 数据包，不依赖 BlockState 变化
+			if (level instanceof ServerLevel serverLevel) {
+				serverLevel.getChunkSource().blockChanged(worldPosition);
+			}
+		}
+	}
 	protected final IEnergyStorage energyStorage = new IEnergyStorage() {
 		@Override
 		public int receiveEnergy(int maxReceive, boolean simulate) {

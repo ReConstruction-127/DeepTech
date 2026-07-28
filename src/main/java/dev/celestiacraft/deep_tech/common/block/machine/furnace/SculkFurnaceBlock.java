@@ -37,6 +37,8 @@ public class SculkFurnaceBlock extends BasicEntityBlock {
 				.setValue(LIT, false));
 	}
 
+	// ✅ 删除错误的构造器和工厂方法（它们属于 SculkFurnaceBlockEntity）
+
 	@Override
 	protected boolean useLitState() {
 		return true;
@@ -46,10 +48,12 @@ public class SculkFurnaceBlock extends BasicEntityBlock {
 	protected BlockFacing useFacingType() {
 		return BlockFacing.HORIZONTAL;
 	}
+
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		builder.add(FACING, LIT);
 	}
+
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
 		return this.defaultBlockState()

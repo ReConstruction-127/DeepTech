@@ -27,8 +27,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> implements IUIHolder.BlockEntityUI {
-	private static final int ELEMENTS_TEXTURE_SIZE = 256;
-	private static final ResourceLocation ELEMENTS_TEXTURE = DeepTech.loadResource("textures/gui/elements/elements.png");
 
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -88,10 +86,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 			entity.energy -= energyCost;
 			entity.progress++;
 			entity.setChanged();
-
-			if (level.getGameTime() % 5 == 0) {
 				entity.sync();
-			}
 
 			// ✅ 使用 maxProgress 判断
 			if (entity.progress >= entity.maxProgress) {
@@ -140,15 +135,13 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		));
 
 		// ✅ 进度条（使用元素纹理）
+		// ✅ 进度条（16x16 独立纹理）
 		group.addWidget(new ProgressBarWidget(
-				68,                 // x 坐标
-				44,                 // y 坐标
-				16,                 // 宽度
-				6,                  // 高度
+				68, 39, 16, 16,
 				this::getProgress,
 				this::getMaxProgress,
-				elementsTexture(0, 0, 16, 6),   // 背景
-				elementsTexture(0, 7, 16, 6)    // 前景
+				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_back.png"),
+				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_front.png")
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
@@ -173,15 +166,6 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		return group;
 	}
 
-	private static ResourceTexture elementsTexture(int u, int v, int width, int height) {
-		return new ResourceTexture(
-				ELEMENTS_TEXTURE,
-				(float) u / ELEMENTS_TEXTURE_SIZE,
-				(float) v / ELEMENTS_TEXTURE_SIZE,
-				(float) width / ELEMENTS_TEXTURE_SIZE,
-				(float) height / ELEMENTS_TEXTURE_SIZE
-		);
-	}
 
 	private void addPlayerInventory(WidgetGroup group, Player player) {
 		Container inventory = player.getInventory();

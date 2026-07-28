@@ -7,11 +7,13 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
+import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
+import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -24,8 +26,20 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBlockEntity> implements IUIHolder.BlockEntityUI {
+
+	// ✅ 三参数构造器（供 Registrate 使用）
 	public SculkFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
+	}
+
+	// ✅ 便捷构造器
+	public SculkFurnaceBlockEntity(BlockPos pos, BlockState state) {
+		this(DTBlockEntities.SCULK_FURNACE.get(), pos, state);
+	}
+
+	// ✅ 静态工厂方法
+	public static SculkFurnaceBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		return new SculkFurnaceBlockEntity(type, pos, state);
 	}
 
 	@Override
@@ -52,7 +66,6 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 			return;
 		}
 
-		// ✅ 直接设置 maxProgress（同步到客户端）
 		entity.maxProgress = recipe.getProcessingTime();
 
 		ItemStack output = recipe.getOutput();
@@ -79,7 +92,6 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 				entity.sync();
 			}
 
-			// ✅ 使用 maxProgress 判断
 			if (entity.progress >= entity.maxProgress) {
 				entity.inventory.getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
@@ -93,122 +105,76 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 			}
 		}
 	}
+
 	@Override
 	public ModularUI createUI(Player player) {
-		ModularUI ui = new ModularUI(
-				176,
-				166,
-				this,
-				player
-		);
-
+		ModularUI ui = new ModularUI(176, 166, this, player);
 		ui.widget(createUIWidget(player));
-
 		return ui;
 	}
 
-
 	private WidgetGroup createUIWidget(Player player) {
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-		group.setBackground(new ResourceTexture("deep_tech:textures/gui/crusher.png"));
+		group.setBackground(new ResourceTexture(DeepTech.MODID + ":textures/gui/crusher.png"));
 
-
-		LabelWidget title = new LabelWidget(
-				8,
-				8,
-				Component.translatable("block.deep_tech.machine_furnace")
-		);
-
+		LabelWidget title = new LabelWidget(8, 8, Component.translatable("block.deep_tech.machine_furnace"));
 		title.setColor(0xFF5D5F60);
-
 		group.addWidget(title);
 
-		group.addWidget(new EnergyBarWidget(
-				18,
-				25,
-				this::getEnergyStored,
-				getMaxEnergyStored()
-		));
+		group.addWidget(new EnergyBarWidget(18, 25, this::getEnergyStored, getMaxEnergyStored()));
 
-		// 在 createUIWidget 中，添加进度条（在输入和输出槽之间）
 		group.addWidget(new ProgressBarWidget(
-				68,                 // x 坐标
-				39,                 // y 坐标
-				16,                 // 宽度
-				16,                 // 高度
-				this::getProgress,  // 当前进度b
+				68, 39, 16, 16,
+				this::getProgress,
 				this::getMaxProgress,
-				new ResourceTexture("deep_tech:textures/gui/elements/progress_back.png"),
-				new ResourceTexture("deep_tech:textures/gui/elements/progress_front.png")
+				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_back.png"),
+				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_front.png")
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
 
 		SlotWidget input = new SlotWidget();
-
 		input.setContainerSlot(container, 0);
-
 		input.setSelfPosition(new Position(41, 38));
-
-//		input.setBackground(SlotWidget.ITEM_SLOT_TEXTURE);
-
+		input.setBackground((ResourceTexture) null);
 		input.setCanTakeItems(true);
 		input.setCanPutItems(true);
-
 		group.addWidget(input);
 
-
 		SlotWidget output = new SlotWidget();
-
 		output.setContainerSlot(container, 1);
-
 		output.setSelfPosition(new Position(97, 38));
-
-//		output.setBackground(SlotWidget.ITEM_SLOT_TEXTURE);
-
+		output.setBackground((ResourceTexture) null);
 		output.setCanTakeItems(true);
 		output.setCanPutItems(false);
-
 		group.addWidget(output);
-		addPlayerInventory(group, player);
 
+		addPlayerInventory(group, player);
 		return group;
 	}
 
 	private void addPlayerInventory(WidgetGroup group, Player player) {
-		Container inventory =
-				player.getInventory();
-
-
-		// 主背包 3×9
+		Container inventory = player.getInventory();
 
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
 				SlotWidget slot = new SlotWidget();
 				slot.initTemplate();
 				slot.setContainerSlot(inventory, col + row * 9 + 9);
-
 				slot.isPlayerContainer = true;
-
 				slot.setSelfPosition(new Position(7 + col * 18, 81 + row * 18));
 				slot.setBackground((ResourceTexture) null);
-
 				group.addWidget(slot);
 			}
 		}
 
-
-		// 快捷栏 9格
-
 		for (int col = 0; col < 9; col++) {
 			SlotWidget slot = new SlotWidget();
-
 			slot.initTemplate();
 			slot.setContainerSlot(inventory, col);
 			slot.isPlayerContainer = true;
 			slot.setSelfPosition(new Position(7 + col * 18, 139));
 			slot.setBackground((ResourceTexture) null);
-
 			group.addWidget(slot);
 		}
 	}

@@ -10,11 +10,11 @@ public class DTBlockEntities {
 	public static final BlockEntityEntry<SculkFurnaceBlockEntity> SCULK_FURNACE;
 
 	static {
-		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
+		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::create)
 				.validBlocks(DTBlocks.MACHINE_CRUSHER)
 				.register();
 
-		SCULK_FURNACE = DeepTech.REGISTRATE.blockEntity("furnace", SculkFurnaceBlockEntity::new)
+		SCULK_FURNACE = DeepTech.REGISTRATE.blockEntity("furnace", SculkFurnaceBlockEntity::create)
 				.validBlocks(DTBlocks.MACHINE_SCULK_FURNACE)
 				.register();
 	}

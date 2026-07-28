@@ -7,7 +7,10 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
+import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
+import dev.celestiacraft.deep_tech.common.recipe.JEIProgressSupplier;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import lombok.Getter;
 import net.minecraft.core.NonNullList;
@@ -119,22 +122,15 @@ public class CrushingRecipe implements Recipe<Container> {
 		outputSlot.setCanPutItems(false);
 		group.addWidget(outputSlot);
 
-		// ✅ 使用机器UI的箭头纹理（假设你有箭头纹理）
-		// 1. 先创建 ImageWidget 实例（无参构造器）
-		ImageWidget arrowImage = new ImageWidget();
-
-// 2. 再设置位置和大小
-		arrowImage.setSelfPosition(new Position(50, 28));
-		arrowImage.setSize(24, 17);
-
-// 3. 最后设置纹理
-		arrowImage.setImage(new ResourceTexture("deep_tech:textures/gui/elements/arrow.png"));
-
-		group.addWidget(arrowImage);
-
-		// 如果你没有箭头纹理，也可以用纯色或继续用文字
-		// group.addWidget(new TextWidget(50, 28, Component.literal("→"))
-		//         .setColor(0xFFFFFFFF).setScale(2.0f));
+		// 用 ProgressBarWidget + 动态 Supplier
+		group.addWidget(new ProgressBarWidget(
+				60, 28,                     // 居中位置
+				16, 16,                     // 尺寸 16x16
+				JEIProgressSupplier.INSTANCE::getProgress,
+				() -> 100,
+				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_back.png"),
+				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_front.png")
+		));
 
 		// 能量和时间
 		group.addWidget(new LabelWidget(8, 5, Component.literal("⚡ " + energyCost + " FE")));

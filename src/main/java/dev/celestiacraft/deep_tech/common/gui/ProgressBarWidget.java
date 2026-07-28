@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.function.Supplier;
 
+
 public class ProgressBarWidget extends Widget {
     private final Supplier<Integer> progressGetter;
     private final Supplier<Integer> maxProgressGetter;
