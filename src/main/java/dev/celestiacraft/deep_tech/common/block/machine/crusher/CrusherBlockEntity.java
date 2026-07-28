@@ -116,7 +116,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	@Override
 	public int getMaxProgress() {
-		return currentProcessingTime;
+		return maxProgress;
 	}
 
 	@Override
