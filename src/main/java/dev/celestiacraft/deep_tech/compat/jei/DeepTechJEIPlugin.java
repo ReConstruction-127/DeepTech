@@ -23,6 +23,7 @@ import java.util.List;
 
 @JeiPlugin
 public class DeepTechJEIPlugin implements IModPlugin {
+
 	@Override
 	public @NotNull ResourceLocation getPluginUid() {
 		return DeepTech.loadResource("jei_plugin");
@@ -31,7 +32,6 @@ public class DeepTechJEIPlugin implements IModPlugin {
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registration) {
 		IGuiHelper helper = registration.getJeiHelpers().getGuiHelper();
-
 		registration.addRecipeCategories(CrushingCategory.builder(helper));
 	}
 
@@ -41,16 +41,10 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		if (level == null) {
 			return;
 		}
+
 		RecipeManager manager = level.getRecipeManager();
 
-	@Override
-	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-		registration.addRecipeCatalyst(
-				DTBlocks.MACHINE_CRUSHER.asStack(),
-				DTJeiRecipeType.CRUSHING
-		);
-	}
-		// ✅ 直接获取所有 CrushingRecipe，不需要遍历 Map
+		// ✅ 获取所有 CrushingRecipe
 		List<CrushingRecipe> crushing = manager.getAllRecipesFor(DTRecipes.CRUSHING.getRecipeType());
 
 		registration.addRecipes(DTJeiRecipeType.CRUSHING, crushing);
@@ -58,6 +52,7 @@ public class DeepTechJEIPlugin implements IModPlugin {
 
 	@Override
 	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+		// ✅ 只保留一个 registerRecipeCatalysts 方法
 		registration.addRecipeCatalyst(
 				new ItemStack(DTBlocks.MACHINE_CRUSHER.get()),
 				DTJeiRecipeType.CRUSHING
