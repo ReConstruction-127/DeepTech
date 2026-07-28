@@ -68,7 +68,7 @@ public class DTBlocks {
 					);
 					provider.getVariantBuilder(context.get())
 							.forAllStates((state) -> {
-								Direction facing = state.getValue(CrusherBlock.HORIZONTAL_FACING);
+								Direction facing = state.getValue(CrusherBlock.FACING);
 								boolean active = state.getValue(CrusherBlock.LIT);
 
 								return ConfiguredModel.builder()
@@ -113,7 +113,7 @@ public class DTBlocks {
 					);
 					provider.getVariantBuilder(context.get())
 							.forAllStates((state) -> {
-								Direction facing = state.getValue(SculkFurnaceBlock.HORIZONTAL_FACING);
+								Direction facing = state.getValue(SculkFurnaceBlock.FACING);
 								boolean active = state.getValue(SculkFurnaceBlock.LIT);
 
 								return ConfiguredModel.builder()
