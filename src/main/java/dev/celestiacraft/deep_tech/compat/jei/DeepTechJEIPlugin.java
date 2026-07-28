@@ -20,8 +20,6 @@ import java.util.List;
 @JeiPlugin
 public class DeepTechJEIPlugin implements IModPlugin {
 
-    public static final RecipeType<CrushingRecipe> CRUSHING_RECIPE_TYPE =
-            RecipeType.create(DeepTech.MODID, "crushing", CrushingRecipe.class);
 
 
     @Override
@@ -52,8 +50,7 @@ public class DeepTechJEIPlugin implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registration.addRecipeCatalyst(
                 new ItemStack(DTBlocks.MACHINE_CRUSHER.get()),
-                CRUSHING_RECIPE_TYPE
-
+                CrushingRecipeCategory.RECIPE_TYPE
         );
     }
 }

@@ -28,7 +28,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	}
 
 	protected int progress = 0;
-	protected final int maxProgress = 100;
+	protected int maxProgress = 100;
 	protected int energy = 0;
 	protected final int maxEnergy = 10000;
 	protected final int maxReceive = 100;
@@ -127,6 +127,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		tag.put("Inventory", inventory.serializeNBT());
 		tag.putInt("Energy", energy);
 		tag.putInt("Progress", progress);
+		tag.putInt("MaxProgress", maxProgress);
 	}
 
 	@Override
@@ -134,6 +135,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		CompoundTag tag = super.getUpdateTag();
 		tag.putInt("Energy", energy);
 		tag.putInt("Progress", progress);
+		tag.putInt("MaxProgress", maxProgress);
 		return tag;
 	}
 	// ========== 网络同步（发送 NBT 数据包） ==========
@@ -156,6 +158,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		super.handleUpdateTag(tag);
 		energy = tag.getInt("Energy");
 		progress = tag.getInt("Progress");
+		maxProgress = tag.getInt("MaxProgress");
 	}
 
 	@Override

@@ -9,5 +9,10 @@ public class GuiLanguage extends LanguageGenerate {
 				"Crusher",
 				"粉碎机"
 		);
+		addGuiLang(
+				"machine_furnace",
+				"Sculk Furnace",
+				"幽匿电炉"
+		);
 	}
 }

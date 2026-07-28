@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.block.machine.crusher;
+package dev.celestiacraft.deep_tech.common.block.machine.furnace;
 
 import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
@@ -7,7 +7,6 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
-import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
@@ -15,10 +14,6 @@ import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
-import dev.celestiacraft.deep_tech.compat.jei.CrushingRecipeCategory;
-import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -28,27 +23,26 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemStackHandler;
 
-public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> implements IUIHolder.BlockEntityUI {
-	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBlockEntity> implements IUIHolder.BlockEntityUI {
+	public SculkFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
 
-	public CrusherBlockEntity(BlockPos pos, BlockState state) {
-		this(DTBlockEntities.CRUSHER.get(), pos, state);
+	public SculkFurnaceBlockEntity(BlockPos pos, BlockState state) {
+		this(DTBlockEntities.SCULK_FURNACE.get(), pos, state);
 	}
 
 
-	public static CrusherBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		return new CrusherBlockEntity(type, pos, state);
+	public static SculkFurnaceBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		return new SculkFurnaceBlockEntity(type, pos, state);
 	};
 
 
 
 
 	@Override
-	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
+	public void serverTick(Level level, BlockPos pos, BlockState state, SculkFurnaceBlockEntity entity) {
 		if (level.isClientSide()) {
 			return;
 		}
@@ -60,8 +54,8 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				.orElse(null);
 
 		if (recipe == null) {
-			if (state.getValue(CrusherBlock.LIT)) {
-				level.setBlock(pos, state.setValue(CrusherBlock.LIT, false), 3);
+			if (state.getValue(SculkFurnaceBlock.LIT)) {
+				level.setBlock(pos, state.setValue(SculkFurnaceBlock.LIT, false), 3);
 			}
 			if (entity.progress > 0) {
 				entity.progress = 0;
@@ -85,8 +79,8 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		boolean hasEnergy = entity.energy >= energyCost;
 
 		boolean isWorking = canOutput && hasEnergy;
-		if (state.getValue(CrusherBlock.LIT) != isWorking) {
-			level.setBlock(pos, state.setValue(CrusherBlock.LIT, isWorking), 3);
+		if (state.getValue(SculkFurnaceBlock.LIT) != isWorking) {
+			level.setBlock(pos, state.setValue(SculkFurnaceBlock.LIT, isWorking), 3);
 		}
 
 		if (isWorking) {
@@ -135,7 +129,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		LabelWidget title = new LabelWidget(
 				8,
 				8,
-				Component.translatable("block.deep_tech.machine_crusher")
+				Component.translatable("block.deep_tech.machine_furnace")
 		);
 
 		title.setColor(0xFF5D5F60);

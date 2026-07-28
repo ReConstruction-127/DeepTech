@@ -13,17 +13,6 @@ public class ProgressBarWidget extends Widget {
     private final ResourceTexture background;
     private final ResourceTexture foreground;
 
-    /**
-     * 水平进度条
-     * @param x X坐标
-     * @param y Y坐标
-     * @param width 宽度
-     * @param height 高度
-     * @param progressGetter 当前进度
-     * @param maxProgressGetter 最大进度
-     * @param background 背景纹理
-     * @param foreground 前景纹理
-     */
     public ProgressBarWidget(int x, int y, int width, int height,
                              Supplier<Integer> progressGetter,
                              Supplier<Integer> maxProgressGetter,
@@ -40,22 +29,34 @@ public class ProgressBarWidget extends Widget {
     public void drawInBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         int progress = progressGetter.get();
         int maxProgress = maxProgressGetter.get();
-        if (maxProgress <= 0) return;
 
-        // 绘制背景
+        // ========== 1. 背景纹理 ==========
         background.draw(graphics, mouseX, mouseY,
                 getPosition().x, getPosition().y,
                 getSize().width, getSize().height);
 
-        // 计算进度宽度
-        int progressWidth = (int) ((float) progress / maxProgress * getSize().width);
-        if (progressWidth <= 0) return;
+        // ========== 2. 无进度时不显示前景 ==========
+        if (progress <= 0 || maxProgress <= 0) {
+            return;
+        }
 
-        // 裁剪：只显示前景的左侧部分
+        // ========== 3. 计算进度比例 ==========
+        float ratio = (float) progress / maxProgress;
+        if (ratio > 1.0f) ratio = 1.0f;
+
+        int displayWidth = (int) (getSize().width * ratio);
+
+        // ========== 调试日志（只在客户端输出，避免刷屏） ==========
+        if (progress % 10 == 0) {
+            System.out.println("🔍 ProgressBar: " + progress + "/" + maxProgress + " = " + ratio + ", width=" + displayWidth);
+        }
+
+        // ========== 4. 裁剪绘制前景 ==========
+        // 注意：enableScissor 的参数是 (x1, y1, x2, y2)，即左上角和右下角
         graphics.enableScissor(
                 getPosition().x,
                 getPosition().y,
-                getPosition().x + progressWidth,
+                getPosition().x + displayWidth,
                 getPosition().y + getSize().height
         );
 

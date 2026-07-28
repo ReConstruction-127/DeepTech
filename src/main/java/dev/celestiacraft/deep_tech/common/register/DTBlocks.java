@@ -4,15 +4,16 @@ import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.FurnaceBlock;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 
 public class DTBlocks {
 	public static BlockEntry<BasicBlock> MACHINE_FRAME;
-
 	static {
 		MACHINE_FRAME = DeepTech.REGISTRATE.block("machine_frame", BasicBlock::new)
 				.item()
@@ -34,8 +35,7 @@ public class DTBlocks {
 				.register();
 	}
 
-	public static final BlockEntry<CrusherBlock> MACHINE_CRUSHER;
-
+	public static BlockEntry<CrusherBlock> MACHINE_CRUSHER;
 	static {
 		MACHINE_CRUSHER = DeepTech.REGISTRATE.block("machine_crusher", CrusherBlock::new)
 				.item()
@@ -70,6 +70,51 @@ public class DTBlocks {
 							.forAllStates((state) -> {
 								Direction facing = state.getValue(CrusherBlock.HORIZONTAL_FACING);
 								boolean active = state.getValue(CrusherBlock.LIT);
+
+								return ConfiguredModel.builder()
+										.modelFile(active ? modelOn : modelOff)
+										.rotationY((int) facing.toYRot())
+										.build();
+							});
+				})
+				.register();
+	}
+	public static BlockEntry<SculkFurnaceBlock> MACHINE_SCULK_FURNACE;
+
+	static {
+		MACHINE_SCULK_FURNACE = DeepTech.REGISTRATE.block("machine_sculk_furnace", SculkFurnaceBlock::new)
+				.item()
+				.model(ItemModelGen.withModel("block/machine/machine_furnace_north"))
+				.build()
+				.blockstate((context, provider) -> {
+					BlockModelProvider models = provider.models();
+
+					// 为每个方向创建模型
+					BlockModelBuilder modelOff = models.cube(
+							"machine_furnace_off",
+
+							provider.modLoc("block/machine/furnace/bottom"),
+							provider.modLoc("block/machine/furnace/top_off"),
+							provider.modLoc("block/machine/furnace/face_off"),
+							provider.modLoc("block/machine/furnace/side_off"),
+							provider.modLoc("block/machine/furnace/side_off"),
+							provider.modLoc("block/machine/furnace/side_off")
+					);
+
+					BlockModelBuilder modelOn = models.cube(
+							"machine_furnace_on",
+
+							provider.modLoc("block/machine/furnace/bottom"),
+							provider.modLoc("block/machine/furnace/top_on"),
+							provider.modLoc("block/machine/furnace/face_on"),
+							provider.modLoc("block/machine/furnace/side_on"),
+							provider.modLoc("block/machine/furnace/side_on"),
+							provider.modLoc("block/machine/furnace/side_on")
+					);
+					provider.getVariantBuilder(context.get())
+							.forAllStates((state) -> {
+								Direction facing = state.getValue(SculkFurnaceBlock.HORIZONTAL_FACING);
+								boolean active = state.getValue(SculkFurnaceBlock.LIT);
 
 								return ConfiguredModel.builder()
 										.modelFile(active ? modelOn : modelOff)
