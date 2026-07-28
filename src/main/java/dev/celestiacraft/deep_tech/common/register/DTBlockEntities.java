@@ -6,19 +6,20 @@ import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlockEnti
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
 
 public class DTBlockEntities {
-    public static final BlockEntityEntry<CrusherBlockEntity> CRUSHER =
-            DeepTech.REGISTRATE
-                    .blockEntity("crusher", CrusherBlockEntity::create)  // ✅ 明确类型
-                    .validBlocks(DTBlocks.MACHINE_CRUSHER)
-                    .register();
+	public static final BlockEntityEntry<CrusherBlockEntity> CRUSHER;
+	public static final BlockEntityEntry<SculkFurnaceBlockEntity> SCULK_FURNACE;
 
-    public static final BlockEntityEntry<SculkFurnaceBlockEntity> SCULK_FURNACE =
-            DeepTech.REGISTRATE
-                    .blockEntity("furnace", SculkFurnaceBlockEntity::create)  // ✅ 明确类型
-                    .validBlocks(DTBlocks.MACHINE_SCULK_FURNACE)
-                    .register();
+	static {
+		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
+				.validBlocks(DTBlocks.MACHINE_CRUSHER)
+				.register();
 
-    public static void register() {
-        DeepTech.registerLog("Block Entities");
-    }
+		SCULK_FURNACE = DeepTech.REGISTRATE.blockEntity("furnace", SculkFurnaceBlockEntity::new)
+				.validBlocks(DTBlocks.MACHINE_SCULK_FURNACE)
+				.register();
+	}
+
+	public static void register() {
+		DeepTech.registerLog("Block Entities");
+	}
 }

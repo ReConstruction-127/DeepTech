@@ -12,7 +12,6 @@ import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
-import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -28,18 +27,6 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 	public SculkFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
-
-	public SculkFurnaceBlockEntity(BlockPos pos, BlockState state) {
-		this(DTBlockEntities.SCULK_FURNACE.get(), pos, state);
-	}
-
-
-	public static SculkFurnaceBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		return new SculkFurnaceBlockEntity(type, pos, state);
-	};
-
-
-
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, SculkFurnaceBlockEntity entity) {

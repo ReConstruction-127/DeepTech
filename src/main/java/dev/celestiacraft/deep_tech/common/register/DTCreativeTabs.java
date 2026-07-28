@@ -31,19 +31,6 @@ public class DTCreativeTabs {
 			return CreativeModeTab.builder()
 					.icon(icon)
 					.title(Component.translatable(tranKey))
-					.displayItems((params, output) -> {
-						// ✅ 根据标签页名称添加对应的物品
-						if (name.equals("material")) {
-							output.accept(DTItems.SCULK_CHUNK.get());
-							output.accept(DTItems.SCULK_ALLOY.get());
-							// 后续添加新材料时在这里继续添加
-						} else if (name.equals("machine")) {
-							output.accept(DTBlocks.MACHINE_FRAME.get().asItem());
-							output.accept(DTBlocks.MACHINE_CRUSHER.get().asItem());
-							output.accept(DTBlocks.MACHINE_SCULK_FURNACE.get().asItem());
-							// 后续添加新机器时在这里继续添加
-						}
-					})
 					.build();
 		});
 	}

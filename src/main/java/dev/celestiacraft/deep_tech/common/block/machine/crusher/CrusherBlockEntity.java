@@ -13,12 +13,7 @@ import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
-import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
-import dev.celestiacraft.deep_tech.compat.jei.CrushingRecipeCategory;
-import mezz.jei.api.recipe.category.IRecipeCategory;
-import mezz.jei.api.runtime.IJeiRuntime;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -32,21 +27,11 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> implements IUIHolder.BlockEntityUI {
 	private static final int ELEMENTS_TEXTURE_SIZE = 256;
-	private static final ResourceLocation ELEMENTS_TEXTURE =
-			DeepTech.loadResource("textures/gui/elements/elements.png");
+	private static final ResourceLocation ELEMENTS_TEXTURE = DeepTech.loadResource("textures/gui/elements/elements.png");
 
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
-
-	public CrusherBlockEntity(BlockPos pos, BlockState state) {
-		this(DTBlockEntities.CRUSHER.get(), pos, state);
-	}
-
-
-	public static CrusherBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		return new CrusherBlockEntity(type, pos, state);
-	};
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
