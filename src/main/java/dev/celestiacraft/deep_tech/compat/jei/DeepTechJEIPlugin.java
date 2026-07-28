@@ -4,39 +4,48 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTBlocks;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
+import dev.celestiacraft.deep_tech.compat.jei.category.CrushingCategory;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
-import mezz.jei.api.recipe.RecipeType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 @JeiPlugin
 public class DeepTechJEIPlugin implements IModPlugin {
+	@Override
+	public @NotNull ResourceLocation getPluginUid() {
+		return DeepTech.loadResource("jei_plugin");
+	}
 
+	@Override
+	public void registerCategories(IRecipeCategoryRegistration registration) {
+		IGuiHelper helper = registration.getJeiHelpers().getGuiHelper();
 
+		registration.addRecipeCategories(CrushingCategory.builder(helper));
+	}
 
-    @Override
-    public @NotNull ResourceLocation getPluginUid() {
-        return new ResourceLocation(DeepTech.MODID, "jei_plugin");
-    }
+	@Override
+	public void registerRecipes(@NotNull IRecipeRegistration registration) {
+		Level level = Minecraft.getInstance().level;
+		if (level == null) {
+			return;
+		}
+		RecipeManager manager = Minecraft.getInstance().level.getRecipeManager();
 
-    @Override
-    public void registerCategories(IRecipeCategoryRegistration registration) {
-        var guiHelper = registration.getJeiHelpers().getGuiHelper();
-        registration.addRecipeCategories(new CrushingRecipeCategory(guiHelper));
-    }
+		List<CrushingRecipe> crushing = manager.getAllRecipesFor(DTRecipes.CRUSHING.get());
 
-    @Override
-    public void registerRecipes(IRecipeRegistration registration) {
-        var level = Minecraft.getInstance().level;
-        if (level == null) return;
+		registration.addRecipes(DTJeiRecipeType.CRUSHING, crushing);
+	}
 
         // ✅ 直接获取所有 CrushingRecipe，不需要遍历 Map
         // registerRecipes 中

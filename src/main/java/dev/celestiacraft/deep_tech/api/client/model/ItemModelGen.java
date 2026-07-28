@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.client;
+package dev.celestiacraft.deep_tech.api.client.model;
 
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateItemModelProvider;
