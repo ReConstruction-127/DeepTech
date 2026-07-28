@@ -1,1 +1,1 @@
-dev.celestiacraft.deep_tech.compat.kubejs.DTKubeJSPlugin
+dev.celestiacraft.deep_tech.compat.kubejs.DeepTechKubeJSPlugin

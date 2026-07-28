@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.api.register.recipe;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -7,10 +8,16 @@ import net.minecraft.world.item.crafting.RecipeType;
 import java.util.function.Supplier;
 
 public class RecipeRegistry<T extends Recipe<?>> implements Supplier<RecipeType<T>> {
+	private final ResourceLocation name;
 	private final Supplier<RecipeType<T>> type;
 	private final Supplier<RecipeSerializer<T>> serializer;
 
-	public RecipeRegistry(Supplier<RecipeType<T>> type, Supplier<RecipeSerializer<T>> serializer) {
+	public RecipeRegistry(
+			ResourceLocation name,
+			Supplier<RecipeType<T>> type,
+			Supplier<RecipeSerializer<T>> serializer
+	) {
+		this.name = name;
 		this.type = type;
 		this.serializer = serializer;
 	}
@@ -34,5 +41,9 @@ public class RecipeRegistry<T extends Recipe<?>> implements Supplier<RecipeType<
 
 	public Supplier<RecipeSerializer<T>> serializerHolder() {
 		return serializer;
+	}
+
+	public String getName() {
+		return name.toString();
 	}
 }
