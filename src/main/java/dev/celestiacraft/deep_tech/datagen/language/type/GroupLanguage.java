@@ -2,7 +2,7 @@ package dev.celestiacraft.deep_tech.datagen.language.type;
 
 import dev.celestiacraft.deep_tech.datagen.language.LanguageGenerate;
 
-public class ItemGroupLanguage extends LanguageGenerate {
+public class GroupLanguage extends LanguageGenerate {
 	public static void addLang() {
 		addCreativeTabLang(
 				"material",
