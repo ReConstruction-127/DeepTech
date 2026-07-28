@@ -3,6 +3,7 @@ package dev.celestiacraft.deep_tech.datagen.language;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.datagen.language.type.BlockLanguage;
 import dev.celestiacraft.deep_tech.datagen.language.type.GuiLanguage;
+import dev.celestiacraft.deep_tech.datagen.language.type.GroupLanguage;
 import dev.celestiacraft.deep_tech.datagen.language.type.ItemLanguage;
 import dev.celestiacraft.deep_tech.datagen.language.type.OtherLanguage;
 
