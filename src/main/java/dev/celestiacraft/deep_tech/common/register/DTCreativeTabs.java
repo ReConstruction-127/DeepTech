@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.common.register;
 
 import com.tterrag.registrate.Registrate;
 import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -22,7 +23,7 @@ public class DTCreativeTabs {
 		TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DeepTech.MODID);
 
 		MATERIAL = addCreativeModeTab("material", () -> DTItems.SCULK_CHUNK.asStack());
-		MACHINE = addCreativeModeTab("machine", () -> DTBlocks.MACHINE_CRUSHER.asStack());
+		MACHINE = addCreativeModeTab("machine", () -> MachineBlocks.CRUSHER.asStack());
 	}
 
 	private static Supplier<CreativeModeTab> addCreativeModeTab(String name, Supplier<ItemStack> icon) {

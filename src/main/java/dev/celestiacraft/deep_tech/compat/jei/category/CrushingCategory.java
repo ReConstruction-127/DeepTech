@@ -2,7 +2,7 @@ package dev.celestiacraft.deep_tech.compat.jei.category;
 
 import dev.celestiacraft.deep_tech.api.client.texture.DTTextures;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
-import dev.celestiacraft.deep_tech.common.register.DTBlocks;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -17,10 +17,10 @@ public class CrushingCategory {
 		IDrawable slotDrawable = helper.getSlotDrawable();
 
 		return SimpleJeiCategory.builder(DTJeiRecipeType.CRUSHING, helper)
-				.setTitle(DTBlocks.MACHINE_CRUSHER.get().getName())
+				.setTitle(MachineBlocks.CRUSHER.get().getName())
 				// 这个setSize()是必须的
 				.setSize(128, 64)
-				.setIcon(DTBlocks.MACHINE_CRUSHER.asStack())
+				.setIcon(MachineBlocks.CRUSHER.asStack())
 				.setRecipe((builder, recipe, group) -> {
 					builder.addSlot(RecipeIngredientRole.INPUT, 10, 20)
 							.addIngredients(recipe.getInput());

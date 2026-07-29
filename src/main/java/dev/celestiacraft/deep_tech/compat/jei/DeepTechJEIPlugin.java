@@ -2,8 +2,8 @@ package dev.celestiacraft.deep_tech.compat.jei;
 
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
-import dev.celestiacraft.deep_tech.common.register.DTBlocks;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.deep_tech.compat.jei.category.CrushingCategory;
 import mezz.jei.api.IModPlugin;
@@ -53,14 +53,14 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		addCatalystsForVanillaRecipe(registration);
 
 		registration.addRecipeCatalyst(
-				DTBlocks.MACHINE_CRUSHER.get(),
+				MachineBlocks.CRUSHER.get(),
 				DTJeiRecipeType.CRUSHING
 		);
 	}
 
 	private void addCatalystsForVanillaRecipe(@NotNull IRecipeCatalystRegistration registration) {
 		registration.addRecipeCatalyst(
-				DTBlocks.MACHINE_SCULK_FURNACE.asItem(),
+				MachineBlocks.SCULK_FURNACE.asItem(),
 				RecipeTypes.SMELTING,
 				RecipeTypes.BLASTING,
 				RecipeTypes.SMOKING

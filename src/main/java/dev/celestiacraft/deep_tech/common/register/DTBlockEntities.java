@@ -4,6 +4,7 @@ import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 
 public class DTBlockEntities {
 	public static final BlockEntityEntry<CrusherBlockEntity> CRUSHER;
@@ -11,11 +12,11 @@ public class DTBlockEntities {
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::create)
-				.validBlocks(DTBlocks.MACHINE_CRUSHER)
+				.validBlock(MachineBlocks.CRUSHER)
 				.register();
 
 		SCULK_FURNACE = DeepTech.REGISTRATE.blockEntity("furnace", SculkFurnaceBlockEntity::create)
-				.validBlocks(DTBlocks.MACHINE_SCULK_FURNACE)
+				.validBlocks(MachineBlocks.SCULK_FURNACE)
 				.register();
 	}
 

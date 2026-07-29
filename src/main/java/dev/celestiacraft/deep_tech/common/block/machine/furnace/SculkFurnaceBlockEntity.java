@@ -9,17 +9,12 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
-import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
-import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
-import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -51,7 +46,9 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, SculkFurnaceBlockEntity entity) {
-		if (level.isClientSide()) return;
+		if (level.isClientSide()) {
+			return;
+		}
 
 		// 使用原版熔炉配方
 		RecipeType<SmeltingRecipe> recipeType = RecipeType.SMELTING;

@@ -28,6 +28,7 @@ public class DeepTech {
 		IEventBus bus = context.getModEventBus();
 
 		DTItems.register();
+//		DTMaterials.register();
 		DTBlocks.register();
 		DTBlockEntities.register();
 		DTRecipes.register(bus);
