@@ -10,14 +10,12 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,28 +50,20 @@ public class DeepTechJEIPlugin implements IModPlugin {
 
 	@Override
 	public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
-		addVanillaCatalysts(registration);
+		addCatalystsForVanillaRecipe(registration);
 
 		registration.addRecipeCatalyst(
 				DTBlocks.MACHINE_CRUSHER.get(),
 				DTJeiRecipeType.CRUSHING
 		);
-
-		// ✅ 电炉催化剂（显示在原版熔炉配方页面左上角）
-		// 使用原版熔炉配方的 RecipeType
-		RecipeType<SmeltingRecipe> smeltingType = RecipeType.create(
-				"minecraft", "smelting", SmeltingRecipe.class
-		);
-		registration.addRecipeCatalyst(
-				new ItemStack(DTBlocks.MACHINE_SCULK_FURNACE.get()),
-				smeltingType
-		);
 	}
 
-	private void addVanillaCatalysts(@NotNull IRecipeCatalystRegistration registration) {
+	private void addCatalystsForVanillaRecipe(@NotNull IRecipeCatalystRegistration registration) {
 		registration.addRecipeCatalyst(
 				DTBlocks.MACHINE_SCULK_FURNACE.asItem(),
-				RecipeTypes.BLASTING
+				RecipeTypes.SMELTING,
+				RecipeTypes.BLASTING,
+				RecipeTypes.SMOKING
 		);
 	}
 }
