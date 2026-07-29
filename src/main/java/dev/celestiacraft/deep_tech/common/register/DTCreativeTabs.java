@@ -48,7 +48,7 @@ public class DTCreativeTabs {
 	}
 
 	public static void register(IEventBus bus) {
-		DeepTech.registerLog("Creative Tabs");
 		TABS.register(bus);
+		DeepTech.registerLog("Creative Tabs");
 	}
 }
