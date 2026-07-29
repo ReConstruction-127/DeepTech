@@ -10,6 +10,11 @@ public class BlockLanguage extends LanguageGenerate {
 				"粉碎机"
 		);
 		addBlockLanguage(
+				"machine_sculk_furnace",
+				"Sculk Furnace",
+				"幽匿电炉"
+		);
+		addBlockLanguage(
 				"machine_frame",
 				"Machine Frame",
 				"机器框架"
