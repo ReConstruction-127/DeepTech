@@ -19,29 +19,29 @@ public class CrushingRecipeGen extends DTRecipeProvider {
 		CrushingRecipeBuilder.builder()
 				.input(Tags.Items.COBBLESTONE)
 				.output(Blocks.GRAVEL)
-				.energyCost(10)
+				.energyCost(20)
 				.processingTime(100)
 				.save(consumer, save("crushing/gravel"));
 
 		CrushingRecipeBuilder.builder()
 				.input(Blocks.STONE)
 				.output(Blocks.COBBLESTONE)
-				.energyCost(10)
+				.energyCost(20)
 				.processingTime(100)
 				.save(consumer, save("crushing/cobblestone"));
 
 		CrushingRecipeBuilder.builder()
 				.input(Blocks.GRAVEL)
 				.output(Blocks.SAND)
-				.energyCost(10)
+				.energyCost(20)
 				.processingTime(100)
 				.save(consumer, save("crushing/sand"));
 
 		CrushingRecipeBuilder.builder()
 				.input(Tags.Items.RAW_MATERIALS_IRON)
 				.output(Items.IRON_NUGGET,12)
-				.energyCost(15)
-				.processingTime(160)
+				.energyCost(30)
+				.processingTime(150)
 				.save(consumer, save("crushing/raw_iron"));
 	}
 }

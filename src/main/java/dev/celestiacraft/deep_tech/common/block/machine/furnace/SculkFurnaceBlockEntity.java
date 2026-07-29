@@ -12,6 +12,7 @@ import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
+import dev.celestiacraft.deep_tech.common.gui.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
@@ -23,6 +24,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -51,9 +53,12 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 	public void serverTick(Level level, BlockPos pos, BlockState state, SculkFurnaceBlockEntity entity) {
 		if (level.isClientSide()) return;
 
-		// 查询配方（复用 inventoryWrapper）
-		CrushingRecipe recipe = level.getRecipeManager()
-				.getRecipeFor(DTRecipes.CRUSHING.getRecipeType(), inventoryWrapper, level)
+		// 使用原版熔炉配方
+		RecipeType<SmeltingRecipe> recipeType = RecipeType.SMELTING;
+		SimpleMachineInventory inventoryWrapper = new SimpleMachineInventory(entity.inventory);
+
+		SmeltingRecipe recipe = level.getRecipeManager()
+				.getRecipeFor(recipeType, inventoryWrapper, level)
 				.orElse(null);
 
 		// 无配方或无法处理
@@ -71,10 +76,12 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 			return;
 		}
 
-		entity.maxProgress = recipe.getProcessingTime();
+		// 固定参数：处理时间 100 tick（5 秒），能量消耗 20 FE/tick
+		int processingTime = 100;
+		int energyCost = 20;
+		entity.maxProgress = processingTime;
 
-		ItemStack output = recipe.getOutput();
-		int energyCost = recipe.getEnergyCost();
+		ItemStack output = recipe.getResultItem(level.registryAccess());
 
 		ItemStack currentOutput = entity.inventory.getStackInSlot(1);
 		boolean canOutput = currentOutput.isEmpty()
@@ -149,8 +156,8 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 				getMaxEnergyStored()
 		));
 
-		group.addWidget(new ProgressBarWidget(
-				68, 39, 16, 16,
+		group.addWidget(new VerticalProgressBarWidget(
+				68, 40, 14, 14,
 				this::getProgress,
 				this::getMaxProgress,
 				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_furnace_back.png"),
