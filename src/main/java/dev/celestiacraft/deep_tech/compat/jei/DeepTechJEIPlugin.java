@@ -8,16 +8,14 @@ import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.deep_tech.compat.jei.category.CrushingCategory;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +23,6 @@ import java.util.List;
 
 @JeiPlugin
 public class DeepTechJEIPlugin implements IModPlugin {
-
 	@Override
 	public @NotNull ResourceLocation getPluginUid() {
 		return DeepTech.loadResource("jei_plugin");
@@ -46,28 +43,27 @@ public class DeepTechJEIPlugin implements IModPlugin {
 
 		RecipeManager manager = level.getRecipeManager();
 
-		// ✅ 获取所有 CrushingRecipe
 		List<CrushingRecipe> crushing = manager.getAllRecipesFor(DTRecipes.CRUSHING.getRecipeType());
 
 		registration.addRecipes(DTJeiRecipeType.CRUSHING, crushing);
 	}
 
 	@Override
-	public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-		// ✅ 只保留一个 registerRecipeCatalysts 方法
+	public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
+		addCatalystsForVanillaRecipe(registration);
+
 		registration.addRecipeCatalyst(
-				new ItemStack(DTBlocks.MACHINE_CRUSHER.get()),
+				DTBlocks.MACHINE_CRUSHER.get(),
 				DTJeiRecipeType.CRUSHING
 		);
+	}
 
-		// ✅ 电炉催化剂（显示在原版熔炉配方页面左上角）
-		// 使用原版熔炉配方的 RecipeType
-		RecipeType<SmeltingRecipe> smeltingType = RecipeType.create(
-				"minecraft", "smelting", SmeltingRecipe.class
-		);
+	private void addCatalystsForVanillaRecipe(@NotNull IRecipeCatalystRegistration registration) {
 		registration.addRecipeCatalyst(
-				new ItemStack(DTBlocks.MACHINE_SCULK_FURNACE.get()),
-				smeltingType
+				DTBlocks.MACHINE_SCULK_FURNACE.asItem(),
+				RecipeTypes.SMELTING,
+				RecipeTypes.BLASTING,
+				RecipeTypes.SMOKING
 		);
 	}
 }
