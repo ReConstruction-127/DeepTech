@@ -39,7 +39,6 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 		return List.of();
 	}
 
-
 	private Collection<IGuiClickableArea> crusher(ModularUIGuiContainer screen) {
 		return List.of(IGuiClickableArea.createBasic(
 				68,
@@ -49,7 +48,6 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 				DTJeiRecipeType.CRUSHING
 		));
 	}
-
 
 	private Collection<IGuiClickableArea> sculkFurnace(ModularUIGuiContainer screen) {
 		return List.of(IGuiClickableArea.createBasic(

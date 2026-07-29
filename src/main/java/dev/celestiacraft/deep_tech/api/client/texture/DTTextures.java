@@ -7,8 +7,6 @@ public class DTTextures {
 
 	static {
 		PROGRESS_FRONT = addGuiTexture("elements/jei/elements", 0, 0, 16, 7);
-	}
-	static {
 		ICON_CRUSHER = addGuiTexture("elements/jei/elements", 224, 0, 32, 32);
 	}
 

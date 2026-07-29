@@ -33,11 +33,8 @@ public class CrushingCategory {
 					slotDrawable.draw(graphics, 9, 19);
 					// 输出槽
 					slotDrawable.draw(graphics, 61, 19);
-
 					DTTextures.PROGRESS_FRONT.render(graphics, 36, 24);
-
 					DTTextures.ICON_CRUSHER.render(graphics, 88, 12);
-
 					Font font = Minecraft.getInstance().font;
 
 					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");
