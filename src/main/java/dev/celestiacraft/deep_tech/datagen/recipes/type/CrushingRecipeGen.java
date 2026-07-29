@@ -39,9 +39,16 @@ public class CrushingRecipeGen extends DTRecipeProvider {
 
 		CrushingRecipeBuilder.builder()
 				.input(Tags.Items.RAW_MATERIALS_IRON)
-				.output(Items.IRON_NUGGET,12)
+				.output(Items.IRON_NUGGET, 12)
 				.energyCost(30)
 				.processingTime(150)
 				.save(consumer, save("crushing/raw_iron"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Tags.Items.RAW_MATERIALS_GOLD)
+				.output(Items.GOLD_NUGGET, 12)
+				.energyCost(30)
+				.processingTime(150)
+				.save(consumer, save("crushing/raw_gold"));
 	}
 }
