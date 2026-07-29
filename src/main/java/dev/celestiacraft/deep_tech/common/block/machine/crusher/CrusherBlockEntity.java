@@ -14,8 +14,8 @@ import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -123,7 +123,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		LabelWidget title = new LabelWidget(
 				8,
 				8,
-				Component.translatable("block.deep_tech.machine_crusher")
+				MachineBlocks.CRUSHER.get().getName()
 		);
 		title.setColor(0xFF5D5F60);
 		group.addWidget(title);

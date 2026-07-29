@@ -12,8 +12,8 @@ import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -132,7 +132,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 		LabelWidget title = new LabelWidget(
 				8,
 				8,
-				Component.translatable("block.deep_tech.machine_sculk_furnace")
+				MachineBlocks.SCULK_FURNACE.get().getName()
 		);
 		title.setColor(0xFF5D5F60);
 		group.addWidget(title);
