@@ -2,9 +2,11 @@ package dev.celestiacraft.deep_tech;
 
 import com.tterrag.registrate.Registrate;
 import dev.celestiacraft.deep_tech.common.register.*;
+import dev.celestiacraft.deep_tech.config.CommonConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,5 +36,11 @@ public class DeepTech {
 		DTRecipes.register(bus);
 		// 创造模式标签页注册请确保一定在最下面
 		DTCreativeTabs.register(bus);
+
+		registerConfig(context);
+	}
+
+	private static void registerConfig(FMLJavaModLoadingContext context) {
+		context.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, "nebula/deep_tech/common.toml");
 	}
 }

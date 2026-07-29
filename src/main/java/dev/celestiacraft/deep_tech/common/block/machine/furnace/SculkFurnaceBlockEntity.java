@@ -13,6 +13,7 @@ import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.deep_tech.config.common.machine.SculkFurnaceConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
@@ -32,6 +33,16 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 	public SculkFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		inventoryWrapper = new SimpleMachineInventory(inventory);
+	}
+
+	@Override
+	public int getMachineMaxEnergy() {
+		return SculkFurnaceConfig.MAX_ENERGY.get();
+	}
+
+	@Override
+	public int getMaxReceive() {
+		return SculkFurnaceConfig.MAX_RECEIVE.get();
 	}
 
 	@Override

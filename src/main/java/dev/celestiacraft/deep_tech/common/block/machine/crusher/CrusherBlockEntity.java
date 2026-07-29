@@ -15,6 +15,7 @@ import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.deep_tech.config.common.machine.CrusherConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
@@ -32,6 +33,16 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		inventoryWrapper = new SimpleMachineInventory(inventory);
+	}
+
+	@Override
+	public int getMachineMaxEnergy() {
+		return CrusherConfig.MAX_ENERGY.get();
+	}
+
+	@Override
+	public int getMaxReceive() {
+		return CrusherConfig.MAX_RECEIVE.get();
 	}
 
 	@Override

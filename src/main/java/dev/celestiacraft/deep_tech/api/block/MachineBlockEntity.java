@@ -23,17 +23,28 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 
 @Getter
-public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T> {
+public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T>, IMachineEnergyConfig {
+	protected int progress = 0;
+	protected int maxProgress = 100;
+	protected int energy = 0;
+
 	public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
 
-	protected int progress = 0;
-	protected int maxProgress = 100;
-	protected int energy = 0;
-	protected final int maxEnergy = 10000;
-	protected final int maxReceive = 100;
-	protected final int maxExtract = 100;
+	/**
+	 * 由于这属于处理机器
+	 * <p>
+	 * 因此让电力输出为0
+	 * <p>
+	 * (什么叫你的工作机器的电能抽出来)
+	 *
+	 * @return
+	 */
+	@Override
+	public int getMaxExtract() {
+		return 0;
+	}
 
 	// 在 MachineBlockEntity 中添加这个方法
 	public void sync() {
@@ -45,53 +56,8 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 			}
 		}
 	}
-	protected final IEnergyStorage energyStorage = new IEnergyStorage() {
-		@Override
-		public int receiveEnergy(int maxReceive, boolean simulate) {
-			int received = Math.min(maxReceive, maxEnergy - energy);
-			if (!simulate && received > 0) {
-				energy += received;
-				setChanged();
-				if (level != null && !level.isClientSide) {
-					sync();
-				}
-			}
-			return received;
-		}
 
-		@Override
-		public int extractEnergy(int maxExtract, boolean simulate) {
-			int extracted = Math.min(maxExtract, energy);
-			if (!simulate && extracted > 0) {
-				energy -= extracted;
-				setChanged();
-				if (level != null && !level.isClientSide) {
-					sync();
-				}
-			}
-			return extracted;
-		}
-
-		@Override
-		public int getEnergyStored() {
-			return energy;
-		}
-
-		@Override
-		public int getMaxEnergyStored() {
-			return maxEnergy;
-		}
-
-		@Override
-		public boolean canExtract() {
-			return true;
-		}
-
-		@Override
-		public boolean canReceive() {
-			return true;
-		}
-	};
+	protected final IEnergyStorage energyStorage = new MachineEnergyCapability(this);
 
 	@Getter
 	protected final ItemStackHandler inventory = new ItemStackHandler(2) {
@@ -215,6 +181,6 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	}
 
 	public int getMaxEnergyStored() {
-		return maxEnergy;
+		return getMachineMaxEnergy();
 	}
 }
