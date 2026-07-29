@@ -1,27 +1,14 @@
 package dev.celestiacraft.deep_tech.common.register;
 
-import com.tterrag.registrate.util.entry.ItemEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
-import dev.celestiacraft.libs.api.register.item.BasicItem;
+import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
+import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
 
 public class DTItems {
-	public static ItemEntry<BasicItem> SCULK_CHUNK;
-	public static ItemEntry<BasicItem> SCULK_ALLOY;
-
-	static {
-		DTCreativeTabs.getTab("material");
-
-		SCULK_CHUNK = DeepTech.REGISTRATE.item("sculk_chunk", BasicItem::new)
-				.model(ItemModelGen.generated("item/sculk_chunk"))
-				.register();
-
-		SCULK_ALLOY = DeepTech.REGISTRATE.item("sculk_alloy", BasicItem::new)
-				.model(ItemModelGen.generated("item/sculk_alloy"))
-				.register();
-	}
-
 	public static void register() {
+		MaterialItems.register();
+		ToolItems.register();
+
 		DeepTech.registerLog("Items");
 	}
 }

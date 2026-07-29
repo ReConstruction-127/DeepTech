@@ -5,6 +5,7 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.FrameBlock;
 import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
+import dev.celestiacraft.deep_tech.tags.DeepTechBlockTags;
 
 public class FrameBlocks {
 	public static final BlockEntry<FrameBlock> MACHINE_FRAME;
@@ -16,6 +17,7 @@ public class FrameBlocks {
 				.item()
 				.model(ItemModelGen.withModel("block/machine_frame"))
 				.build()
+				.tag(DeepTechBlockTags.WRENCH_PICKUP)
 				.blockstate(FrameBlock.genBlockState("machine_frame"))
 				.register();
 	}

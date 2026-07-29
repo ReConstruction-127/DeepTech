@@ -3,6 +3,8 @@ package dev.celestiacraft.deep_tech.common.register;
 import com.tterrag.registrate.Registrate;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
+import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -16,14 +18,17 @@ import java.util.function.Supplier;
 public class DTCreativeTabs {
 	public static final DeferredRegister<CreativeModeTab> TABS;
 
-	public static final Supplier<CreativeModeTab> MATERIAL;
-	public static final Supplier<CreativeModeTab> MACHINE;
+	public static final Supplier<CreativeModeTab>
+			MATERIAL,
+			MACHINE,
+			TOOL;
 
 	static {
 		TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DeepTech.MODID);
 
-		MATERIAL = addCreativeModeTab("material", () -> DTItems.SCULK_CHUNK.asStack());
+		MATERIAL = addCreativeModeTab("material", () -> MaterialItems.SCULK_CHUNK.asStack());
 		MACHINE = addCreativeModeTab("machine", () -> MachineBlocks.CRUSHER.asStack());
+		TOOL = addCreativeModeTab("tool", () -> ToolItems.WRENCH.asStack());
 	}
 
 	private static Supplier<CreativeModeTab> addCreativeModeTab(String name, Supplier<ItemStack> icon) {
