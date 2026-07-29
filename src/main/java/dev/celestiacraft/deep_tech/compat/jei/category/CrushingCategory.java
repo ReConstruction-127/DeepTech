@@ -29,9 +29,10 @@ public class CrushingCategory {
 							.addItemStack(recipe.getOutput());
 				})
 				.setDraw((recipe, view, graphics, mouseX, mouseY) -> {
-
-					slotDrawable.draw(graphics, 9, 19);   // 输入槽
-					slotDrawable.draw(graphics, 61, 19);   // 输出槽
+					// 输入槽
+					slotDrawable.draw(graphics, 9, 19);
+					// 输出槽
+					slotDrawable.draw(graphics, 61, 19);
 
 					DTTextures.PROGRESS_FRONT.render(graphics, 36, 24);
 

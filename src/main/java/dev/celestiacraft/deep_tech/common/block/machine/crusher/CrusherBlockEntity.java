@@ -13,15 +13,12 @@ import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
-import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,22 +32,12 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		this.inventoryWrapper = new SimpleMachineInventory(this.inventory);
+		inventoryWrapper = new SimpleMachineInventory(inventory);
 	}
-
-	public CrusherBlockEntity(BlockPos pos, BlockState state) {
-		this(DTBlockEntities.CRUSHER.get(), pos, state);
-	}
-
-	public static CrusherBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		return new CrusherBlockEntity(type, pos, state);
-	}
-
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
 		if (level.isClientSide()) return;
 
-		// 查询配方（复用 inventoryWrapper）
 		CrushingRecipe recipe = level.getRecipeManager()
 				.getRecipeFor(DTRecipes.CRUSHING.getRecipeType(), inventoryWrapper, level)
 				.orElse(null);
