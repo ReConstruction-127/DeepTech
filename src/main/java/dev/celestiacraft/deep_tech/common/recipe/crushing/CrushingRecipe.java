@@ -92,51 +92,57 @@ public class CrushingRecipe implements Recipe<Container> {
 		return list;
 	}
 
-	public ModularUI createModularUI(Player player) {
-		ItemStackHandler handler = new ItemStackHandler(2);
-		handler.setStackInSlot(0, input.getItems()[0].copy());
-		handler.setStackInSlot(1, output.copy());
-		SimpleMachineInventory container = new SimpleMachineInventory(handler);
-
-		int width = 120;
-		int height = 60;
-		ModularUI ui = new ModularUI(width, height, null, player);
-
-		WidgetGroup group = new WidgetGroup(0, 0, width, height);
-
-		// 输入槽
-		SlotWidget inputSlot = new SlotWidget();
-		inputSlot.setContainerSlot(container, 0);
-		inputSlot.setSelfPosition(new Position(10, 22));
-		inputSlot.setBackground(SlotWidget.ITEM_SLOT_TEXTURE);
-		inputSlot.setCanTakeItems(false);
-		inputSlot.setCanPutItems(false);
-		group.addWidget(inputSlot);
-
-		// 输出槽
-		SlotWidget outputSlot = new SlotWidget();
-		outputSlot.setContainerSlot(container, 1);
-		outputSlot.setSelfPosition(new Position(90, 22));
-		outputSlot.setBackground(SlotWidget.ITEM_SLOT_TEXTURE);
-		outputSlot.setCanTakeItems(false);
-		outputSlot.setCanPutItems(false);
-		group.addWidget(outputSlot);
-
-		// 用 ProgressBarWidget + 动态 Supplier
-		group.addWidget(new ProgressBarWidget(
-				60, 28,                     // 居中位置
-				16, 16,                     // 尺寸 16x16
-				JEIProgressSupplier.INSTANCE::getProgress,
-				() -> 100,
-				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_back.png"),
-				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_front.png")
-		));
-
-		// 能量和时间
-		group.addWidget(new LabelWidget(8, 5, Component.literal("⚡ " + energyCost + " FE")));
-		group.addWidget(new LabelWidget(8, 48, Component.literal("⏱ " + processingTime + " tick")));
-
-		ui.widget(group);
-		return ui;
-	}
+//	public ModularUI createModularUI(Player player) {
+//		ItemStackHandler handler = new ItemStackHandler(2);
+//		handler.setStackInSlot(0, input.getItems()[0].copy());
+//		handler.setStackInSlot(1, output.copy());
+//		SimpleMachineInventory container = new SimpleMachineInventory(handler);
+//
+//		int width = 120;
+//		int height = 60;
+//		ModularUI ui = new ModularUI(width, height, null, player);
+//
+//		WidgetGroup group = new WidgetGroup(0, 0, width, height);
+//
+//		// 输入槽
+//		SlotWidget inputSlot = new SlotWidget();
+//		inputSlot.setContainerSlot(container, 0);
+//		inputSlot.setSelfPosition(new Position(10, 22));
+//		inputSlot.setBackground(SlotWidget.ITEM_SLOT_TEXTURE);
+//		inputSlot.setCanTakeItems(false);
+//		inputSlot.setCanPutItems(false);
+//		group.addWidget(inputSlot);
+//
+//		// 输出槽
+//		SlotWidget outputSlot = new SlotWidget();
+//		outputSlot.setContainerSlot(container, 1);
+//		outputSlot.setSelfPosition(new Position(42, 22));
+//		outputSlot.setBackground(SlotWidget.ITEM_SLOT_TEXTURE);
+//		outputSlot.setCanTakeItems(false);
+//		outputSlot.setCanPutItems(false);
+//		group.addWidget(outputSlot);
+//
+//		ImageWidget progressImage = new ImageWidget();
+//		progressImage.setSelfPosition(new Position(44, 27));
+//		progressImage.setSize(16, 16);
+//		progressImage.setImage(new ResourceTexture(
+//				DeepTech.MODID + ":textures/gui/elements/jei/progressbar/crusher.png"
+//		));
+//		group.addWidget(progressImage);
+//
+//		ImageWidget iconImage = new ImageWidget();
+//		iconImage.setSelfPosition(new Position(69, 20));
+//		iconImage.setSize(32, 32);
+//		iconImage.setImage(new ResourceTexture(
+//				DeepTech.MODID + ":textures/gui/elements/jei/crusher.png"
+//		));
+//		group.addWidget(iconImage);
+//
+//		// 能量和时间
+//		group.addWidget(new LabelWidget(8, 5, Component.literal("⚡ " + energyCost + " FE")));
+//		group.addWidget(new LabelWidget(8, 48, Component.literal("⏱ " + processingTime + " tick")));
+//
+//		ui.widget(group);
+//		return ui;
+//	}
 }

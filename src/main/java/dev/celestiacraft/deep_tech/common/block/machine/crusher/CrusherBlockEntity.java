@@ -28,8 +28,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> implements IUIHolder.BlockEntityUI {
 
+	// 复用 inventoryWrapper，避免每 tick 创建
+	private final SimpleMachineInventory inventoryWrapper;
+	// 用于控制 sync 频率的计数器
+	private int syncCounter = 0;
+
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
+		this.inventoryWrapper = new SimpleMachineInventory(this.inventory);
 	}
 
 	public CrusherBlockEntity(BlockPos pos, BlockState state) {
@@ -42,29 +48,28 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
-		if (level.isClientSide()) {
-			return;
-		}
+		if (level.isClientSide()) return;
 
-		SimpleMachineInventory inventoryWrapper = new SimpleMachineInventory(entity.inventory);
-		RecipeType<CrushingRecipe> recipeType = DTRecipes.CRUSHING.getRecipeType();
+		// 查询配方（复用 inventoryWrapper）
 		CrushingRecipe recipe = level.getRecipeManager()
-				.getRecipeFor(recipeType, inventoryWrapper, level)
+				.getRecipeFor(DTRecipes.CRUSHING.getRecipeType(), inventoryWrapper, level)
 				.orElse(null);
 
+		// 无配方或无法处理
 		if (recipe == null) {
 			if (state.getValue(CrusherBlock.LIT)) {
 				level.setBlock(pos, state.setValue(CrusherBlock.LIT, false), 3);
 			}
 			if (entity.progress > 0) {
 				entity.progress = 0;
-				entity.setChanged();
+				entity.setChanged(); // 状态变化，保存一次
+				entity.sync();       // 通知客户端进度归零
+				entity.syncCounter = 0;
 			}
 			entity.maxProgress = 100;
 			return;
 		}
 
-		// ✅ 直接设置 maxProgress（同步到客户端）
 		entity.maxProgress = recipe.getProcessingTime();
 
 		ItemStack output = recipe.getOutput();
@@ -76,8 +81,9 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				&& currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
 
 		boolean hasEnergy = entity.energy >= energyCost;
-
 		boolean isWorking = canOutput && hasEnergy;
+
+		// 更新方块光照状态
 		if (state.getValue(CrusherBlock.LIT) != isWorking) {
 			level.setBlock(pos, state.setValue(CrusherBlock.LIT, isWorking), 3);
 		}
@@ -85,10 +91,13 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		if (isWorking) {
 			entity.energy -= energyCost;
 			entity.progress++;
-			entity.setChanged();
-				entity.sync();
 
-			// ✅ 使用 maxProgress 判断
+			// 每 5 tick 同步一次进度到客户端（不触发磁盘保存）
+			if (++entity.syncCounter % 5 == 0) {
+				entity.sync();   // 假设 sync() 只发包，不调用 setChanged()
+			}
+
+			// 进度完成
 			if (entity.progress >= entity.maxProgress) {
 				entity.inventory.getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
@@ -97,9 +106,14 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 					currentOutput.grow(output.getCount());
 				}
 				entity.progress = 0;
+				entity.syncCounter = 0;
+				// ✅ 完成时调用一次 setChanged 和 sync
 				entity.setChanged();
 				entity.sync();
 			}
+		} else {
+			// 如果机器停止工作（能量不足或输出满），重置同步计数器
+			entity.syncCounter = 0;
 		}
 	}
 
@@ -134,8 +148,6 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				getMaxEnergyStored()
 		));
 
-		// ✅ 进度条（使用元素纹理）
-		// ✅ 进度条（16x16 独立纹理）
 		group.addWidget(new ProgressBarWidget(
 				68, 39, 16, 16,
 				this::getProgress,
@@ -166,11 +178,9 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		return group;
 	}
 
-
 	private void addPlayerInventory(WidgetGroup group, Player player) {
 		Container inventory = player.getInventory();
 
-		// 主背包 3×9
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
 				SlotWidget slot = new SlotWidget();
@@ -183,7 +193,6 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 			}
 		}
 
-		// 快捷栏 9格
 		for (int col = 0; col < 9; col++) {
 			SlotWidget slot = new SlotWidget();
 			slot.initTemplate();
