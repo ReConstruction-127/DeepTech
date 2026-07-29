@@ -139,8 +139,8 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				68, 39, 16, 16,
 				this::getProgress,
 				this::getMaxProgress,
-				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_back.png"),
-				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_front.png")
+				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/progress_crusher_back.png")),
+				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/progress_crusher_front.png"))
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(inventory);

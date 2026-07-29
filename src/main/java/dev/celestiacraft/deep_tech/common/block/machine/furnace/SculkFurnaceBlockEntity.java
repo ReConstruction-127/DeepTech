@@ -127,7 +127,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 	private WidgetGroup createUIWidget(Player player) {
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-		group.setBackground(new ResourceTexture("deep_tech:textures/gui/sculk_furnace.png"));
+		group.setBackground(new ResourceTexture(DeepTech.loadResource("textures/gui/sculk_furnace.png")));
 
 		LabelWidget title = new LabelWidget(
 				8,
@@ -148,8 +148,8 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 				68, 40, 14, 14,
 				this::getProgress,
 				this::getMaxProgress,
-				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_furnace_back.png"),
-				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_furnace_front.png")
+				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/progress_furnace_back.png")),
+				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/progress_furnace_front.png"))
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
