@@ -10,6 +10,8 @@ public class DTItems {
 	public static ItemEntry<BasicItem> SCULK_ALLOY;
 
 	static {
+		DTCreativeTabs.getTab("material");
+
 		SCULK_CHUNK = DeepTech.REGISTRATE.item("sculk_chunk", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_chunk"))
 				.register();

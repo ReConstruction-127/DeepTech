@@ -12,15 +12,20 @@ import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 
 public class DTBlocks {
-	public static BlockEntry<BasicBlock> MACHINE_FRAME;
+	public static final BlockEntry<BasicBlock> MACHINE_FRAME;
+	public static final BlockEntry<CrusherBlock> MACHINE_CRUSHER;
+	public static final BlockEntry<SculkFurnaceBlock> MACHINE_SCULK_FURNACE;
+
 	static {
+		DTCreativeTabs.getTab("machine");
+
 		MACHINE_FRAME = DeepTech.REGISTRATE.block("machine_frame", BasicBlock::new)
 				.item()
 				.model(ItemModelGen.withModel("block/machine_frame"))
 				.build()
 				.blockstate((context, provider) -> {
-					var models = provider.models();
-					var model = models.cube(
+					BlockModelProvider models = provider.models();
+					BlockModelBuilder model = models.cube(
 							"machine_frame",
 							provider.modLoc("block/machine_frame_top"),
 							provider.modLoc("block/machine_frame_top"),
@@ -32,10 +37,7 @@ public class DTBlocks {
 					provider.simpleBlock(context.get(), model);
 				})
 				.register();
-	}
 
-	public static BlockEntry<CrusherBlock> MACHINE_CRUSHER;
-	static {
 		MACHINE_CRUSHER = DeepTech.REGISTRATE.block("machine_crusher", CrusherBlock::new)
 				.item()
 				.model(ItemModelGen.withModel("block/machine/machine_crusher_north"))
@@ -77,10 +79,7 @@ public class DTBlocks {
 							});
 				})
 				.register();
-	}
-	public static BlockEntry<SculkFurnaceBlock> MACHINE_SCULK_FURNACE;
 
-	static {
 		MACHINE_SCULK_FURNACE = DeepTech.REGISTRATE.block("machine_sculk_furnace", SculkFurnaceBlock::new)
 				.item()
 				.model(ItemModelGen.withModel("block/machine/machine_sculk_furnace_north"))

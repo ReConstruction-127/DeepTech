@@ -21,8 +21,8 @@ public class DTCreativeTabs {
 	static {
 		TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DeepTech.MODID);
 
-		MATERIAL = addCreativeModeTab("material", DTItems.SCULK_CHUNK::asStack);
-		MACHINE = addCreativeModeTab("machine", DTBlocks.MACHINE_CRUSHER::asStack);
+		MATERIAL = addCreativeModeTab("material", () -> DTItems.SCULK_CHUNK.asStack());
+		MACHINE = addCreativeModeTab("machine", () -> DTBlocks.MACHINE_CRUSHER.asStack());
 	}
 
 	private static Supplier<CreativeModeTab> addCreativeModeTab(String name, Supplier<ItemStack> icon) {
