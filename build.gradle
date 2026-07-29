@@ -96,18 +96,8 @@ repositories {
 	mavenLocal()
 
 	maven {
-		url "https://maven.sighs.cc/repository/maven-releases/"
-		content {
-			includeGroup "cc.sighs.auratip"
-			includeGroup "cc.sighs.oelib"
-		}
-	}
-	maven {
-		url "https://maven.sighs.cc/repository/maven-snapshots/"
-		content {
-			includeGroup "cc.sighs.auratip"
-			includeGroup "cc.sighs.oelib"
-		}
+		name "LowDragMC-Ldlib"
+		url "https://maven.firstdarkdev.xyz/snapshots"
 	}
 	maven {
 		name 'Tterrag Maven'
@@ -189,7 +179,7 @@ dependencies {
 	jarJar(group: "dev.celestiacraft", name: "nebula_libs", version: "[${nebula_lib_version}]") { transitive = false }
 
 	// LDLib
-	implementation fg.deobf("curse.maven:ldlib-626676:7339338")
+	implementation fg.deobf("com.lowdragmc.ldlib:ldlib-forge-1.20.1:1.0.50")
 
 	// TEST ONLY CC&A
 	runtimeOnly fg.deobf("curse.maven:createaddition-439890:6306951")
