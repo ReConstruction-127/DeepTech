@@ -1,15 +1,18 @@
 package dev.celestiacraft.deep_tech.compat.jei;
 
+import com.lowdragmc.lowdraglib.gui.modular.ModularUIGuiContainer;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.deep_tech.compat.jei.category.CrushingCategory;
+import dev.celestiacraft.deep_tech.compat.jei.handler.MachineGuiHandler;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -65,5 +68,10 @@ public class DeepTechJEIPlugin implements IModPlugin {
 				RecipeTypes.BLASTING,
 				RecipeTypes.SMOKING
 		);
+	}
+
+	@Override
+	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+		registration.addGuiContainerHandler(ModularUIGuiContainer.class, MachineGuiHandler.INSTANCE);
 	}
 }
