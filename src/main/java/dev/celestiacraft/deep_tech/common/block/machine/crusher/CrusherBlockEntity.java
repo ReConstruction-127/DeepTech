@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> implements IUIHolder.BlockEntityUI {
-
 	// 复用 inventoryWrapper，避免每 tick 创建
 	private final SimpleMachineInventory inventoryWrapper;
 	// 用于控制 sync 频率的计数器
@@ -34,6 +33,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		super(type, pos, state);
 		inventoryWrapper = new SimpleMachineInventory(inventory);
 	}
+
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
 		if (level.isClientSide()) return;
@@ -118,7 +118,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	private WidgetGroup createUIWidget(Player player) {
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-		group.setBackground(new ResourceTexture("deep_tech:textures/gui/crusher.png"));
+		group.setBackground(new ResourceTexture(DeepTech.loadResource("textures/gui/crusher.png")));
 
 		LabelWidget title = new LabelWidget(
 				8,

@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBlockEntity> implements IUIHolder.BlockEntityUI {
-
 	// 复用 inventoryWrapper，避免每 tick 创建
 	private final SimpleMachineInventory inventoryWrapper;
 	// 用于控制 sync 频率的计数器
