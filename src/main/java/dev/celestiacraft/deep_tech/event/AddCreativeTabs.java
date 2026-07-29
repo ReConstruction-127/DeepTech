@@ -23,6 +23,7 @@ public class AddCreativeTabs {
 		if (key.equals(DTCreativeTabs.getTabKey("machine"))) {
 			event.accept(DTBlocks.MACHINE_FRAME.asStack());
 			event.accept(DTBlocks.MACHINE_CRUSHER.asStack());
+			event.accept(DTBlocks.MACHINE_SCULK_FURNACE.asStack());
 		}
 	}
 }

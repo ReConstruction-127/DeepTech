@@ -9,6 +9,7 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.gui.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
@@ -17,6 +18,7 @@ import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -27,40 +29,43 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBlockEntity> implements IUIHolder.BlockEntityUI {
 
-	// ✅ 三参数构造器（供 Registrate 使用）
+	// 复用 inventoryWrapper，避免每 tick 创建
+	private final SimpleMachineInventory inventoryWrapper;
+	// 用于控制 sync 频率的计数器
+	private int syncCounter = 0;
+
 	public SculkFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
+		this.inventoryWrapper = new SimpleMachineInventory(this.inventory);
 	}
 
-	// ✅ 便捷构造器
 	public SculkFurnaceBlockEntity(BlockPos pos, BlockState state) {
 		this(DTBlockEntities.SCULK_FURNACE.get(), pos, state);
 	}
 
-	// ✅ 静态工厂方法
 	public static SculkFurnaceBlockEntity create(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		return new SculkFurnaceBlockEntity(type, pos, state);
 	}
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, SculkFurnaceBlockEntity entity) {
-		if (level.isClientSide()) {
-			return;
-		}
+		if (level.isClientSide()) return;
 
-		SimpleMachineInventory inventoryWrapper = new SimpleMachineInventory(entity.inventory);
-		RecipeType<CrushingRecipe> recipeType = DTRecipes.CRUSHING.getRecipeType();
+		// 查询配方（复用 inventoryWrapper）
 		CrushingRecipe recipe = level.getRecipeManager()
-				.getRecipeFor(recipeType, inventoryWrapper, level)
+				.getRecipeFor(DTRecipes.CRUSHING.getRecipeType(), inventoryWrapper, level)
 				.orElse(null);
 
+		// 无配方或无法处理
 		if (recipe == null) {
 			if (state.getValue(SculkFurnaceBlock.LIT)) {
 				level.setBlock(pos, state.setValue(SculkFurnaceBlock.LIT, false), 3);
 			}
 			if (entity.progress > 0) {
 				entity.progress = 0;
-				entity.setChanged();
+				entity.setChanged(); // 状态变化，保存一次
+				entity.sync();       // 通知客户端进度归零
+				entity.syncCounter = 0;
 			}
 			entity.maxProgress = 100;
 			return;
@@ -72,13 +77,14 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 		int energyCost = recipe.getEnergyCost();
 
 		ItemStack currentOutput = entity.inventory.getStackInSlot(1);
-		boolean canOutput = currentOutput.isEmpty() ||
-				(ItemStack.isSameItemSameTags(currentOutput, output) &&
-						currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
+		boolean canOutput = currentOutput.isEmpty()
+				|| (ItemStack.isSameItemSameTags(currentOutput, output)
+				&& currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
 
 		boolean hasEnergy = entity.energy >= energyCost;
-
 		boolean isWorking = canOutput && hasEnergy;
+
+		// 更新方块光照状态
 		if (state.getValue(SculkFurnaceBlock.LIT) != isWorking) {
 			level.setBlock(pos, state.setValue(SculkFurnaceBlock.LIT, isWorking), 3);
 		}
@@ -86,12 +92,13 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 		if (isWorking) {
 			entity.energy -= energyCost;
 			entity.progress++;
-			entity.setChanged();
 
-			if (level.getGameTime() % 5 == 0) {
-				entity.sync();
+			// 每 5 tick 同步一次进度到客户端（不触发磁盘保存）
+			if (++entity.syncCounter % 5 == 0) {
+				entity.sync();   // 假设 sync() 只发包，不调用 setChanged()
 			}
 
+			// 进度完成
 			if (entity.progress >= entity.maxProgress) {
 				entity.inventory.getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
@@ -100,10 +107,20 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 					currentOutput.grow(output.getCount());
 				}
 				entity.progress = 0;
+				entity.syncCounter = 0;
+				// ✅ 完成时调用一次 setChanged 和 sync
 				entity.setChanged();
 				entity.sync();
 			}
+		} else {
+			// 如果机器停止工作（能量不足或输出满），重置同步计数器
+			entity.syncCounter = 0;
 		}
+	}
+
+	@Override
+	public int getMaxProgress() {
+		return maxProgress;
 	}
 
 	@Override
@@ -115,20 +132,29 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 	private WidgetGroup createUIWidget(Player player) {
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-		group.setBackground(new ResourceTexture(DeepTech.MODID + ":textures/gui/crusher.png"));
+		group.setBackground(new ResourceTexture("deep_tech:textures/gui/sculk_furnace.png"));
 
-		LabelWidget title = new LabelWidget(8, 8, Component.translatable("block.deep_tech.machine_furnace"));
+		LabelWidget title = new LabelWidget(
+				8,
+				8,
+				Component.translatable("block.deep_tech.machine_sculk_furnace")
+		);
 		title.setColor(0xFF5D5F60);
 		group.addWidget(title);
 
-		group.addWidget(new EnergyBarWidget(18, 25, this::getEnergyStored, getMaxEnergyStored()));
+		group.addWidget(new EnergyBarWidget(
+				18,
+				25,
+				this::getEnergyStored,
+				getMaxEnergyStored()
+		));
 
 		group.addWidget(new ProgressBarWidget(
 				68, 39, 16, 16,
 				this::getProgress,
 				this::getMaxProgress,
-				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_back.png"),
-				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_crusher_front.png")
+				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_furnace_back.png"),
+				new ResourceTexture(DeepTech.MODID + ":textures/gui/elements/progress_furnace_front.png")
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
