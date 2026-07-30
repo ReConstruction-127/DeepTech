@@ -9,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -57,50 +56,13 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		}
 	}
 
-	protected final IEnergyStorage energyStorage = new MachineEnergyCapability(this);
-
 	@Getter
-	protected final ItemStackHandler inventory = new ItemStackHandler(2) {
-		@Override
-		protected void onContentsChanged(int slot) {
-			setChanged();
-		}
-	};
+	private final IEnergyStorage energyStorage = new MachineEnergyCapability(this);
+	@Getter
+	private final ItemStackHandler inventory = new MachineItemHandler(this);
 
 	private final LazyOptional<IEnergyStorage> energyCap = LazyOptional.of(() -> energyStorage);
-	private final LazyOptional<IItemHandler> itemCap = LazyOptional.of(() -> new IItemHandler() {
-		@Override
-		public int getSlots() {
-			return inventory.getSlots();
-		}
-
-		@Override
-		public @NotNull ItemStack getStackInSlot(int slot) {
-			return inventory.getStackInSlot(slot);
-		}
-
-		@Override
-		public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-			if (slot != 0) return stack;
-			return inventory.insertItem(slot, stack, simulate);
-		}
-
-		@Override
-		public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-			if (slot != 1) return ItemStack.EMPTY;
-			return inventory.extractItem(slot, amount, simulate);
-		}
-
-		@Override
-		public int getSlotLimit(int slot) {
-			return inventory.getSlotLimit(slot);
-		}
-
-		@Override
-		public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-			return slot == 0 && inventory.isItemValid(slot, stack);
-		}
-	});
+	private final LazyOptional<IItemHandler> itemCap = LazyOptional.of(() -> inventory);
 
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, Direction side) {
