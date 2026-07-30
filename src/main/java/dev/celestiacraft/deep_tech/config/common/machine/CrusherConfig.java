@@ -13,12 +13,12 @@ public class CrusherConfig extends ConfigModule {
 
 	@Override
 	protected void addConfigs() {
-		MAX_ENERGY = builder.comment("Cursher's max energy stored")
+		MAX_ENERGY = builder.comment("Crusher's max energy stored")
 				.comment("type: int")
 				.comment("default: 10000")
 				.defineInRange("crusher_max_energy_stored", 10000, 1, Integer.MAX_VALUE);
 
-		MAX_RECEIVE = builder.comment("Cursher's max energy receive")
+		MAX_RECEIVE = builder.comment("Crusher's max energy receive")
 				.comment("type: int")
 				.comment("default: 100")
 				.defineInRange("crusher_max_energy_receive", 100, 1, Integer.MAX_VALUE);

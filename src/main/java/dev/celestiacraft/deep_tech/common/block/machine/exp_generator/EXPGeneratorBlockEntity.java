@@ -42,6 +42,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	private final SimpleMachineInventory inventoryWrapper;
 	private int syncCounter = 0;
 
+	// ✅ 延迟初始化
 	private FluidTank fluidTank;
 	private LazyOptional<IFluidHandler> fluidCap;
 
@@ -75,6 +76,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		return 0;
 	}
 
+	// ----- 延迟初始化 -----
 	private void initFluidTank() {
 		if (fluidTank == null) {
 			int capacity = EXPGeneratorConfig.FLUID_CAPACITY.get();
@@ -91,6 +93,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
+	// ----- 流体能力暴露 -----
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		initFluidTank();
@@ -108,6 +111,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
+	// ----- 持久化 -----
 	@Override
 	protected void saveAdditional(CompoundTag tag) {
 		super.saveAdditional(tag);
@@ -136,6 +140,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
+	// ----- 核心逻辑 -----
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, EXPGeneratorBlockEntity entity) {
 		if (level.isClientSide()) return;
@@ -185,6 +190,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 		isWorking = isWorking || generatedPower;
 
+		// 3. 更新方块状态
 		if (state.getValue(EXPGeneratorBlock.LIT) != isWorking) {
 			level.setBlock(pos, state.setValue(EXPGeneratorBlock.LIT, isWorking), 3);
 		}
@@ -195,6 +201,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
+	// ----- GUI -----
 	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
@@ -205,7 +212,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	private WidgetGroup createUIWidget(Player player) {
 		initFluidTank();
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-		group.setBackground(new ResourceTexture(DeepTech.loadResource("textures/gui/exp_generator.png")));
+		group.setBackground(new ResourceTexture(DeepTech.loadGui("exp_generator")));
 
 		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.EXP_GENERATOR.get().getName());
 		title.setColor(0xFF5D5F60);
@@ -214,10 +221,16 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		group.addWidget(new EnergyBarWidget(
 				18, 25,
 				this::getEnergyStored,
-				this.getMachineMaxEnergy()
+				getMachineMaxEnergy()
 		));
 
-		// 在 createUIWidget 中
+		group.addWidget(new FluidBarWidget(
+				36, 25, 14, 42,
+				() -> fluidTank.getFluidAmount(),
+				EXPGeneratorConfig.FLUID_CAPACITY.get(),
+				new ResourceTexture(DeepTech.loadGui("elements/energy_back")),
+				new ResourceTexture(DeepTech.loadGui("elements/energy_front"))
+		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
 		SlotWidget inputSlot = new SlotWidget();
