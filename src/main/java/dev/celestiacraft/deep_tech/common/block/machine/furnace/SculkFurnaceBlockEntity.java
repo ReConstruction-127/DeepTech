@@ -32,7 +32,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 	public SculkFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inventoryWrapper = new SimpleMachineInventory(inventory);
+		inventoryWrapper = new SimpleMachineInventory(getInventory());
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 		// 使用原版熔炉配方
 		RecipeType<SmeltingRecipe> recipeType = RecipeType.SMELTING;
-		SimpleMachineInventory inventoryWrapper = new SimpleMachineInventory(entity.inventory);
+		SimpleMachineInventory inventoryWrapper = new SimpleMachineInventory(entity.getInventory());
 
 		SmeltingRecipe recipe = level.getRecipeManager()
 				.getRecipeFor(recipeType, inventoryWrapper, level)
@@ -81,7 +81,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 		ItemStack output = recipe.getResultItem(level.registryAccess());
 
-		ItemStack currentOutput = entity.inventory.getStackInSlot(1);
+		ItemStack currentOutput = entity.getInventory().getStackInSlot(1);
 		boolean canOutput = currentOutput.isEmpty()
 				|| (ItemStack.isSameItemSameTags(currentOutput, output)
 				&& currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
@@ -105,9 +105,9 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 			// 进度完成
 			if (entity.progress >= entity.maxProgress) {
-				entity.inventory.getStackInSlot(0).shrink(1);
+				entity.getInventory().getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
-					entity.inventory.setStackInSlot(1, output.copy());
+					entity.getInventory().setStackInSlot(1, output.copy());
 				} else {
 					currentOutput.grow(output.getCount());
 				}
@@ -162,7 +162,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/progress_furnace_front.png"))
 		));
 
-		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
+		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
 
 		SlotWidget input = new SlotWidget();
 		input.setContainerSlot(container, 0);

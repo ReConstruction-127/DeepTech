@@ -32,7 +32,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inventoryWrapper = new SimpleMachineInventory(inventory);
+		inventoryWrapper = new SimpleMachineInventory(getInventory());
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		ItemStack output = recipe.getOutput();
 		int energyCost = recipe.getEnergyCost();
 
-		ItemStack currentOutput = entity.inventory.getStackInSlot(1);
+		ItemStack currentOutput = entity.getInventory().getStackInSlot(1);
 		boolean canOutput = currentOutput.isEmpty()
 				|| (ItemStack.isSameItemSameTags(currentOutput, output)
 				&& currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
@@ -97,9 +97,9 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 			// 进度完成
 			if (entity.progress >= entity.maxProgress) {
-				entity.inventory.getStackInSlot(0).shrink(1);
+				entity.getInventory().getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
-					entity.inventory.setStackInSlot(1, output.copy());
+					entity.getInventory().setStackInSlot(1, output.copy());
 				} else {
 					currentOutput.grow(output.getCount());
 				}
@@ -154,7 +154,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/progress_crusher_front.png"))
 		));
 
-		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
+		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
 
 		SlotWidget input = new SlotWidget();
 		input.setContainerSlot(container, 0);
