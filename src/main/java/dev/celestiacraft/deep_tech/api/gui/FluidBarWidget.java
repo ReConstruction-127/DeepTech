@@ -37,8 +37,8 @@ public class FluidBarWidget extends Widget {
 			return;
 		}
 		float ratio = (float) fluid / maxFluid;
-		if (ratio > 1f) {
-			ratio = 1f;
+		if (ratio > 1.0f) {
+			ratio = 1.0f;
 		}
 		int displayHeight = (int) (getSize().height * ratio);
 

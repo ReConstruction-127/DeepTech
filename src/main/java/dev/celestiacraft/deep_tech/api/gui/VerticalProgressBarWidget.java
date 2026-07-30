@@ -54,14 +54,11 @@ public class VerticalProgressBarWidget extends Widget {
 			return;
 		}
 
-		// 计算比例（从 0 到 1）
 		float ratio = (float) progress / maxProgress;
 		if (ratio > 1.0f) ratio = 1.0f;
 
-		// ✅ 垂直方向：从下往上计算显示高度
 		int displayHeight = (int) (getSize().height * ratio);
 
-		// ✅ 裁剪区域：从底部向上
 		graphics.enableScissor(
 				getPosition().x,
 				getPosition().y + getSize().height - displayHeight,

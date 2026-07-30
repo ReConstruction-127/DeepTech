@@ -2,20 +2,17 @@ package dev.celestiacraft.deep_tech.common.block.machine.exp_generator;
 
 import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
-import com.lowdragmc.lowdraglib.gui.texture.ProgressTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
-import com.lowdragmc.lowdraglib.gui.widget.TankWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.side.fluid.FluidHelper;
-import com.lowdragmc.lowdraglib.side.fluid.IFluidStorage;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.FluidBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
+import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import net.minecraft.core.BlockPos;
@@ -26,7 +23,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -35,8 +31,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.jetbrains.annotations.NotNull;
-import com.lowdragmc.lowdraglib.gui.widget.TankWidget;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 
 public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBlockEntity> implements IUIHolder.BlockEntityUI {
 	private final SimpleMachineInventory inventoryWrapper;
@@ -95,7 +89,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	// ----- 流体能力暴露 -----
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
 		initFluidTank();
 		if (cap == ForgeCapabilities.FLUID_HANDLER) {
 			return fluidCap.cast();
@@ -113,7 +107,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	// ----- 持久化 -----
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
+	protected void saveAdditional(@NotNull CompoundTag tag) {
 		super.saveAdditional(tag);
 		if (fluidTank != null) {
 			CompoundTag fluidTag = new CompoundTag();
@@ -123,7 +117,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
+	public void load(@NotNull CompoundTag tag) {
 		super.load(tag);
 		if (tag.contains("FluidTank")) {
 			initFluidTank();
@@ -149,21 +143,30 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		boolean isWorking = false;
 
 		// ===== 1. 玩家经验汲取 =====
-		AABB aboveBox = new AABB(pos.getX(), pos.getY() + 1, pos.getZ(),
-				pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1);
+		AABB aboveBox = new AABB(
+				pos.getX(),
+				pos.getY() + 1,
+				pos.getZ(),
+				pos.getX() + 1,
+				pos.getY() + 2,
+				pos.getZ() + 1
+		);
 		int expToTake = EXPGeneratorConfig.PLAYER_EXP_PER_TICK.get();
 
 		boolean canAcceptFluid = entity.fluidTank.getFluidAmount() < entity.fluidTank.getCapacity();
 
-		level.getEntitiesOfClass(Player.class, aboveBox, player -> !player.isSpectator())
+		level.getEntitiesOfClass(
+						Player.class,
+						aboveBox,
+						(player) -> {
+							return !player.isSpectator();
+						})
 				.stream()
 				.findFirst()
-				.ifPresent(player -> {
-					// ✅ 只有能量和流体都未满，且玩家有足够经验时才扣除
+				.ifPresent((player) -> {
 					if (canAcceptFluid && player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
-						// ✅ 先用 水 代替液态经验
-						FluidStack playerFluid = new FluidStack(Fluids.WATER, expToTake);
+						FluidStack playerFluid = new FluidStack(DTFluids.LIQUID_EXPERIENCE.get(), expToTake);
 						int filled = entity.fluidTank.fill(playerFluid, IFluidHandler.FluidAction.EXECUTE);
 						if (filled > 0) {
 							entity.setChanged();

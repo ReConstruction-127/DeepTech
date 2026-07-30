@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-
 public class EnergyBarWidget extends Widget {
 	private final Supplier<Integer> energy;
 	private final int maxEnergy;

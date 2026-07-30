@@ -37,7 +37,6 @@ public class ProgressBarWidget extends Widget {
 		int progress = progressGetter.get();
 		int maxProgress = maxProgressGetter.get();
 
-		// ========== 1. 背景纹理 ==========
 		background.draw(
 				graphics,
 				mouseX,
@@ -48,23 +47,17 @@ public class ProgressBarWidget extends Widget {
 				getSize().height
 		);
 
-		// ========== 2. 无进度时不显示前景 ==========
 		if (progress <= 0 || maxProgress <= 0) {
 			return;
 		}
 
-		// ========== 3. 计算进度比例 ==========
 		float ratio = (float) progress / maxProgress;
-		if (ratio > 1.0f) ratio = 1.0f;
+		if (ratio > 1.0f) {
+			ratio = 1.0f;
+		}
 
 		int displayWidth = (int) (getSize().width * ratio);
 
-		// ========== 调试日志（只在客户端输出，避免刷屏） ==========
-		if (progress % 10 == 0) {
-		}
-
-		// ========== 4. 裁剪绘制前景 ==========
-		// 注意：enableScissor 的参数是 (x1, y1, x2, y2)，即左上角和右下角
 		graphics.enableScissor(
 				getPosition().x,
 				getPosition().y,
