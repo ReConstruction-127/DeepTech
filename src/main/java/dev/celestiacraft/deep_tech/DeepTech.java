@@ -22,6 +22,10 @@ public class DeepTech {
 		return ResourceLocation.fromNamespaceAndPath(MODID, path);
 	}
 
+	public static ResourceLocation loadGui(String path) {
+		return loadResource("textures/gui/%s.png".formatted(path));
+	}
+
 	public static void registerLog(String registerType) {
 		LOGGER.info("{} {} is Registered!", NAME, registerType);
 	}

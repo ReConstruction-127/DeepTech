@@ -129,7 +129,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	private WidgetGroup createUIWidget(Player player) {
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-		group.setBackground(new ResourceTexture(DeepTech.loadResource("textures/gui/crusher.png")));
+		group.setBackground(new ResourceTexture(DeepTech.loadGui("crusher")));
 
 		LabelWidget title = new LabelWidget(
 				8,
@@ -150,8 +150,8 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				68, 39, 16, 16,
 				this::getProgress,
 				this::getMaxProgress,
-				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/progress_crusher_back.png")),
-				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/progress_crusher_front.png"))
+				new ResourceTexture(DeepTech.loadGui("elements/progress_crusher_back")),
+				new ResourceTexture(DeepTech.loadGui("elements/progress_crusher_front"))
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());

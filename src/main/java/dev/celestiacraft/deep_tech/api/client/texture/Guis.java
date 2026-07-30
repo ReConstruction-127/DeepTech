@@ -18,7 +18,7 @@ public class Guis implements ScreenElement {
 	}
 
 	public Guis(String path, int startX, int startY, int width, int height) {
-		location = DeepTech.loadResource(String.format("textures/gui/%s.png", path));
+		location = DeepTech.loadGui(path);
 		this.startX = startX;
 		this.startY = startY;
 		this.width = width;
