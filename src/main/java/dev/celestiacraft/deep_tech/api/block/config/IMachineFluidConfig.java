@@ -32,6 +32,6 @@ public interface IMachineFluidConfig {
 	}
 
 	default boolean canDrainFluid(int tank, FluidStack stack) {
-		return tank < getFluidInputTankCount() || tank >= getMaxMachineTank();
+		return tank >= getFluidInputTankCount() && tank < getMaxMachineTank();
 	}
 }

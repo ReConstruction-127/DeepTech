@@ -1,17 +1,21 @@
 package dev.celestiacraft.deep_tech.api.gui;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
+import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
 public class FluidBarWidget extends Widget {
 	private final Supplier<Integer> fluidGetter;
+	private final @Nullable Supplier<FluidStack> fluidStackGetter;
 	private final int maxFluid;
 	private final ResourceTexture background;
-	private final ResourceTexture foreground;
+	private final @Nullable ResourceTexture foreground;
 
 	public FluidBarWidget(
 			int x,
@@ -23,8 +27,36 @@ public class FluidBarWidget extends Widget {
 			ResourceTexture background,
 			ResourceTexture foreground
 	) {
+		this(x, y, width, height, fluidGetter, maxFluid, null, background, foreground);
+	}
+
+	public FluidBarWidget(
+			int x,
+			int y,
+			int width,
+			int height,
+			Supplier<Integer> fluidGetter,
+			int maxFluid,
+			Supplier<FluidStack> fluidStackGetter,
+			ResourceTexture background
+	) {
+		this(x, y, width, height, fluidGetter, maxFluid, fluidStackGetter, background, null);
+	}
+
+	private FluidBarWidget(
+			int x,
+			int y,
+			int width,
+			int height,
+			Supplier<Integer> fluidGetter,
+			int maxFluid,
+			@Nullable Supplier<FluidStack> fluidStackGetter,
+			ResourceTexture background,
+			@Nullable ResourceTexture foreground
+	) {
 		super(x, y, width, height);
 		this.fluidGetter = fluidGetter;
+		this.fluidStackGetter = fluidStackGetter;
 		this.maxFluid = maxFluid;
 		this.background = background;
 		this.foreground = foreground;
@@ -58,15 +90,27 @@ public class FluidBarWidget extends Widget {
 				getPosition().x + getSize().width,
 				getPosition().y + getSize().height
 		);
-		foreground.draw(
-				graphics,
-				mouseX,
-				mouseY,
-				getPosition().x,
-				getPosition().y,
-				getSize().width,
-				getSize().height
-		);
+		FluidStack fluidStack = fluidStackGetter == null ? FluidStack.EMPTY : fluidStackGetter.get();
+		if (!fluidStack.isEmpty()) {
+			DrawerHelper.drawFluidForGui(
+					graphics,
+					fluidStack,
+					getPosition().x,
+					getPosition().y,
+					getSize().width,
+					getSize().height
+			);
+		} else if (foreground != null) {
+			foreground.draw(
+					graphics,
+					mouseX,
+					mouseY,
+					getPosition().x,
+					getPosition().y,
+					getSize().width,
+					getSize().height
+			);
+		}
 		graphics.disableScissor();
 	}
 }

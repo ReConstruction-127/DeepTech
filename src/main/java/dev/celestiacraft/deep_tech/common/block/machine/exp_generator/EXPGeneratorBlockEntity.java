@@ -81,7 +81,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	@Override
 	public boolean canDrainFluid(int tank, FluidStack stack) {
-		return true;
+		return false;
 	}
 
 	private int getExperienceTank() {
@@ -179,8 +179,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				36, 25, 14, 42,
 				this::getFluidAmount,
 				getFluidCapacity(),
-				new ResourceTexture(DeepTech.loadGui("elements/energy_back")),
-				new ResourceTexture(DeepTech.loadGui("elements/energy_front"))
+				() -> getFluidStorage().getFluidInTank(getExperienceTank()),
+				new ResourceTexture(DeepTech.loadGui("elements/energy_back"))
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
