@@ -19,9 +19,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,234 +31,242 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.Map;
-
 public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBlockEntity> implements IUIHolder.BlockEntityUI {
+	private final SimpleMachineInventory inventoryWrapper;
+	private int syncCounter = 0;
 
-    private final SimpleMachineInventory inventoryWrapper;
-    private int syncCounter = 0;
+	// ✅ 延迟初始化
+	private FluidTank fluidTank;
+	private LazyOptional<IFluidHandler> fluidCap;
 
-    // ✅ 延迟初始化
-    private FluidTank fluidTank;
-    private LazyOptional<IFluidHandler> fluidCap;
+	public EXPGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+		super(type, pos, state);
+		inventoryWrapper = new SimpleMachineInventory(getInventory());
+	}
 
-    public EXPGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state);
-        inventoryWrapper = new SimpleMachineInventory(inventory);
-    }
+	@Override
+	public int getMaxExtract() {
+		return EXPGeneratorConfig.MAX_EXTRACT.get();
+	}
 
-    // ----- 能量配置（只输出，不输入） -----
-    @Override
-    public int getMaxReceive() {
-        return 0;
-    }
+	@Override
+	public int getMachineMaxEnergy() {
+		return EXPGeneratorConfig.MAX_ENERGY.get();
+	}
 
-    @Override
-    public int getMaxExtract() {
-        return EXPGeneratorConfig.getMaxExtractOrDefault(50);
-    }
+	@Override
+	public int getMaxReceive() {
+		return 0;
+	}
 
-    @Override
-    public int getMachineMaxEnergy() {
-        return EXPGeneratorConfig.getMaxEnergyOrDefault(10000);
-    }
+	@Override
+	public int getItemInputSlotCount() {
+		return 1;
+	}
 
-    // ----- 延迟初始化 -----
-    private void initFluidTank() {
-        if (fluidTank == null) {
-            int capacity = EXPGeneratorConfig.getFluidCapacityOrDefault(1000);
-            fluidTank = new FluidTank(capacity) {
-                @Override
-                protected void onContentsChanged() {
-                    setChanged();
-                    if (level != null && !level.isClientSide) {
-                        sync();
-                    }
-                }
-            };
-            fluidCap = LazyOptional.of(() -> fluidTank);
-        }
-    }
+	@Override
+	public int getItemOutputSlotCount() {
+		return 0;
+	}
 
-    // ----- 流体能力暴露 -----
-    @Override
-    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        initFluidTank();
-        if (cap == ForgeCapabilities.FLUID_HANDLER) {
-            return fluidCap.cast();
-        }
-        return super.getCapability(cap, side);
-    }
+	// ----- 延迟初始化 -----
+	private void initFluidTank() {
+		if (fluidTank == null) {
+			int capacity = EXPGeneratorConfig.FLUID_CAPACITY.get();
+			fluidTank = new FluidTank(capacity) {
+				@Override
+				protected void onContentsChanged() {
+					setChanged();
+					if (level != null && !level.isClientSide) {
+						sync();
+					}
+				}
+			};
+			fluidCap = LazyOptional.of(() -> fluidTank);
+		}
+	}
 
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        if (fluidCap != null) {
-            fluidCap.invalidate();
-        }
-    }
+	// ----- 流体能力暴露 -----
+	@Override
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+		initFluidTank();
+		if (cap == ForgeCapabilities.FLUID_HANDLER) {
+			return fluidCap.cast();
+		}
+		return super.getCapability(cap, side);
+	}
 
-    // ----- 持久化 -----
-    @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        if (fluidTank != null) {
-            CompoundTag fluidTag = new CompoundTag();
-            fluidTank.writeToNBT(fluidTag);
-            tag.put("FluidTank", fluidTag);
-        }
-    }
+	@Override
+	public void invalidateCaps() {
+		super.invalidateCaps();
+		if (fluidCap != null) {
+			fluidCap.invalidate();
+		}
+	}
 
-    @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        if (tag.contains("FluidTank")) {
-            initFluidTank();
-            fluidTank.readFromNBT(tag.getCompound("FluidTank"));
-        }
-    }
+	// ----- 持久化 -----
+	@Override
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+		if (fluidTank != null) {
+			CompoundTag fluidTag = new CompoundTag();
+			fluidTank.writeToNBT(fluidTag);
+			tag.put("FluidTank", fluidTag);
+		}
+	}
 
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        initFluidTank();
-        if (level != null && !level.isClientSide) {
-            sync();
-        }
-    }
+	@Override
+	public void load(CompoundTag tag) {
+		super.load(tag);
+		if (tag.contains("FluidTank")) {
+			initFluidTank();
+			fluidTank.readFromNBT(tag.getCompound("FluidTank"));
+		}
+	}
 
-    // ----- 核心逻辑 -----
-    @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, EXPGeneratorBlockEntity entity) {
-        if (level.isClientSide()) return;
-        initFluidTank();
+	@Override
+	public void onLoad() {
+		super.onLoad();
+		initFluidTank();
+		if (level != null && !level.isClientSide) {
+			sync();
+		}
+	}
 
-        boolean isWorking = false;
+	// ----- 核心逻辑 -----
+	@Override
+	public void serverTick(Level level, BlockPos pos, BlockState state, EXPGeneratorBlockEntity entity) {
+		if (level.isClientSide()) return;
+		initFluidTank();
 
-        // 1. 玩家经验汲取（站在机器上方）
-        AABB aboveBox = new AABB(pos.getX(), pos.getY() + 1, pos.getZ(),
-                pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1);
-        int expToTake = EXPGeneratorConfig.getPlayerExpPerTickOrDefault(1); // ✅ 改为安全方法
-        level.getEntitiesOfClass(Player.class, aboveBox, player -> !player.isSpectator())
-                .stream()
-                .findFirst()
-                .ifPresent(player -> {
-                    if (player.totalExperience >= expToTake) {
-                        player.giveExperiencePoints(-expToTake);
-                        var fluid = ForgeRegistries.FLUIDS.getValue(DeepTech.loadResource("liquid_experience"));
-                        if (fluid != null) {
-                            FluidStack playerFluid = new FluidStack(fluid, expToTake);
-                            int filled = entity.fluidTank.fill(playerFluid, IFluidHandler.FluidAction.EXECUTE);
-                            if (filled > 0) {
-                                entity.setChanged();
-                                entity.sync();
-                            }
-                        }
-                    }
-                });
+		boolean isWorking = false;
 
-        // 2. 液态经验 → FE
-        boolean generatedPower = false;
-        if (entity.energy < entity.getMachineMaxEnergy()) {
-            int mbPerTick = EXPGeneratorConfig.getMbPerTickOrDefault(5); // ✅
-            FluidStack drainStack = entity.fluidTank.drain(mbPerTick, IFluidHandler.FluidAction.SIMULATE);
-            if (!drainStack.isEmpty() && drainStack.getAmount() >= mbPerTick) {
-                entity.fluidTank.drain(mbPerTick, IFluidHandler.FluidAction.EXECUTE);
-                int fePerMb = EXPGeneratorConfig.getFePerMbOrDefault(10); // ✅
-                int generated = fePerMb * mbPerTick;
-                entity.energy = Math.min(entity.energy + generated, entity.getMachineMaxEnergy());
-                entity.setChanged();
-                entity.sync();
-                generatedPower = true;
-            }
-        }
+		// 1. 玩家经验汲取（站在机器上方）
+		AABB aboveBox = new AABB(pos.getX(), pos.getY() + 1, pos.getZ(),
+				pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1);
+		int expToTake = EXPGeneratorConfig.PLAYER_EXP_PER_TICK.get();
+		level.getEntitiesOfClass(Player.class, aboveBox, (player) -> {
+					return !player.isSpectator();
+				})
+				.stream()
+				.findFirst()
+				.ifPresent((player) -> {
+					if (player.totalExperience >= expToTake) {
+						player.giveExperiencePoints(-expToTake);
+						var fluid = ForgeRegistries.FLUIDS.getValue(DeepTech.loadResource("liquid_experience"));
+						if (fluid != null) {
+							FluidStack playerFluid = new FluidStack(fluid, expToTake);
+							int filled = entity.fluidTank.fill(playerFluid, IFluidHandler.FluidAction.EXECUTE);
+							if (filled > 0) {
+								entity.setChanged();
+								entity.sync();
+							}
+						}
+					}
+				});
 
-        isWorking = isWorking || generatedPower;
+		// 2. 液态经验 → FE
+		boolean generatedPower = false;
+		if (entity.energy < entity.getMachineMaxEnergy()) {
+			int mbPerTick = EXPGeneratorConfig.MB_PER_TICK.get();
+			FluidStack drainStack = entity.fluidTank.drain(mbPerTick, IFluidHandler.FluidAction.SIMULATE);
+			if (!drainStack.isEmpty() && drainStack.getAmount() >= mbPerTick) {
+				entity.fluidTank.drain(mbPerTick, IFluidHandler.FluidAction.EXECUTE);
+				int fePerMb = EXPGeneratorConfig.FE_PER_MB.get();
+				int generated = fePerMb * mbPerTick;
+				entity.energy = Math.min(entity.energy + generated, entity.getMachineMaxEnergy());
+				entity.setChanged();
+				entity.sync();
+				generatedPower = true;
+			}
+		}
 
-        // 3. 更新方块状态
-        if (state.getValue(EXPGeneratorBlock.LIT) != isWorking) {
-            level.setBlock(pos, state.setValue(EXPGeneratorBlock.LIT, isWorking), 3);
-        }
+		isWorking = isWorking || generatedPower;
 
-        if (!isWorking && entity.progress > 0) {
-            entity.progress = 0;
-            entity.setChanged();
-        }
-    }
+		// 3. 更新方块状态
+		if (state.getValue(EXPGeneratorBlock.LIT) != isWorking) {
+			level.setBlock(pos, state.setValue(EXPGeneratorBlock.LIT, isWorking), 3);
+		}
 
-    // ----- GUI -----
-    @Override
-    public ModularUI createUI(Player player) {
-        ModularUI ui = new ModularUI(176, 166, this, player);
-        ui.widget(createUIWidget(player));
-        return ui;
-    }
+		if (!isWorking && entity.progress > 0) {
+			entity.progress = 0;
+			entity.setChanged();
+		}
+	}
 
-    private WidgetGroup createUIWidget(Player player) {
-        initFluidTank();
-        WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-        group.setBackground(new ResourceTexture(DeepTech.loadResource("textures/gui/exp_generator.png")));
+	// ----- GUI -----
+	@Override
+	public ModularUI createUI(Player player) {
+		ModularUI ui = new ModularUI(176, 166, this, player);
+		ui.widget(createUIWidget(player));
+		return ui;
+	}
 
-        LabelWidget title = new LabelWidget(8, 8, MachineBlocks.EXP_GENERATOR.get().getName());
-        title.setColor(0xFF5D5F60);
-        group.addWidget(title);
+	private WidgetGroup createUIWidget(Player player) {
+		initFluidTank();
+		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
+		group.setBackground(new ResourceTexture(DeepTech.loadResource("textures/gui/exp_generator.png")));
 
-        group.addWidget(new EnergyBarWidget(
-                18, 25,
-                this::getEnergyStored,
-                this.getMachineMaxEnergy()
-        ));
+		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.EXP_GENERATOR.get().getName());
+		title.setColor(0xFF5D5F60);
+		group.addWidget(title);
 
-        group.addWidget(new FluidBarWidget(
-                36, 25, 14, 42,
-                () -> fluidTank.getFluidAmount(),
-                EXPGeneratorConfig.getFluidCapacityOrDefault(1000), // ✅
-                new ResourceTexture(DeepTech.loadResource("textures/gui/elements/fluid_back.png")),
-                new ResourceTexture(DeepTech.loadResource("textures/gui/elements/fluid_front.png"))
-        ));
+		group.addWidget(new EnergyBarWidget(
+				18, 25,
+				this::getEnergyStored,
+				this.getMachineMaxEnergy()
+		));
 
-        SimpleMachineInventory container = new SimpleMachineInventory(inventory);
-        SlotWidget inputSlot = new SlotWidget();
-        inputSlot.setContainerSlot(container, 0);
-        inputSlot.setSelfPosition(new Position(41, 38));
-        inputSlot.setBackground((ResourceTexture) null);
-        inputSlot.setCanTakeItems(true);
-        inputSlot.setCanPutItems(true);
-        group.addWidget(inputSlot);
+		group.addWidget(new FluidBarWidget(
+				36, 25, 14, 42,
+				() -> fluidTank.getFluidAmount(),
+				EXPGeneratorConfig.FLUID_CAPACITY.get(),
+				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/fluid_back.png")),
+				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/fluid_front.png"))
+		));
 
-        addPlayerInventory(group, player);
-        return group;
-    }
+		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
+		SlotWidget inputSlot = new SlotWidget();
+		inputSlot.setContainerSlot(container, 0);
+		inputSlot.setSelfPosition(new Position(41, 38));
+		inputSlot.setBackground((ResourceTexture) null);
+		inputSlot.setCanTakeItems(true);
+		inputSlot.setCanPutItems(true);
+		group.addWidget(inputSlot);
 
-    private void addPlayerInventory(WidgetGroup group, Player player) {
-        Container inventory = player.getInventory();
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                SlotWidget slot = new SlotWidget();
-                slot.initTemplate();
-                slot.setContainerSlot(inventory, col + row * 9 + 9);
-                slot.isPlayerContainer = true;
-                slot.setSelfPosition(new Position(7 + col * 18, 81 + row * 18));
-                slot.setBackground((ResourceTexture) null);
-                group.addWidget(slot);
-            }
-        }
-        for (int col = 0; col < 9; col++) {
-            SlotWidget slot = new SlotWidget();
-            slot.initTemplate();
-            slot.setContainerSlot(inventory, col);
-            slot.isPlayerContainer = true;
-            slot.setSelfPosition(new Position(7 + col * 18, 139));
-            slot.setBackground((ResourceTexture) null);
-            group.addWidget(slot);
-        }
-    }
+		addPlayerInventory(group, player);
+		return group;
+	}
 
-    public int getFluidAmount() {
-        return fluidTank != null ? fluidTank.getFluidAmount() : 0;
-    }
+	private void addPlayerInventory(WidgetGroup group, Player player) {
+		Container inventory = player.getInventory();
+		for (int row = 0; row < 3; row++) {
+			for (int col = 0; col < 9; col++) {
+				SlotWidget slot = new SlotWidget();
+				slot.initTemplate();
+				slot.setContainerSlot(inventory, col + row * 9 + 9);
+				slot.isPlayerContainer = true;
+				slot.setSelfPosition(new Position(7 + col * 18, 81 + row * 18));
+				slot.setBackground((ResourceTexture) null);
+				group.addWidget(slot);
+			}
+		}
+		for (int col = 0; col < 9; col++) {
+			SlotWidget slot = new SlotWidget();
+			slot.initTemplate();
+			slot.setContainerSlot(inventory, col);
+			slot.isPlayerContainer = true;
+			slot.setSelfPosition(new Position(7 + col * 18, 139));
+			slot.setBackground((ResourceTexture) null);
+			group.addWidget(slot);
+		}
+	}
 
-    public int getFluidCapacity() {
-        return fluidTank != null ? fluidTank.getCapacity() : 0;
-    }
+	public int getFluidAmount() {
+		return fluidTank != null ? fluidTank.getFluidAmount() : 0;
+	}
+
+	public int getFluidCapacity() {
+		return fluidTank != null ? fluidTank.getCapacity() : 0;
+	}
 }

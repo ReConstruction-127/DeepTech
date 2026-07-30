@@ -22,8 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity
-		implements ITickableBlockEntity<T>, IMachineItemConfig, IMachineEnergyConfig {
+public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T>, IMachineItemConfig, IMachineEnergyConfig {
 	@Getter
 	protected int progress = 0;
 	@Getter

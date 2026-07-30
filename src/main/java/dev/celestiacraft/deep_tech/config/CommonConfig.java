@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.config;
 
 import dev.celestiacraft.deep_tech.config.common.machine.CrusherConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.SculkFurnaceConfig;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -10,6 +11,7 @@ public class CommonConfig {
 
 	public static final CrusherConfig CRUSHER;
 	public static final SculkFurnaceConfig SCULK_FURNACE;
+	public static final EXPGeneratorConfig EXP_GENERATOR;
 
 	static {
 		BUILDER.comment("All settings below will only take effect after restarting the server or client.")
@@ -17,6 +19,7 @@ public class CommonConfig {
 
 		CRUSHER = new CrusherConfig(BUILDER);
 		SCULK_FURNACE = new SculkFurnaceConfig(BUILDER);
+		EXP_GENERATOR = new EXPGeneratorConfig(BUILDER);
 
 		SPEC = BUILDER.build();
 		BUILDER.pop();

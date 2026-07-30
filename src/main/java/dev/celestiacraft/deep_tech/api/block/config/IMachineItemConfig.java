@@ -11,7 +11,7 @@ public interface IMachineItemConfig {
 	 * @return 机器总槽位数量
 	 */
 	default int getMaxMachineSlot() {
-		return getInputSlotCount() + getOutputSlotCount();
+		return getItemInputSlotCount() + getItemOutputSlotCount();
 	}
 
 	/**
@@ -23,7 +23,7 @@ public interface IMachineItemConfig {
 	 *
 	 * @return 输入槽数量
 	 */
-	int getInputSlotCount();
+	int getItemInputSlotCount();
 
 	/**
 	 * 获取机器输出槽数量
@@ -34,7 +34,7 @@ public interface IMachineItemConfig {
 	 *
 	 * @return 输出槽数量
 	 */
-	int getOutputSlotCount();
+	int getItemOutputSlotCount();
 
 	/**
 	 * 将第几个输入槽转换为实际槽位下标
@@ -44,7 +44,7 @@ public interface IMachineItemConfig {
 	 * @param index 输入槽序号, 从 0 开始
 	 * @return 实际槽位下标
 	 */
-	default int getInputSlotIndex(int index) {
+	default int getItemInputSlotIndex(int index) {
 		return index;
 	}
 
@@ -56,16 +56,16 @@ public interface IMachineItemConfig {
 	 * @param index 输出槽序号, 从 0 开始
 	 * @return 实际槽位下标
 	 */
-	default int getOutputSlotIndex(int index) {
-		return getInputSlotCount() + index;
+	default int getItemOutputSlotIndex(int index) {
+		return getItemInputSlotCount() + index;
 	}
 
 	default boolean canInsertItem(int slot, ItemStack stack) {
-		return slot >= 0 && slot < getInputSlotCount();
+		return slot >= 0 && slot < getItemInputSlotCount();
 	}
 
 	default boolean canExtractItem(int slot, ItemStack stack) {
-		return slot >= getInputSlotCount() && slot < getMaxMachineSlot();
+		return slot >= getItemInputSlotCount() && slot < getMaxMachineSlot();
 	}
 
 	default int getMachineSlotLimit(int slot) {

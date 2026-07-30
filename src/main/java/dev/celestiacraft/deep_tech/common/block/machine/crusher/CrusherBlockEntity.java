@@ -46,12 +46,12 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 	}
 
 	@Override
-	public int getInputSlotCount() {
+	public int getItemInputSlotCount() {
 		return 1;
 	}
 
 	@Override
-	public int getOutputSlotCount() {
+	public int getItemOutputSlotCount() {
 		return 1;
 	}
 
