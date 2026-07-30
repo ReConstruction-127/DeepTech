@@ -30,7 +30,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBlockEntity> implements IUIHolder.BlockEntityUI {
@@ -216,7 +215,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		group.addWidget(new EnergyBarWidget(
 				18, 25,
 				this::getEnergyStored,
-				this.getMachineMaxEnergy()
+				getMachineMaxEnergy()
 		));
 
 		group.addWidget(new FluidBarWidget(
