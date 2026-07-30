@@ -12,6 +12,7 @@ import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.FluidBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
+import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import net.minecraft.core.BlockPos;
@@ -154,7 +155,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				.ifPresent((player) -> {
 					if (player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
-						var fluid = ForgeRegistries.FLUIDS.getValue(DeepTech.loadResource("liquid_experience"));
+						var fluid = DTFluids.LIQUID_EXPERIENCE.get();
 						if (fluid != null) {
 							FluidStack playerFluid = new FluidStack(fluid, expToTake);
 							int filled = entity.fluidTank.fill(playerFluid, IFluidHandler.FluidAction.EXECUTE);
@@ -222,8 +223,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				36, 25, 14, 42,
 				() -> fluidTank.getFluidAmount(),
 				EXPGeneratorConfig.FLUID_CAPACITY.get(),
-				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/fluid_back.png")),
-				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/fluid_front.png"))
+				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/energy_back.png")),
+				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/energy_front.png"))
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
