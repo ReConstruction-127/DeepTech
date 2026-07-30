@@ -30,6 +30,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBlockEntity> implements IUIHolder.BlockEntityUI {
 	private final SimpleMachineInventory inventoryWrapper;
@@ -88,7 +89,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	// ----- 流体能力暴露 -----
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
 		initFluidTank();
 		if (cap == ForgeCapabilities.FLUID_HANDLER) {
 			return fluidCap.cast();
@@ -106,7 +107,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	// ----- 持久化 -----
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
+	protected void saveAdditional(@NotNull CompoundTag tag) {
 		super.saveAdditional(tag);
 		if (fluidTank != null) {
 			CompoundTag fluidTag = new CompoundTag();
@@ -116,7 +117,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
+	public void load(@NotNull CompoundTag tag) {
 		super.load(tag);
 		if (tag.contains("FluidTank")) {
 			initFluidTank();
