@@ -2,17 +2,20 @@ package dev.celestiacraft.deep_tech.common.block.machine.exp_generator;
 
 import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
+import com.lowdragmc.lowdraglib.gui.texture.ProgressTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
+import com.lowdragmc.lowdraglib.gui.widget.TankWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
+import com.lowdragmc.lowdraglib.side.fluid.FluidHelper;
+import com.lowdragmc.lowdraglib.side.fluid.IFluidStorage;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.FluidBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
-import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import net.minecraft.core.BlockPos;
@@ -23,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -30,14 +34,14 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
+import com.lowdragmc.lowdraglib.gui.widget.TankWidget;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
 public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBlockEntity> implements IUIHolder.BlockEntityUI {
 	private final SimpleMachineInventory inventoryWrapper;
 	private int syncCounter = 0;
 
-	// ✅ 延迟初始化
 	private FluidTank fluidTank;
 	private LazyOptional<IFluidHandler> fluidCap;
 
@@ -71,7 +75,6 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		return 0;
 	}
 
-	// ----- 延迟初始化 -----
 	private void initFluidTank() {
 		if (fluidTank == null) {
 			int capacity = EXPGeneratorConfig.FLUID_CAPACITY.get();
@@ -88,9 +91,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
-	// ----- 流体能力暴露 -----
 	@Override
-	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
 		initFluidTank();
 		if (cap == ForgeCapabilities.FLUID_HANDLER) {
 			return fluidCap.cast();
@@ -106,9 +108,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
-	// ----- 持久化 -----
 	@Override
-	protected void saveAdditional(@NotNull CompoundTag tag) {
+	protected void saveAdditional(CompoundTag tag) {
 		super.saveAdditional(tag);
 		if (fluidTank != null) {
 			CompoundTag fluidTag = new CompoundTag();
@@ -118,7 +119,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	}
 
 	@Override
-	public void load(@NotNull CompoundTag tag) {
+	public void load(CompoundTag tag) {
 		super.load(tag);
 		if (tag.contains("FluidTank")) {
 			initFluidTank();
@@ -135,7 +136,6 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
-	// ----- 核心逻辑 -----
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, EXPGeneratorBlockEntity entity) {
 		if (level.isClientSide()) return;
@@ -143,31 +143,31 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 		boolean isWorking = false;
 
-		// 1. 玩家经验汲取（站在机器上方）
+		// ===== 1. 玩家经验汲取 =====
 		AABB aboveBox = new AABB(pos.getX(), pos.getY() + 1, pos.getZ(),
 				pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1);
 		int expToTake = EXPGeneratorConfig.PLAYER_EXP_PER_TICK.get();
-		level.getEntitiesOfClass(Player.class, aboveBox, (player) -> {
-					return !player.isSpectator();
-				})
+
+		boolean canAcceptFluid = entity.fluidTank.getFluidAmount() < entity.fluidTank.getCapacity();
+
+		level.getEntitiesOfClass(Player.class, aboveBox, player -> !player.isSpectator())
 				.stream()
 				.findFirst()
-				.ifPresent((player) -> {
-					if (player.totalExperience >= expToTake) {
+				.ifPresent(player -> {
+					// ✅ 只有能量和流体都未满，且玩家有足够经验时才扣除
+					if (canAcceptFluid && player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
-						var fluid = DTFluids.LIQUID_EXPERIENCE.get();
-						if (fluid != null) {
-							FluidStack playerFluid = new FluidStack(fluid, expToTake);
-							int filled = entity.fluidTank.fill(playerFluid, IFluidHandler.FluidAction.EXECUTE);
-							if (filled > 0) {
-								entity.setChanged();
-								entity.sync();
-							}
+						// ✅ 先用 水 代替液态经验
+						FluidStack playerFluid = new FluidStack(Fluids.WATER, expToTake);
+						int filled = entity.fluidTank.fill(playerFluid, IFluidHandler.FluidAction.EXECUTE);
+						if (filled > 0) {
+							entity.setChanged();
+							entity.sync();
 						}
 					}
 				});
 
-		// 2. 液态经验 → FE
+		// ===== 2. 消耗流体 → FE =====
 		boolean generatedPower = false;
 		if (entity.energy < entity.getMachineMaxEnergy()) {
 			int mbPerTick = EXPGeneratorConfig.MB_PER_TICK.get();
@@ -185,7 +185,6 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 		isWorking = isWorking || generatedPower;
 
-		// 3. 更新方块状态
 		if (state.getValue(EXPGeneratorBlock.LIT) != isWorking) {
 			level.setBlock(pos, state.setValue(EXPGeneratorBlock.LIT, isWorking), 3);
 		}
@@ -196,7 +195,6 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
-	// ----- GUI -----
 	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
@@ -219,13 +217,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				this.getMachineMaxEnergy()
 		));
 
-		group.addWidget(new FluidBarWidget(
-				36, 25, 14, 42,
-				() -> fluidTank.getFluidAmount(),
-				EXPGeneratorConfig.FLUID_CAPACITY.get(),
-				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/energy_back.png")),
-				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/energy_front.png"))
-		));
+		// 在 createUIWidget 中
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
 		SlotWidget inputSlot = new SlotWidget();
