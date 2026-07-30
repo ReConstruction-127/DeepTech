@@ -206,7 +206,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	private WidgetGroup createUIWidget(Player player) {
 		initFluidTank();
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-		group.setBackground(new ResourceTexture(DeepTech.loadResource("textures/gui/exp_generator.png")));
+		group.setBackground(new ResourceTexture(DeepTech.loadGui("exp_generator")));
 
 		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.EXP_GENERATOR.get().getName());
 		title.setColor(0xFF5D5F60);
@@ -222,8 +222,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				36, 25, 14, 42,
 				() -> fluidTank.getFluidAmount(),
 				EXPGeneratorConfig.FLUID_CAPACITY.get(),
-				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/energy_back.png")),
-				new ResourceTexture(DeepTech.loadResource("textures/gui/elements/energy_front.png"))
+				new ResourceTexture(DeepTech.loadGui("elements/energy_back")),
+				new ResourceTexture(DeepTech.loadGui("elements/energy_front"))
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
