@@ -46,6 +46,16 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 	}
 
 	@Override
+	public int getInputSlotCount() {
+		return 1;
+	}
+
+	@Override
+	public int getOutputSlotCount() {
+		return 1;
+	}
+
+	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
 		if (level.isClientSide()) return;
 

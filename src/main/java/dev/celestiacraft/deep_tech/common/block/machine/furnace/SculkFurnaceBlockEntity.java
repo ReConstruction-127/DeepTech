@@ -46,6 +46,16 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 	}
 
 	@Override
+	public int getInputSlotCount() {
+		return 1;
+	}
+
+	@Override
+	public int getOutputSlotCount() {
+		return 1;
+	}
+
+	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, SculkFurnaceBlockEntity entity) {
 		if (level.isClientSide()) {
 			return;

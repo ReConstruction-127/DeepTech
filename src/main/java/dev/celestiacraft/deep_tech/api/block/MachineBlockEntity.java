@@ -1,5 +1,7 @@
 package dev.celestiacraft.deep_tech.api.block;
 
+import dev.celestiacraft.deep_tech.api.block.config.IMachineEnergyConfig;
+import dev.celestiacraft.deep_tech.api.block.config.IMachineItemConfig;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import lombok.Getter;
@@ -16,12 +18,12 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T>, IMachineEnergyConfig {
+public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity
+		implements ITickableBlockEntity<T>, IMachineItemConfig, IMachineEnergyConfig {
 	@Getter
 	protected int progress = 0;
 	@Getter
@@ -60,7 +62,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	@Getter
 	private final IEnergyStorage energyStorage = new MachineEnergyCapability(this);
 	@Getter
-	private final ItemStackHandler inventory = new MachineItemHandler(this);
+	private final MachineItemHandler inventory = new MachineItemHandler(this);
 
 	private final LazyOptional<IEnergyStorage> energyCap = LazyOptional.of(() -> energyStorage);
 	private final LazyOptional<IItemHandler> itemCap = LazyOptional.of(() -> inventory);
