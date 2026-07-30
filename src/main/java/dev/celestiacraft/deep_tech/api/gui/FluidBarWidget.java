@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.gui;
+package dev.celestiacraft.deep_tech.api.gui;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -6,61 +6,41 @@ import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.function.Supplier;
 
-/**
- * 垂直进度条（从下往上填充）
- */
-public class VerticalProgressBarWidget extends Widget {
-    private final Supplier<Integer> progressGetter;
-    private final Supplier<Integer> maxProgressGetter;
-
+public class FluidBarWidget extends Widget {
+    private final Supplier<Integer> fluidGetter;
+    private final int maxFluid;
     private final ResourceTexture background;
     private final ResourceTexture foreground;
 
-    public VerticalProgressBarWidget(int x, int y, int width, int height,
-                                     Supplier<Integer> progressGetter,
-                                     Supplier<Integer> maxProgressGetter,
-                                     ResourceTexture background,
-                                     ResourceTexture foreground) {
+    public FluidBarWidget(int x, int y, int width, int height,
+                          Supplier<Integer> fluidGetter, int maxFluid,
+                          ResourceTexture background, ResourceTexture foreground) {
         super(x, y, width, height);
-        this.progressGetter = progressGetter;
-        this.maxProgressGetter = maxProgressGetter;
+        this.fluidGetter = fluidGetter;
+        this.maxFluid = maxFluid;
         this.background = background;
         this.foreground = foreground;
     }
 
     @Override
     public void drawInBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        int progress = progressGetter.get();
-        int maxProgress = maxProgressGetter.get();
-
-        // 背景纹理
+        int fluid = fluidGetter.get();
         background.draw(graphics, mouseX, mouseY,
                 getPosition().x, getPosition().y,
                 getSize().width, getSize().height);
-
-        if (progress <= 0 || maxProgress <= 0) {
-            return;
-        }
-
-        // 计算比例（从 0 到 1）
-        float ratio = (float) progress / maxProgress;
-        if (ratio > 1.0f) ratio = 1.0f;
-
-        // ✅ 垂直方向：从下往上计算显示高度
+        if (fluid <= 0 || maxFluid <= 0) return;
+        float ratio = (float) fluid / maxFluid;
+        if (ratio > 1f) ratio = 1f;
         int displayHeight = (int) (getSize().height * ratio);
-
-        // ✅ 裁剪区域：从底部向上
         graphics.enableScissor(
                 getPosition().x,
                 getPosition().y + getSize().height - displayHeight,
                 getPosition().x + getSize().width,
                 getPosition().y + getSize().height
         );
-
         foreground.draw(graphics, mouseX, mouseY,
                 getPosition().x, getPosition().y,
                 getSize().width, getSize().height);
-
         graphics.disableScissor();
     }
 }

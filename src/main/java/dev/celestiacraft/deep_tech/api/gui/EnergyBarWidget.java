@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.gui;
+package dev.celestiacraft.deep_tech.api.gui;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
