@@ -123,12 +123,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 		}
 	}
 
-	@Override
-	public int getMaxProgress() {
-		return maxProgress;
-	}
-
-	@Override
+		@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
 		ui.widget(createUIWidget(player));

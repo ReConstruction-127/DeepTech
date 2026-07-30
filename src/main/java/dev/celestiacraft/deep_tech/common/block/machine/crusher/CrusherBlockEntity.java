@@ -116,11 +116,6 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 	}
 
 	@Override
-	public int getMaxProgress() {
-		return maxProgress;
-	}
-
-	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
 		ui.widget(createUIWidget(player));
