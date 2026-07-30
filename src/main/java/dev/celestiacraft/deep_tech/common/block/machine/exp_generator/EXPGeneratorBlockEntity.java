@@ -2,26 +2,31 @@ package dev.celestiacraft.deep_tech.common.block.machine.exp_generator;
 
 import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
+import com.lowdragmc.lowdraglib.gui.texture.ProgressTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
-import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
-import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
+import com.lowdragmc.lowdraglib.gui.widget.*;
+import com.lowdragmc.lowdraglib.misc.FluidStorage;
+import com.lowdragmc.lowdraglib.side.fluid.IFluidStorage;
+import com.lowdragmc.lowdraglib.side.fluid.IFluidTransfer;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
-import dev.celestiacraft.deep_tech.api.gui.FluidBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.FluidTankWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
@@ -31,10 +36,13 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	private final SimpleMachineInventory inventoryWrapper;
 	private int syncCounter = 0;
 
+
 	public EXPGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		inventoryWrapper = new SimpleMachineInventory(getInventory());
 	}
+
+
 
 	@Override
 	public int getMaxExtract() {
@@ -143,6 +151,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 		isWorking = isWorking || generatedPower;
 
+
 		// 3. 更新方块状态
 		if (state.getValue(EXPGeneratorBlock.LIT) != isWorking) {
 			level.setBlock(pos, state.setValue(EXPGeneratorBlock.LIT, isWorking), 3);
@@ -154,6 +163,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
+	// GUI
 	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
@@ -175,12 +185,14 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				getMachineMaxEnergy()
 		));
 
-		group.addWidget(new FluidBarWidget(
-				36, 25, 14, 42,
-				this::getFluidAmount,
-				getFluidCapacity(),
-				new ResourceTexture(DeepTech.loadGui("elements/energy_back")),
-				new ResourceTexture(DeepTech.loadGui("elements/energy_front"))
+		int capacity = getFluidCapacity();
+		int amount = getFluidAmount();
+
+
+		group.addWidget(new FluidTankWidget(
+				36, 25, 18, 54,
+				this::getFluidStorage,
+				getExperienceTank()
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
