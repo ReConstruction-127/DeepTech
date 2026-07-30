@@ -1,6 +1,6 @@
 package dev.celestiacraft.deep_tech.config.common.machine;
 
-import dev.celestiacraft.deep_tech.config.ConfigModule;
+import dev.celestiacraft.libs.config.api.ConfigModule;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class SculkFurnaceConfig extends ConfigModule {
