@@ -16,29 +16,20 @@ import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBlockEntity> implements IUIHolder.BlockEntityUI {
 	private final SimpleMachineInventory inventoryWrapper;
 	private int syncCounter = 0;
-
-	// ✅ 延迟初始化
-	private FluidTank fluidTank;
-	private LazyOptional<IFluidHandler> fluidCap;
 
 	public EXPGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -70,75 +61,37 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		return 0;
 	}
 
-	// ----- 延迟初始化 -----
-	private void initFluidTank() {
-		if (fluidTank == null) {
-			int capacity = EXPGeneratorConfig.FLUID_CAPACITY.get();
-			fluidTank = new FluidTank(capacity) {
-				@Override
-				protected void onContentsChanged() {
-					setChanged();
-					if (level != null && !level.isClientSide) {
-						sync();
-					}
-				}
-			};
-			fluidCap = LazyOptional.of(() -> fluidTank);
-		}
-	}
-
-	// ----- 流体能力暴露 -----
 	@Override
-	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
-		initFluidTank();
-		if (cap == ForgeCapabilities.FLUID_HANDLER) {
-			return fluidCap.cast();
-		}
-		return super.getCapability(cap, side);
+	public int getFluidInputTankCount() {
+		return 1;
 	}
 
 	@Override
-	public void invalidateCaps() {
-		super.invalidateCaps();
-		if (fluidCap != null) {
-			fluidCap.invalidate();
-		}
-	}
-
-	// ----- 持久化 -----
-	@Override
-	protected void saveAdditional(@NotNull CompoundTag tag) {
-		super.saveAdditional(tag);
-		if (fluidTank != null) {
-			CompoundTag fluidTag = new CompoundTag();
-			fluidTank.writeToNBT(fluidTag);
-			tag.put("FluidTank", fluidTag);
-		}
+	public int getMachineTankCapacity(int tank) {
+		return EXPGeneratorConfig.FLUID_CAPACITY.get();
 	}
 
 	@Override
-	public void load(@NotNull CompoundTag tag) {
-		super.load(tag);
-		if (tag.contains("FluidTank")) {
-			initFluidTank();
-			fluidTank.readFromNBT(tag.getCompound("FluidTank"));
-		}
+	public boolean canFillFluid(int tank, FluidStack stack) {
+		return super.canFillFluid(tank, stack) && (
+				stack.getFluid() == DTFluids.LIQUID_EXPERIENCE.get()
+						|| stack.getFluid() == DTFluids.LIQUID_EXPERIENCE.getSource()
+		);
 	}
 
 	@Override
-	public void onLoad() {
-		super.onLoad();
-		initFluidTank();
-		if (level != null && !level.isClientSide) {
-			sync();
-		}
+	public boolean canDrainFluid(int tank, FluidStack stack) {
+		return true;
+	}
+
+	private int getExperienceTank() {
+		return getFluidInputTankIndex(0);
 	}
 
 	// ----- 核心逻辑 -----
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, EXPGeneratorBlockEntity entity) {
 		if (level.isClientSide()) return;
-		initFluidTank();
 
 		boolean isWorking = false;
 
@@ -152,36 +105,33 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				pos.getZ() + 1
 		);
 		int expToTake = EXPGeneratorConfig.PLAYER_EXP_PER_TICK.get();
+		int experienceTank = entity.getExperienceTank();
 
-		boolean canAcceptFluid = entity.fluidTank.getFluidAmount() < entity.fluidTank.getCapacity();
+		boolean canAcceptFluid = entity.getFluidAmount() < entity.getFluidCapacity();
+		List<Player> playerOfClass = level.getEntitiesOfClass(
+				Player.class,
+				aboveBox,
+				(player) -> {
+					return !player.isSpectator();
+				});
 
-		level.getEntitiesOfClass(
-						Player.class,
-						aboveBox,
-						(player) -> {
-							return !player.isSpectator();
-						})
-				.stream()
+		playerOfClass.stream()
 				.findFirst()
 				.ifPresent((player) -> {
 					if (canAcceptFluid && player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
-						FluidStack playerFluid = new FluidStack(DTFluids.LIQUID_EXPERIENCE.get(), expToTake);
-						int filled = entity.fluidTank.fill(playerFluid, IFluidHandler.FluidAction.EXECUTE);
-						if (filled > 0) {
-							entity.setChanged();
-							entity.sync();
-						}
+						FluidStack playerFluid = new FluidStack(DTFluids.LIQUID_EXPERIENCE.getSource(), expToTake);
+						entity.getFluidStorage().fillTank(experienceTank, playerFluid, IFluidHandler.FluidAction.EXECUTE, false);
 					}
 				});
 
-		// ===== 2. 消耗流体 → FE =====
 		boolean generatedPower = false;
 		if (entity.energy < entity.getMachineMaxEnergy()) {
 			int mbPerTick = EXPGeneratorConfig.MB_PER_TICK.get();
-			FluidStack drainStack = entity.fluidTank.drain(mbPerTick, IFluidHandler.FluidAction.SIMULATE);
+			FluidStack drainStack = entity.getFluidStorage().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.SIMULATE, false);
+
 			if (!drainStack.isEmpty() && drainStack.getAmount() >= mbPerTick) {
-				entity.fluidTank.drain(mbPerTick, IFluidHandler.FluidAction.EXECUTE);
+				entity.getFluidStorage().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.EXECUTE, false);
 				int fePerMb = EXPGeneratorConfig.FE_PER_MB.get();
 				int generated = fePerMb * mbPerTick;
 				entity.energy = Math.min(entity.energy + generated, entity.getMachineMaxEnergy());
@@ -204,7 +154,6 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
-	// ----- GUI -----
 	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
@@ -213,7 +162,6 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	}
 
 	private WidgetGroup createUIWidget(Player player) {
-		initFluidTank();
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
 		group.setBackground(new ResourceTexture(DeepTech.loadGui("exp_generator")));
 
@@ -229,8 +177,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 		group.addWidget(new FluidBarWidget(
 				36, 25, 14, 42,
-				() -> fluidTank.getFluidAmount(),
-				EXPGeneratorConfig.FLUID_CAPACITY.get(),
+				this::getFluidAmount,
+				getFluidCapacity(),
 				new ResourceTexture(DeepTech.loadGui("elements/energy_back")),
 				new ResourceTexture(DeepTech.loadGui("elements/energy_front"))
 		));
@@ -273,10 +221,10 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	}
 
 	public int getFluidAmount() {
-		return fluidTank != null ? fluidTank.getFluidAmount() : 0;
+		return getFluidStorage().getFluidInTank(getExperienceTank()).getAmount();
 	}
 
 	public int getFluidCapacity() {
-		return fluidTank != null ? fluidTank.getCapacity() : 0;
+		return getFluidStorage().getTankCapacity(getExperienceTank());
 	}
 }

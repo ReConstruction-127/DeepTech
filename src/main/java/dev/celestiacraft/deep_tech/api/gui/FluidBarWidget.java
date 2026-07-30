@@ -33,15 +33,6 @@ public class FluidBarWidget extends Widget {
 	@Override
 	public void drawInBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
 		int fluid = fluidGetter.get();
-		if (fluid <= 0 || maxFluid <= 0) {
-			return;
-		}
-		float ratio = (float) fluid / maxFluid;
-		if (ratio > 1.0f) {
-			ratio = 1.0f;
-		}
-		int displayHeight = (int) (getSize().height * ratio);
-
 		background.draw(
 				graphics,
 				mouseX,
@@ -51,6 +42,15 @@ public class FluidBarWidget extends Widget {
 				getSize().width,
 				getSize().height
 		);
+
+		if (fluid <= 0 || maxFluid <= 0) {
+			return;
+		}
+		float ratio = (float) fluid / maxFluid;
+		if (ratio > 1.0f) {
+			ratio = 1.0f;
+		}
+		int displayHeight = (int) (getSize().height * ratio);
 
 		graphics.enableScissor(
 				getPosition().x,

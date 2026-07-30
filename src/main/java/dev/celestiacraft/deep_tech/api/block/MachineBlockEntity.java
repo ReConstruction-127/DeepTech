@@ -18,6 +18,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,9 +64,12 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	private final IEnergyStorage energyStorage = new MachineEnergyCapability(this);
 	@Getter
 	private final MachineItemHandler inventory = new MachineItemHandler(this);
+	@Getter
+	private final MachineFluidHandler fluidStorage = new MachineFluidHandler(this);
 
 	private final LazyOptional<IEnergyStorage> energyCap = LazyOptional.of(() -> energyStorage);
 	private final LazyOptional<IItemHandler> itemCap = LazyOptional.of(() -> inventory);
+	private final LazyOptional<IFluidHandler> fluidCap = LazyOptional.of(() -> fluidStorage);
 
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, Direction side) {
@@ -75,6 +79,9 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		if (capability == ForgeCapabilities.ITEM_HANDLER) {
 			return itemCap.cast();
 		}
+		if (capability == ForgeCapabilities.FLUID_HANDLER && getMaxMachineTank() > 0) {
+			return fluidCap.cast();
+		}
 		return super.getCapability(capability, side);
 	}
 
@@ -83,6 +90,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		super.invalidateCaps();
 		energyCap.invalidate();
 		itemCap.invalidate();
+		fluidCap.invalidate();
 	}
 
 	@Override
@@ -92,6 +100,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		tag.putInt("Energy", energy);
 		tag.putInt("Progress", progress);
 		tag.putInt("MaxProgress", maxProgress);
+		tag.put("Fluids", fluidStorage.serializeNBT());
 	}
 
 	@Override
@@ -100,6 +109,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		tag.putInt("Energy", energy);
 		tag.putInt("Progress", progress);
 		tag.putInt("MaxProgress", maxProgress);
+		tag.put("Fluids", fluidStorage.serializeNBT());
 		return tag;
 	}
 
@@ -123,6 +133,9 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		energy = tag.getInt("Energy");
 		progress = tag.getInt("Progress");
 		maxProgress = tag.getInt("MaxProgress");
+		if (tag.contains("Fluids")) {
+			fluidStorage.deserializeNBT(tag.getCompound("Fluids"));
+		}
 	}
 
 	@Override
@@ -131,6 +144,10 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		inventory.deserializeNBT(tag.getCompound("Inventory"));
 		energy = tag.getInt("Energy");
 		progress = tag.getInt("Progress");
+		maxProgress = tag.getInt("MaxProgress");
+		if (tag.contains("Fluids")) {
+			fluidStorage.deserializeNBT(tag.getCompound("Fluids"));
+		}
 	}
 
 	@Override
