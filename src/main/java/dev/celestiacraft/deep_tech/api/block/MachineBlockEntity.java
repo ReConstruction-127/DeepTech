@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.api.block;
 
 import dev.celestiacraft.deep_tech.api.block.config.IMachineEnergyConfig;
+import dev.celestiacraft.deep_tech.api.block.config.IMachineFluidConfig;
 import dev.celestiacraft.deep_tech.api.block.config.IMachineItemConfig;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T>, IMachineItemConfig, IMachineEnergyConfig {
+public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T>, IMachineItemConfig, IMachineFluidConfig, IMachineEnergyConfig {
 	@Getter
 	protected int progress = 0;
 	@Getter
