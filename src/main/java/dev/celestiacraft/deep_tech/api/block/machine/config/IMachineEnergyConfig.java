@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.block.config;
+package dev.celestiacraft.deep_tech.api.block.machine.config;
 
 /**
  * 这里是一些关于电力的配置

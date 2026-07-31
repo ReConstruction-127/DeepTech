@@ -1,5 +1,6 @@
-package dev.celestiacraft.deep_tech.api.block;
+package dev.celestiacraft.deep_tech.api.block.machine.capability;
 
+import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraftforge.common.util.INBTSerializable;

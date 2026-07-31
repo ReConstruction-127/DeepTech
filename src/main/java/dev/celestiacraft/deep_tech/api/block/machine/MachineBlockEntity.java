@@ -1,8 +1,11 @@
-package dev.celestiacraft.deep_tech.api.block;
+package dev.celestiacraft.deep_tech.api.block.machine;
 
-import dev.celestiacraft.deep_tech.api.block.config.IMachineEnergyConfig;
-import dev.celestiacraft.deep_tech.api.block.config.IMachineFluidConfig;
-import dev.celestiacraft.deep_tech.api.block.config.IMachineItemConfig;
+import dev.celestiacraft.deep_tech.api.block.machine.capability.MachineEnergyCapability;
+import dev.celestiacraft.deep_tech.api.block.machine.capability.MachineFluidHandler;
+import dev.celestiacraft.deep_tech.api.block.machine.capability.MachineItemHandler;
+import dev.celestiacraft.deep_tech.api.block.machine.config.IMachineEnergyConfig;
+import dev.celestiacraft.deep_tech.api.block.machine.config.IMachineFluidConfig;
+import dev.celestiacraft.deep_tech.api.block.machine.config.IMachineItemConfig;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import lombok.Getter;

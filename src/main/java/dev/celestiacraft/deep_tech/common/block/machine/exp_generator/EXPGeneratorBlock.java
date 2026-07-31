@@ -3,7 +3,7 @@ package dev.celestiacraft.deep_tech.common.block.machine.exp_generator;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
-import dev.celestiacraft.deep_tech.api.block.MachineBlock;
+import dev.celestiacraft.deep_tech.api.block.machine.MachineBlock;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;

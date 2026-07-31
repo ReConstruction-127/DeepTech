@@ -15,8 +15,8 @@ public class DTFluids {
 		DTCreativeTabs.getTab("material");
 
 		LIQUID_EXPERIENCE = DTFluidBuilder.of("liquid_experience")
-				.flowing(DTFluidTextures.EXP.getFlowing())
-				.still(DTFluidTextures.EXP.getStill())
+				.flowing(DTFluidTextures.EXPERIENCE.getFlowing())
+				.still(DTFluidTextures.EXPERIENCE.getStill())
 				.bucket()
 				.model(DTFluidTexture.forgeFluidBucket("liquid_experience"))
 				.build()

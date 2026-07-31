@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.block.config;
+package dev.celestiacraft.deep_tech.api.block.machine.config;
 
 import net.minecraft.world.item.ItemStack;
 

@@ -8,7 +8,7 @@ import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
+import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;

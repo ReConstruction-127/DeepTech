@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.block;
+package dev.celestiacraft.deep_tech.api.block.machine;
 
 import com.lowdragmc.lowdraglib.gui.factory.BlockEntityUIFactory;
 import com.tterrag.registrate.providers.DataGenContext;

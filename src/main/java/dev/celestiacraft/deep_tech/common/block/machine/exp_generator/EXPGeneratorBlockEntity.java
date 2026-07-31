@@ -8,10 +8,11 @@ import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
+import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.FluidTankWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
+import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import dev.celestiacraft.deep_tech.tags.DeepTechFluidTags;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -124,7 +124,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				.ifPresent((player) -> {
 					if (canAcceptFluid && player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
-						FluidStack playerFluid = new FluidStack(dev.celestiacraft.deep_tech.common.register.DTFluids.LIQUID_EXPERIENCE.get(), expToTake);
+						FluidStack playerFluid = new FluidStack(DTFluids.LIQUID_EXPERIENCE.get(), expToTake);
 						entity.getFluidStorage().fillTank(experienceTank, playerFluid, IFluidHandler.FluidAction.EXECUTE, false);
 					}
 				});
