@@ -66,12 +66,65 @@ public interface IMachineFluidConfig {
 
 	/**
 	 * 获取指定流体罐的容量
+	 * <pre>{@code
+	 * 例如机器拥有:
+	 * 输入流体罐:
+	 *   tank 0 -> 容量 114 mB
+	 *   tank 1 -> 容量 200 mB
+	 *
+	 * 输出流体罐:
+	 *   tank 2 -> 容量 300 mB
+	 *   tank 3 -> 容量 514 mB
+	 *
+	 * 可以通过重写该方法为不同流体罐设置不同容量:
+	 *
+	 * @Override
+	 * public int getMachineTankCapacity(int tank) {
+	 *     return switch (tank) {
+	 *         case 0 -> 114;
+	 *         case 1 -> 200;
+	 *         case 2 -> 300;
+	 *         case 3 -> 514;
+	 *         default -> 8000;
+	 *     };
+	 * }
+	 * }</pre>
 	 *
 	 * @param tank 实际流体罐下标
 	 * @return 流体罐最大容量, 单位为 mB
 	 */
 	default int getMachineTankCapacity(int tank) {
 		return 0;
+	}
+
+	/**
+	 * 判断指定实际流体罐是否为输入流体罐
+	 *
+	 * @param tank 实际流体罐下标
+	 * @return 是否为输入流体罐
+	 */
+	default boolean isFluidInputTank(int tank) {
+		for (int i = 0; i < getFluidInputTankCount(); i++) {
+			if (getFluidInputTankIndex(i) == tank) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * 判断指定实际流体罐是否为输出流体罐
+	 *
+	 * @param tank 实际流体罐下标
+	 * @return 是否为输出流体罐
+	 */
+	default boolean isFluidOutputTank(int tank) {
+		for (int i = 0; i < getFluidOutputTankCount(); i++) {
+			if (getFluidOutputTankIndex(i) == tank) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -84,7 +137,7 @@ public interface IMachineFluidConfig {
 	 * @return 是否允许填充流体
 	 */
 	default boolean canFillFluid(int tank, FluidStack stack) {
-		return tank >= 0 && tank < getFluidInputTankCount();
+		return isFluidInputTank(tank);
 	}
 
 	/**
@@ -97,6 +150,6 @@ public interface IMachineFluidConfig {
 	 * @return 是否允许排出流体
 	 */
 	default boolean canDrainFluid(int tank, FluidStack stack) {
-		return tank >= getFluidInputTankCount() && tank < getMaxMachineTank();
+		return isFluidOutputTank(tank);
 	}
 }
