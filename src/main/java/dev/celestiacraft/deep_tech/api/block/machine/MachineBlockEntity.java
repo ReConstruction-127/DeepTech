@@ -9,6 +9,7 @@ import dev.celestiacraft.deep_tech.api.block.machine.config.IMachineItemConfig;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -27,12 +28,12 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
+@Getter
 public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T>, IMachineItemConfig, IMachineFluidConfig, IMachineEnergyConfig {
-	@Getter
-	protected int progress = 0;
-	@Getter
-	protected int maxProgress = 100;
-	protected int energy = 0;
+	public int progress = 0;
+	public int maxProgress = 100;
+	@Setter
+	public int energy = 0;
 
 	public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);

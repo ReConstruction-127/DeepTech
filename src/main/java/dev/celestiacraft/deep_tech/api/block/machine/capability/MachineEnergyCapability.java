@@ -21,7 +21,7 @@ public class MachineEnergyCapability implements IEnergyStorage {
 		received = Math.max(received, 0);
 
 		if (!simulate && received > 0) {
-			machine.energy += received;
+			machine.setEnergy(machine.getEnergy() + received);
 			machine.setChanged();
 			machine.sync();
 		}

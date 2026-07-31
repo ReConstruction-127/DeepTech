@@ -83,7 +83,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	@Override
 	public boolean canDrainFluid(int tank, FluidStack stack) {
-		return false;
+		return true;
 	}
 
 	private int getExperienceTank() {

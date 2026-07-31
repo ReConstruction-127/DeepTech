@@ -36,8 +36,17 @@ public class SimpleMachineInventory implements Container {
 
     @Override
     public @NotNull ItemStack removeItem(int slot, int amount) {
-        // ✅ 直接提取，不需要额外的 set
-        return handler.extractItem(slot, amount, false);
+        // 玩家在 GUI 中用鼠标取物时绕过 canExtractItem 策略, 直接操作存储
+        // (canExtractItem 仍然约束漏斗/管道等外部自动化抽取)
+        ItemStack stack = handler.getStackInSlot(slot);
+        if (stack.isEmpty() || amount <= 0) {
+            return ItemStack.EMPTY;
+        }
+        ItemStack removed = stack.copy();
+        removed.setCount(Math.min(amount, stack.getCount()));
+        stack.shrink(removed.getCount());
+        handler.setStackInSlot(slot, stack);
+        return removed;
     }
 
     @Override

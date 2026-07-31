@@ -60,14 +60,40 @@ public interface IMachineItemConfig {
 		return getItemInputSlotCount() + index;
 	}
 
+	/**
+	 * 判断指定槽位是否允许插入物品
+	 * <p>
+	 * 默认情况下, 只有输入槽允许插入物品
+	 *
+	 * @param slot  实际槽位下标
+	 * @param stack 尝试插入的物品
+	 * @return 是否允许插入物品
+	 */
 	default boolean canInsertItem(int slot, ItemStack stack) {
 		return slot >= 0 && slot < getItemInputSlotCount();
 	}
 
+	/**
+	 * 判断指定槽位是否允许提取物品
+	 * <p>
+	 * 默认情况下, 只有输出槽允许提取物品
+	 *
+	 * @param slot  实际槽位下标
+	 * @param stack 尝试提取的物品
+	 * @return 是否允许提取物品
+	 */
 	default boolean canExtractItem(int slot, ItemStack stack) {
 		return slot >= getItemInputSlotCount() && slot < getMaxMachineSlot();
 	}
 
+	/**
+	 * 获取指定槽位的最大物品堆叠数量
+	 * <p>
+	 * 默认情况下, 每个槽位最大存储原版允许的 64 个物品
+	 *
+	 * @param slot 实际槽位下标
+	 * @return 该槽位最大物品数量
+	 */
 	default int getMachineSlotLimit(int slot) {
 		return 64;
 	}
