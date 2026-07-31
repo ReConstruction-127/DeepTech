@@ -10,7 +10,7 @@ import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
-import dev.celestiacraft.deep_tech.api.gui.FluidBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.FluidTankWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
@@ -175,7 +175,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				getMachineMaxEnergy()
 		));
 
-		group.addWidget(new FluidBarWidget(
+		group.addWidget(new FluidTankWidget(
 				36,
 				25,
 				14,
