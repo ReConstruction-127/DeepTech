@@ -14,12 +14,14 @@ import dev.celestiacraft.deep_tech.api.gui.FluidTankWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
+import dev.celestiacraft.deep_tech.tags.DeepTechFluidTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.fluids.FluidStack;
@@ -73,9 +75,10 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	@Override
 	public boolean canFillFluid(int tank, FluidStack stack) {
+		Fluid fluid = stack.getFluid();
+
 		return super.canFillFluid(tank, stack)
-				&& (stack.getFluid() == Fluids.WATER
-				|| stack.getFluid() == Fluids.WATER);
+				|| fluid.is(DeepTechFluidTags.EXPERIENCE);
 	}
 
 	@Override
@@ -90,7 +93,9 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	// ----- 核心逻辑 -----
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, EXPGeneratorBlockEntity entity) {
-		if (level.isClientSide()) return;
+		if (level.isClientSide()) {
+			return;
+		}
 
 		boolean isWorking = false;
 
@@ -144,7 +149,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 		// 3. 更新方块状态
 		if (state.getValue(EXPGeneratorBlock.LIT) != isWorking) {
-			level.setBlock(pos, state.setValue(EXPGeneratorBlock.LIT, isWorking), 3);
+			level.setBlockAndUpdate(pos, state.setValue(EXPGeneratorBlock.LIT, isWorking));
 		}
 
 		if (!isWorking && entity.progress > 0) {

@@ -1,10 +1,10 @@
 package dev.celestiacraft.deep_tech.common.register;
 
 import com.tterrag.registrate.util.entry.FluidEntry;
+import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.texture.DTFluidTexture;
 import dev.celestiacraft.deep_tech.api.client.texture.DTFluidTextures;
 import dev.celestiacraft.deep_tech.api.register.fluid.DTFluidBuilder;
-import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.tags.DeepTechFluidTags;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 

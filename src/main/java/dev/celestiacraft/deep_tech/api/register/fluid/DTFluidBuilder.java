@@ -11,16 +11,26 @@ import com.tterrag.registrate.util.nullness.NonNullFunction;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.texture.DTFluidTexture;
 import dev.celestiacraft.libs.api.register.fluid.BasicFluidType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
 public class DTFluidBuilder<T extends ForgeFlowingFluid> {
+
+	@FunctionalInterface
+	public interface FluidTickHandler {
+		void tick(Level level, BlockPos pos, FluidState state);
+	}
+
 	private final Registrate registrate;
 	private final String name;
 	private final FluidBuilder.FluidTypeFactory typeFactory;
@@ -31,6 +41,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 	private int tintColor = 0xFFFFFFFF;
 	private FluidBuilder<T, Registrate> builder;
 	private boolean sourceConfigured;
+	private FluidTickHandler tickHandler;
 
 	private DTFluidBuilder(Registrate registrate, String name, FluidBuilder.FluidTypeFactory typeFactory, NonNullFunction<ForgeFlowingFluid.Properties, T> fluidFactory) {
 		this.registrate = registrate;
@@ -101,6 +112,16 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		return this;
 	}
 
+	/**
+	 * 给流体注册 tick 回调, 源液体和流动液体都会生效
+	 * 使用该方法时不要再传自定义流体工厂, 直接用 {@link #of(String)}。
+	 */
+	public DTFluidBuilder<T> tick(FluidTickHandler handler) {
+		checkMutable();
+		tickHandler = handler;
+		return this;
+	}
+
 	public DTFluidBuilder<T> properties(NonNullConsumer<FluidType.Properties> consumer) {
 		builder().properties(consumer);
 		return this;
@@ -115,13 +136,38 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		if (builder == null) {
 			checkTextures();
 			FluidBuilder.FluidTypeFactory factory = typeFactory == null ? this::createBasicFluidType : typeFactory;
-			builder = registrate.fluid(name, stillTexture, flowingTexture, factory, fluidFactory);
+			if (tickHandler == null) {
+				builder = registrate.fluid(name, stillTexture, flowingTexture, factory, fluidFactory);
+			} else {
+				FluidTickHandler handler = tickHandler;
+				builder = registrate.fluid(name, stillTexture, flowingTexture, factory, properties -> createTickedFlowing(properties, handler));
+			}
 		}
 		return builder;
 	}
 
+	private T createTickedFlowing(ForgeFlowingFluid.Properties properties, FluidTickHandler handler) {
+		return (T) new ForgeFlowingFluid.Flowing(properties) {
+			@Override
+			public void tick(@NotNull Level level, @NotNull BlockPos pos, @NotNull FluidState state) {
+				super.tick(level, pos, state);
+				handler.tick(level, pos, state);
+			}
+		};
+	}
+
 	public FluidBuilder<T, Registrate> source() {
-		return source(ForgeFlowingFluid.Source::new);
+		if (tickHandler == null) {
+			return source(ForgeFlowingFluid.Source::new);
+		}
+		FluidTickHandler handler = tickHandler;
+		return source((properties) -> new ForgeFlowingFluid.Source(properties) {
+			@Override
+			public void tick(@NotNull Level level, @NotNull BlockPos pos, @NotNull FluidState state) {
+				super.tick(level, pos, state);
+				handler.tick(level, pos, state);
+			}
+		});
 	}
 
 	public FluidBuilder<T, Registrate> source(NonNullFunction<ForgeFlowingFluid.Properties, ? extends ForgeFlowingFluid> factory) {
