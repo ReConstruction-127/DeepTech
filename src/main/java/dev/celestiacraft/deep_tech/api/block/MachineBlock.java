@@ -14,6 +14,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -62,6 +63,11 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 			return InteractionResult.SUCCESS;
 		}
 
+		ItemStack stack = player.getMainHandItem();
+		if (stack.getItem() instanceof BucketItem) {
+			return super.use(state, level, pos, player, hand, hit);
+		}
+
 		BlockEntity blockEntity = level.getBlockEntity(pos);
 		if (blockEntity != null && getBlockEntityClass().isInstance(blockEntity) && player instanceof ServerPlayer serverPlayer) {
 			return getMachineUI(getBlockEntityClass().cast(blockEntity), serverPlayer)
@@ -82,7 +88,7 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 		});
 	}
 
-	protected static <B extends BasicBlock> NonNullBiConsumer<DataGenContext<Block, B>, RegistrateBlockstateProvider> genBlockState(String textureFolder) {
+	public static <B extends BasicBlock> NonNullBiConsumer<DataGenContext<Block, B>, RegistrateBlockstateProvider> genBlockState(String textureFolder) {
 		return (context, provider) -> {
 			BlockModelBuilder modelOff = machineModel(provider, context.getName() + "_off", textureFolder, false);
 			BlockModelBuilder modelOn = machineModel(provider, context.getName() + "_on", textureFolder, true);
@@ -97,7 +103,7 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 		};
 	}
 
-	protected static BlockModelBuilder machineModel(RegistrateBlockstateProvider provider, String name, String textureFolder, boolean lit) {
+	public static BlockModelBuilder machineModel(RegistrateBlockstateProvider provider, String name, String textureFolder, boolean lit) {
 		String suffix = lit ? "on" : "off";
 		String textureRoot = "block/machine/" + textureFolder + "/";
 
@@ -112,7 +118,7 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 		);
 	}
 
-	protected static <T extends Block> void horizontalLitBlock(RegistrateBlockstateProvider provider, T block, BlockModelBuilder modelOff, BlockModelBuilder modelOn) {
+	public static <T extends Block> void horizontalLitBlock(RegistrateBlockstateProvider provider, T block, BlockModelBuilder modelOff, BlockModelBuilder modelOn) {
 		provider.getVariantBuilder(block)
 				.forAllStates((state) -> {
 					Direction direction = state.getValue(BasicBlock.HORIZONTAL_FACING);

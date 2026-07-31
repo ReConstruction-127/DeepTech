@@ -12,6 +12,8 @@ public class DTFluids {
 	public static final FluidEntry<ForgeFlowingFluid.Flowing> LIQUID_EXPERIENCE;
 
 	static {
+		DTCreativeTabs.getTab("material");
+
 		LIQUID_EXPERIENCE = DTFluidBuilder.of("liquid_experience")
 				.flowing(DTFluidTextures.EXP.getFlowing())
 				.still(DTFluidTextures.EXP.getStill())

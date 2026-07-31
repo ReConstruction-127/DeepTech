@@ -10,25 +10,30 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 
 public class EXPGeneratorBlock extends MachineBlock<EXPGeneratorBlockEntity> {
-    public EXPGeneratorBlock(Properties properties) {
-        super(properties);
-    }
+	public EXPGeneratorBlock(Properties properties) {
+		super(properties);
+	}
 
-    @Override
-    public BlockEntityType<EXPGeneratorBlockEntity> getBlockEntityType() {
-        return DTBlockEntities.EXP_GENERATOR.get();
-    }
+	@Override
+	public BlockEntityType<EXPGeneratorBlockEntity> getBlockEntityType() {
+		return DTBlockEntities.EXP_GENERATOR.get();
+	}
 
-    @Override
-    public Class<EXPGeneratorBlockEntity> getBlockEntityClass() {
-        return EXPGeneratorBlockEntity.class;
-    }
+	@Override
+	public Class<EXPGeneratorBlockEntity> getBlockEntityClass() {
+		return EXPGeneratorBlockEntity.class;
+	}
 
-    public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
-        return (context, provider) -> {
-            BlockModelBuilder modelOff = machineModel(provider, context.getName() + "_off", "exp_generator", false);
-            BlockModelBuilder modelOn = machineModel(provider, context.getName() + "_on", "exp_generator", true);
-            horizontalLitBlock(provider, context.get(), modelOff, modelOn);
-        };
-    }
+	@Override
+	public boolean creativeUseFluidInteraction() {
+		return true;
+	}
+
+	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
+		return (context, provider) -> {
+			BlockModelBuilder modelOff = machineModel(provider, context.getName() + "_off", "exp_generator", false);
+			BlockModelBuilder modelOn = machineModel(provider, context.getName() + "_on", "exp_generator", true);
+			horizontalLitBlock(provider, context.get(), modelOff, modelOn);
+		};
+	}
 }

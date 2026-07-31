@@ -5,6 +5,7 @@ import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
 import com.lowdragmc.lowdraglib.side.fluid.forge.FluidHelperImpl;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -113,5 +114,15 @@ public class FluidTankWidget extends Widget {
 			);
 		}
 		graphics.disableScissor();
+	}
+
+	@Override
+	public void drawInForeground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+		super.drawInForeground(graphics, mouseX, mouseY, partialTicks);
+
+		if (isMouseOverElement(mouseX, mouseY)) {
+			String text = String.format("%s mB / %s mB", fluidGetter.get(), maxFluid);
+			setHoverTooltips(Component.literal(text));
+		}
 	}
 }
