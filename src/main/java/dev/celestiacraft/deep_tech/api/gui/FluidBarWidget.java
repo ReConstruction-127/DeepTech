@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.api.gui;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
+import com.lowdragmc.lowdraglib.side.fluid.forge.FluidHelperImpl;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraftforge.fluids.FluidStack;
@@ -94,7 +95,7 @@ public class FluidBarWidget extends Widget {
 		if (!fluidStack.isEmpty()) {
 			DrawerHelper.drawFluidForGui(
 					graphics,
-					fluidStack,
+					FluidHelperImpl.toFluidStack(fluidStack),
 					getPosition().x,
 					getPosition().y,
 					getSize().width,

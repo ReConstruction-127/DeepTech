@@ -12,7 +12,6 @@ import dev.celestiacraft.deep_tech.api.block.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.FluidBarWidget;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
-import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import net.minecraft.core.BlockPos;
@@ -21,6 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -73,10 +73,9 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	@Override
 	public boolean canFillFluid(int tank, FluidStack stack) {
-		return super.canFillFluid(tank, stack) && (
-				stack.getFluid() == DTFluids.LIQUID_EXPERIENCE.get()
-						|| stack.getFluid() == DTFluids.LIQUID_EXPERIENCE.getSource()
-		);
+		return super.canFillFluid(tank, stack)
+				&& (stack.getFluid() == Fluids.WATER
+				|| stack.getFluid() == Fluids.WATER);
 	}
 
 	@Override
@@ -120,7 +119,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				.ifPresent((player) -> {
 					if (canAcceptFluid && player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
-						FluidStack playerFluid = new FluidStack(DTFluids.LIQUID_EXPERIENCE.getSource(), expToTake);
+						FluidStack playerFluid = new FluidStack(Fluids.WATER, expToTake);
 						entity.getFluidStorage().fillTank(experienceTank, playerFluid, IFluidHandler.FluidAction.EXECUTE, false);
 					}
 				});
@@ -170,17 +169,21 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		group.addWidget(title);
 
 		group.addWidget(new EnergyBarWidget(
-				18, 25,
+				18,
+				25,
 				this::getEnergyStored,
 				getMachineMaxEnergy()
 		));
 
 		group.addWidget(new FluidBarWidget(
-				36, 25, 14, 42,
+				36,
+				25,
+				14,
+				42,
 				this::getFluidAmount,
 				getFluidCapacity(),
 				() -> getFluidStorage().getFluidInTank(getExperienceTank()),
-				new ResourceTexture(DeepTech.loadGui("elements/energy_back"))
+				new ResourceTexture(DeepTech.loadGui("elements/tank_back"))
 		));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
