@@ -163,6 +163,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		}
 	}
 
+
 	// GUI
 	@Override
 	public ModularUI createUI(Player player) {
@@ -185,15 +186,36 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				getMachineMaxEnergy()
 		));
 
-		int capacity = getFluidCapacity();
+		// ===== 流体储罐 =====
 		int amount = getFluidAmount();
+		int capacity = getFluidCapacity();
 
+// 从实际存储中读取流体类型
+		net.minecraftforge.fluids.FluidStack actualFluid =
+				getFluidStorage().getFluidInTank(getExperienceTank());
 
-		group.addWidget(new FluidTankWidget(
-				36, 25, 18, 54,
-				this::getFluidStorage,
-				getExperienceTank()
-		));
+		FluidStorage tank = new FluidStorage(capacity);
+
+		if (amount > 0 && actualFluid != null && !actualFluid.isEmpty()) {
+			com.lowdragmc.lowdraglib.side.fluid.FluidStack ldlibFluid =
+					com.lowdragmc.lowdraglib.side.fluid.FluidStack.create(
+							actualFluid.getFluid(),  // ✅ 实际流体类型
+							amount
+					);
+			if (ldlibFluid != null && !ldlibFluid.isEmpty()) {
+				tank.setFluid(ldlibFluid);
+				System.out.println("🔍 储罐: 显示 " + actualFluid.getFluid().getFluidType().getDescription().getString() +
+						" (" + amount + "/" + capacity + " mB)");
+			}
+		}
+
+		TankWidget tankWidget = new TankWidget();
+		tankWidget.setFluidTank(tank);
+		tankWidget.setShowAmount(true);
+		tankWidget.setFillDirection(ProgressTexture.FillDirection.DOWN_TO_UP);
+		tankWidget.setSelfPosition(new Position(36, 25));
+		tankWidget.setSize(18, 54);
+		group.addWidget(tankWidget);
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
 		SlotWidget inputSlot = new SlotWidget();
