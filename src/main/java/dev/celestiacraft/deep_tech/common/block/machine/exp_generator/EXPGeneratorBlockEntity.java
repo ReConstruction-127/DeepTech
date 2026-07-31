@@ -124,7 +124,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				.ifPresent((player) -> {
 					if (canAcceptFluid && player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
-						FluidStack playerFluid = new FluidStack(Fluids.WATER, expToTake);
+						FluidStack playerFluid = new FluidStack(dev.celestiacraft.deep_tech.common.register.DTFluids.LIQUID_EXPERIENCE.get(), expToTake);
 						entity.getFluidStorage().fillTank(experienceTank, playerFluid, IFluidHandler.FluidAction.EXECUTE, false);
 					}
 				});
