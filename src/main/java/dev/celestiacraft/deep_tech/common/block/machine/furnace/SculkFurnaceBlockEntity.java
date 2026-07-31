@@ -63,10 +63,9 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 		// 使用原版熔炉配方
 		RecipeType<SmeltingRecipe> recipeType = RecipeType.SMELTING;
-		SimpleMachineInventory inventoryWrapper = new SimpleMachineInventory(entity.getInventory());
 
 		SmeltingRecipe recipe = level.getRecipeManager()
-				.getRecipeFor(recipeType, inventoryWrapper, level)
+				.getRecipeFor(recipeType, entity.inventoryWrapper, level)
 				.orElse(null);
 
 		// 无配方或无法处理

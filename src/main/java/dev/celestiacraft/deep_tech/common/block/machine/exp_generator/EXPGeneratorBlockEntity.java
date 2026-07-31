@@ -74,8 +74,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	@Override
 	public boolean canFillFluid(int tank, FluidStack stack) {
 		return super.canFillFluid(tank, stack)
-				&& (stack.getFluid() == Fluids.WATER
-				|| stack.getFluid() == Fluids.WATER);
+				&& (stack.getFluid() == dev.celestiacraft.deep_tech.common.register.DTFluids.LIQUID_EXPERIENCE.get()
+				|| stack.getFluid() == dev.celestiacraft.deep_tech.common.register.DTFluids.LIQUID_EXPERIENCE.get().getSource());
 	}
 
 	@Override
@@ -119,7 +119,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				.ifPresent((player) -> {
 					if (canAcceptFluid && player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
-						FluidStack playerFluid = new FluidStack(Fluids.WATER, expToTake);
+						int mbAmount = expToTake * EXPGeneratorConfig.EXP_TO_MB.get();
+						FluidStack playerFluid = new FluidStack(dev.celestiacraft.deep_tech.common.register.DTFluids.LIQUID_EXPERIENCE.get().getSource(), mbAmount);
 						entity.getFluidStorage().fillTank(experienceTank, playerFluid, IFluidHandler.FluidAction.EXECUTE, false);
 					}
 				});
