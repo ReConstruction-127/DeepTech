@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.gui;
+package dev.celestiacraft.deep_tech.api.gui.widget;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -7,15 +7,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-
-public class ProgressBarWidget extends Widget {
+/**
+ * 垂直进度条（从下往上填充）
+ */
+public class VerticalProgressBarWidget extends Widget {
 	private final Supplier<Integer> progressGetter;
 	private final Supplier<Integer> maxProgressGetter;
 
 	private final ResourceTexture background;
 	private final ResourceTexture foreground;
 
-	public ProgressBarWidget(
+	public VerticalProgressBarWidget(
 			int x,
 			int y,
 			int width,
@@ -37,6 +39,7 @@ public class ProgressBarWidget extends Widget {
 		int progress = progressGetter.get();
 		int maxProgress = maxProgressGetter.get();
 
+		// 背景纹理
 		background.draw(
 				graphics,
 				mouseX,
@@ -52,16 +55,14 @@ public class ProgressBarWidget extends Widget {
 		}
 
 		float ratio = (float) progress / maxProgress;
-		if (ratio > 1.0f) {
-			ratio = 1.0f;
-		}
+		if (ratio > 1.0f) ratio = 1.0f;
 
-		int displayWidth = (int) (getSize().width * ratio);
+		int displayHeight = (int) (getSize().height * ratio);
 
 		graphics.enableScissor(
 				getPosition().x,
-				getPosition().y,
-				getPosition().x + displayWidth,
+				getPosition().y + getSize().height - displayHeight,
+				getPosition().x + getSize().width,
 				getPosition().y + getSize().height
 		);
 

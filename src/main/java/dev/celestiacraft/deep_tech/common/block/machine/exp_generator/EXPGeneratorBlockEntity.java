@@ -9,8 +9,9 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
-import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
-import dev.celestiacraft.deep_tech.api.gui.FluidTankWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.FluidTankWidget;
+import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
@@ -191,14 +192,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				new ResourceTexture(DeepTech.loadGui("elements/tank_back"))
 		));
 
-		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
-		SlotWidget inputSlot = new SlotWidget();
-		inputSlot.setContainerSlot(container, 0);
-		inputSlot.setSelfPosition(new Position(41, 38));
-		inputSlot.setBackground((ResourceTexture) null);
-		inputSlot.setCanTakeItems(true);
-		inputSlot.setCanPutItems(true);
-		group.addWidget(inputSlot);
+		// 根据配置动态生成物品槽位: 输入/输出槽数量为 0 时不会创建任何 widget
+		MachineItemSlots.add(group, this, getInventory(), new Position(41, 38), new Position(97, 38));
 
 		addPlayerInventory(group, player);
 		return group;

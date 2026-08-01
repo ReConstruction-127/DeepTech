@@ -3,9 +3,8 @@ package dev.celestiacraft.deep_tech.common.register.block;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.FrameBlock;
-import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
+import dev.celestiacraft.deep_tech.api.block.properties.MiningLevel;
 import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
-import dev.celestiacraft.deep_tech.tags.DeepTechBlockTags;
 
 public class FrameBlocks {
 	public static final BlockEntry<FrameBlock> MACHINE_FRAME;
@@ -13,12 +12,17 @@ public class FrameBlocks {
 	static {
 		DTCreativeTabs.getTab("machine");
 
-		MACHINE_FRAME = DeepTech.REGISTRATE.block("machine_frame", FrameBlock::new)
+		MACHINE_FRAME = addFrame("machine", MiningLevel.WOODEN);
+	}
+
+	private static BlockEntry<FrameBlock> addFrame(String name, MiningLevel level) {
+		String registerId = String.format("%s_frame", name);
+		return DeepTech.REGISTRATE.block(registerId, FrameBlock::new)
+				.transform(FrameBlock.miniProperties(level))
+				.blockstate(FrameBlock.genBlockState(name))
 				.item()
-				.model(ItemModelGen.withModel("block/machine_frame"))
+				.model(FrameBlock.item(name))
 				.build()
-				.tag(DeepTechBlockTags.WRENCH_PICKUP)
-				.blockstate(FrameBlock.genBlockState("machine_frame"))
 				.register();
 	}
 

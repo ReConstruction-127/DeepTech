@@ -35,6 +35,7 @@ public class MachineBlocks {
 				.blockstate(SculkFurnaceBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
+
 		EXP_GENERATOR = DeepTech.REGISTRATE.block("machine_exp_generator", EXPGeneratorBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)

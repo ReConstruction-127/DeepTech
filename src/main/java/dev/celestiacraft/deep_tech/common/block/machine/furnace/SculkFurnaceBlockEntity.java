@@ -9,8 +9,9 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
-import dev.celestiacraft.deep_tech.api.gui.EnergyBarWidget;
-import dev.celestiacraft.deep_tech.api.gui.VerticalProgressBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.VerticalProgressBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.SculkFurnaceConfig;
@@ -167,23 +168,8 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 				new ResourceTexture(DeepTech.loadGui("elements/progress_furnace_front"))
 		));
 
-		SimpleMachineInventory container = new SimpleMachineInventory(getInventory());
-
-		SlotWidget input = new SlotWidget();
-		input.setContainerSlot(container, 0);
-		input.setSelfPosition(new Position(41, 38));
-		input.setBackground((ResourceTexture) null);
-		input.setCanTakeItems(true);
-		input.setCanPutItems(true);
-		group.addWidget(input);
-
-		SlotWidget output = new SlotWidget();
-		output.setContainerSlot(container, 1);
-		output.setSelfPosition(new Position(97, 38));
-		output.setBackground((ResourceTexture) null);
-		output.setCanTakeItems(true);
-		output.setCanPutItems(false);
-		group.addWidget(output);
+		// 根据配置动态生成物品槽位: 输入/输出槽数量为 0 时不会创建任何 widget
+		MachineItemSlots.add(group, this, getInventory(), new Position(41, 38), new Position(97, 38));
 
 		addPlayerInventory(group, player);
 		return group;
