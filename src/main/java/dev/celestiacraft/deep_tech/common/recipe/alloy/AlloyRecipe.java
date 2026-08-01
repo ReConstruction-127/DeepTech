@@ -15,6 +15,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -27,23 +28,43 @@ public class AlloyRecipe implements Recipe<Container> {
 	private final int energyCost;
 	private final int processingTime;
 
-	@Override
-	public boolean matches(@NotNull Container container, @NotNull Level level) {
+	/**
+	 * 无序匹配: 为每个输入寻找一个未被占用的匹配槽位.
+	 *
+	 * @return 每个输入对应的槽位下标; 无法完全匹配时返回 {@code null}
+	 */
+	public int @Nullable [] matchSlots(@NotNull Container container) {
 		if (inputs.isEmpty()) {
-			return false;
+			return null;
 		}
-		// 按顺序匹配: 第 i 个输入必须匹配容器第 i 个槽位, 且数量足够
+		int[] slots = new int[inputs.size()];
+		boolean[] used = new boolean[container.getContainerSize()];
+
 		for (int i = 0; i < inputs.size(); i++) {
 			IngredientWithCount input = inputs.get(i);
-			if (i >= container.getContainerSize()) {
-				return false;
+			boolean found = false;
+			for (int slot = 0; slot < container.getContainerSize(); slot++) {
+				if (used[slot]) {
+					continue;
+				}
+				ItemStack stack = container.getItem(slot);
+				if (stack.getCount() >= input.getCount() && input.getIngredient().test(stack)) {
+					used[slot] = true;
+					slots[i] = slot;
+					found = true;
+					break;
+				}
 			}
-			ItemStack stack = container.getItem(i);
-			if (stack.getCount() < input.getCount() || !input.getIngredient().test(stack)) {
-				return false;
+			if (!found) {
+				return null;
 			}
 		}
-		return true;
+		return slots;
+	}
+
+	@Override
+	public boolean matches(@NotNull Container container, @NotNull Level level) {
+		return matchSlots(container) != null;
 	}
 
 	@Override
