@@ -33,7 +33,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inventoryWrapper = new SimpleMachineInventory(getInventory());
+		inventoryWrapper = new SimpleMachineInventory(getItemHandler());
 	}
 
 	@Override
@@ -71,8 +71,8 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 			}
 			if (entity.progress > 0) {
 				entity.progress = 0;
-				entity.setChanged(); // 状态变化，保存一次
-				entity.sync();       // 通知客户端进度归零
+				entity.setChanged();
+				entity.sync();
 				entity.syncCounter = 0;
 			}
 			entity.maxProgress = 100;
@@ -84,7 +84,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		ItemStack output = recipe.getOutput();
 		int energyCost = recipe.getEnergyCost();
 
-		ItemStack currentOutput = entity.getInventory().getStackInSlot(1);
+		ItemStack currentOutput = entity.getItemHandler().getStackInSlot(1);
 		boolean canOutput = currentOutput.isEmpty()
 				|| (ItemStack.isSameItemSameTags(currentOutput, output)
 				&& currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
@@ -101,16 +101,15 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 			entity.energy -= energyCost;
 			entity.progress++;
 
-			// 每 5 tick 同步一次进度到客户端（不触发磁盘保存）
 			if (++entity.syncCounter % 5 == 0) {
-				entity.sync();   // 假设 sync() 只发包，不调用 setChanged()
+				entity.sync();
 			}
 
 			// 进度完成
 			if (entity.progress >= entity.maxProgress) {
-				entity.getInventory().getStackInSlot(0).shrink(1);
+				entity.getItemHandler().getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
-					entity.getInventory().setStackInSlot(1, output.copy());
+					entity.getItemHandler().setStackInSlot(1, output.copy());
 				} else {
 					currentOutput.grow(output.getCount());
 				}
@@ -121,7 +120,6 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				entity.sync();
 			}
 		} else {
-			// 如果机器停止工作（能量不足或输出满），重置同步计数器
 			entity.syncCounter = 0;
 		}
 	}
@@ -161,7 +159,13 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		));
 
 		// 根据配置动态生成物品槽位: 输入/输出槽数量为 0 时不会创建任何 widget
-		MachineItemSlots.add(group, this, getInventory(), new Position(41, 38), new Position(97, 38));
+		MachineItemSlots.add(
+				group,
+				this,
+				getItemHandler(),
+				new Position(41, 38),
+				new Position(97, 38)
+		);
 
 		addPlayerInventory(group, player);
 		return group;

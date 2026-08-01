@@ -33,7 +33,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 	public SculkFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inventoryWrapper = new SimpleMachineInventory(getInventory());
+		inventoryWrapper = new SimpleMachineInventory(getItemHandler());
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 		// 使用原版熔炉配方
 		RecipeType<SmeltingRecipe> recipeType = RecipeType.SMELTING;
-		SimpleMachineInventory inventoryWrapper = new SimpleMachineInventory(entity.getInventory());
+		SimpleMachineInventory inventoryWrapper = new SimpleMachineInventory(entity.getItemHandler());
 
 		SmeltingRecipe recipe = level.getRecipeManager()
 				.getRecipeFor(recipeType, entity.inventoryWrapper, level)
@@ -92,7 +92,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 
 		ItemStack output = recipe.getResultItem(level.registryAccess());
 
-		ItemStack currentOutput = entity.getInventory().getStackInSlot(1);
+		ItemStack currentOutput = entity.getItemHandler().getStackInSlot(1);
 		boolean canOutput = currentOutput.isEmpty()
 				|| (ItemStack.isSameItemSameTags(currentOutput, output)
 				&& currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
@@ -109,32 +109,29 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 			entity.energy -= energyCost;
 			entity.progress++;
 
-			// 每 5 tick 同步一次进度到客户端（不触发磁盘保存）
 			if (++entity.syncCounter % 5 == 0) {
-				entity.sync();   // 假设 sync() 只发包，不调用 setChanged()
+				entity.sync();
 			}
 
 			// 进度完成
 			if (entity.progress >= entity.maxProgress) {
-				entity.getInventory().getStackInSlot(0).shrink(1);
+				entity.getItemHandler().getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
-					entity.getInventory().setStackInSlot(1, output.copy());
+					entity.getItemHandler().setStackInSlot(1, output.copy());
 				} else {
 					currentOutput.grow(output.getCount());
 				}
 				entity.progress = 0;
 				entity.syncCounter = 0;
-				// ✅ 完成时调用一次 setChanged 和 sync
 				entity.setChanged();
 				entity.sync();
 			}
 		} else {
-			// 如果机器停止工作（能量不足或输出满），重置同步计数器
 			entity.syncCounter = 0;
 		}
 	}
 
-		@Override
+	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
 		ui.widget(createUIWidget(player));
@@ -169,7 +166,13 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 		));
 
 		// 根据配置动态生成物品槽位: 输入/输出槽数量为 0 时不会创建任何 widget
-		MachineItemSlots.add(group, this, getInventory(), new Position(41, 38), new Position(97, 38));
+		MachineItemSlots.add(
+				group,
+				this,
+				getItemHandler(),
+				new Position(41, 38),
+				new Position(97, 38)
+		);
 
 		addPlayerInventory(group, player);
 		return group;

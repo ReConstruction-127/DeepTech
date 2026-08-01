@@ -67,13 +67,13 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	@Getter
 	private final IEnergyStorage energyStorage = new MachineEnergyCapability(this);
 	@Getter
-	private final MachineItemHandler inventory = new MachineItemHandler(this);
+	private final MachineItemHandler itemHandler = new MachineItemHandler(this);
 	@Getter
-	private final MachineFluidHandler fluidStorage = new MachineFluidHandler(this);
+	private final MachineFluidHandler fluidHandler = new MachineFluidHandler(this);
 
 	private final LazyOptional<IEnergyStorage> energyCap = LazyOptional.of(() -> energyStorage);
-	private final LazyOptional<IItemHandler> itemCap = LazyOptional.of(() -> inventory);
-	private final LazyOptional<IFluidHandler> fluidCap = LazyOptional.of(() -> fluidStorage);
+	private final LazyOptional<IItemHandler> itemCap = LazyOptional.of(() -> itemHandler);
+	private final LazyOptional<IFluidHandler> fluidCap = LazyOptional.of(() -> fluidHandler);
 
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, Direction side) {
@@ -100,11 +100,11 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	@Override
 	protected void saveAdditional(@NotNull CompoundTag tag) {
 		super.saveAdditional(tag);
-		tag.put("Inventory", inventory.serializeNBT());
+		tag.put("Inventory", itemHandler.serializeNBT());
 		tag.putInt("Energy", energy);
 		tag.putInt("Progress", progress);
 		tag.putInt("MaxProgress", maxProgress);
-		tag.put("Fluids", fluidStorage.serializeNBT());
+		tag.put("Fluids", fluidHandler.serializeNBT());
 	}
 
 	@Override
@@ -113,7 +113,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		tag.putInt("Energy", energy);
 		tag.putInt("Progress", progress);
 		tag.putInt("MaxProgress", maxProgress);
-		tag.put("Fluids", fluidStorage.serializeNBT());
+		tag.put("Fluids", fluidHandler.serializeNBT());
 		return tag;
 	}
 
@@ -138,19 +138,19 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		progress = tag.getInt("Progress");
 		maxProgress = tag.getInt("MaxProgress");
 		if (tag.contains("Fluids")) {
-			fluidStorage.deserializeNBT(tag.getCompound("Fluids"));
+			fluidHandler.deserializeNBT(tag.getCompound("Fluids"));
 		}
 	}
 
 	@Override
 	public void load(@NotNull CompoundTag tag) {
 		super.load(tag);
-		inventory.deserializeNBT(tag.getCompound("Inventory"));
+		itemHandler.deserializeNBT(tag.getCompound("Inventory"));
 		energy = tag.getInt("Energy");
 		progress = tag.getInt("Progress");
 		maxProgress = tag.getInt("MaxProgress");
 		if (tag.contains("Fluids")) {
-			fluidStorage.deserializeNBT(tag.getCompound("Fluids"));
+			fluidHandler.deserializeNBT(tag.getCompound("Fluids"));
 		}
 	}
 

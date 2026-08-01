@@ -36,7 +36,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	public EXPGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inventoryWrapper = new SimpleMachineInventory(getInventory());
+		inventoryWrapper = new SimpleMachineInventory(getItemHandler());
 	}
 
 	@Override
@@ -126,17 +126,17 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 					if (canAcceptFluid && player.totalExperience >= expToTake) {
 						player.giveExperiencePoints(-expToTake);
 						FluidStack playerFluid = new FluidStack(DTFluids.LIQUID_EXPERIENCE.get(), expToTake);
-						entity.getFluidStorage().fillTank(experienceTank, playerFluid, IFluidHandler.FluidAction.EXECUTE, false);
+						entity.getFluidHandler().fillTank(experienceTank, playerFluid, IFluidHandler.FluidAction.EXECUTE, false);
 					}
 				});
 
 		boolean generatedPower = false;
 		if (entity.energy < entity.getMachineMaxEnergy()) {
 			int mbPerTick = EXPGeneratorConfig.MB_PER_TICK.get();
-			FluidStack drainStack = entity.getFluidStorage().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.SIMULATE, false);
+			FluidStack drainStack = entity.getFluidHandler().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.SIMULATE, false);
 
 			if (!drainStack.isEmpty() && drainStack.getAmount() >= mbPerTick) {
-				entity.getFluidStorage().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.EXECUTE, false);
+				entity.getFluidHandler().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.EXECUTE, false);
 				int fePerMb = EXPGeneratorConfig.FE_PER_MB.get();
 				int generated = fePerMb * mbPerTick;
 				entity.energy = Math.min(entity.energy + generated, entity.getMachineMaxEnergy());
@@ -188,12 +188,18 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				40,
 				this::getFluidAmount,
 				getFluidCapacity(),
-				() -> getFluidStorage().getFluidInTank(getExperienceTank()),
+				() -> getFluidHandler().getFluidInTank(getExperienceTank()),
 				new ResourceTexture(DeepTech.loadGui("elements/tank_back"))
 		));
 
 		// 根据配置动态生成物品槽位: 输入/输出槽数量为 0 时不会创建任何 widget
-		MachineItemSlots.add(group, this, getInventory(), new Position(41, 38), new Position(97, 38));
+		MachineItemSlots.add(
+				group,
+				this,
+				getItemHandler(),
+				new Position(41, 38),
+				new Position(97, 38)
+		);
 
 		addPlayerInventory(group, player);
 		return group;
@@ -224,10 +230,10 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 	}
 
 	public int getFluidAmount() {
-		return getFluidStorage().getFluidInTank(getExperienceTank()).getAmount();
+		return getFluidHandler().getFluidInTank(getExperienceTank()).getAmount();
 	}
 
 	public int getFluidCapacity() {
-		return getFluidStorage().getTankCapacity(getExperienceTank());
+		return getFluidHandler().getTankCapacity(getExperienceTank());
 	}
 }
