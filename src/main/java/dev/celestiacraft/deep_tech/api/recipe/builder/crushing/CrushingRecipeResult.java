@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.server.recipe.builder.crushing;
+package dev.celestiacraft.deep_tech.api.recipe.builder.crushing;
 
 import com.google.gson.JsonObject;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;

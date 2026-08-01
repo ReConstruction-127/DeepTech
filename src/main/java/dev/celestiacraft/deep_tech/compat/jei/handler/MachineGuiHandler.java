@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.compat.jei.handler;
 
 import com.lowdragmc.lowdraglib.gui.modular.ModularUIGuiContainer;
+import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
@@ -21,6 +22,7 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 
 	private MachineGuiHandler() {
 		register(CrusherBlockEntity.class, this::crusher);
+		register(AlloyFurnaceBlockEntity.class, this::alloyFurnace);
 		register(SculkFurnaceBlockEntity.class, this::sculkFurnace);
 	}
 
@@ -46,6 +48,16 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 				16,
 				16,
 				DTJeiRecipeType.CRUSHING
+		));
+	}
+
+	private Collection<IGuiClickableArea> alloyFurnace(ModularUIGuiContainer screen) {
+		return List.of(IGuiClickableArea.createBasic(
+				74,
+				39,
+				16,
+				16,
+				DTJeiRecipeType.ALLOY
 		));
 	}
 

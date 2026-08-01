@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.common.recipe.alloy;
 
+import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,18 +16,34 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
 public class AlloyRecipe implements Recipe<Container> {
 	private final ResourceLocation id;
-	private final Ingredient input;
+	private final List<IngredientWithCount> inputs;
 	private final ItemStack output;
 	private final int energyCost;
 	private final int processingTime;
 
 	@Override
 	public boolean matches(@NotNull Container container, @NotNull Level level) {
-		return input.test(container.getItem(0));
+		if (inputs.isEmpty()) {
+			return false;
+		}
+		// 按顺序匹配: 第 i 个输入必须匹配容器第 i 个槽位, 且数量足够
+		for (int i = 0; i < inputs.size(); i++) {
+			IngredientWithCount input = inputs.get(i);
+			if (i >= container.getContainerSize()) {
+				return false;
+			}
+			ItemStack stack = container.getItem(i);
+			if (stack.getCount() < input.getCount() || !input.getIngredient().test(stack)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -62,7 +79,9 @@ public class AlloyRecipe implements Recipe<Container> {
 	@Override
 	public @NotNull NonNullList<Ingredient> getIngredients() {
 		NonNullList<Ingredient> list = NonNullList.create();
-		list.add(input);
+		for (IngredientWithCount input : inputs) {
+			list.add(input.getIngredient());
+		}
 		return list;
 	}
 }

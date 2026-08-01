@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.datagen.recipes;
 
 import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.datagen.recipes.type.AlloyRecipeGen;
 import dev.celestiacraft.deep_tech.datagen.recipes.type.CrushingRecipeGen;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -22,9 +23,14 @@ public class DTRecipeProvider extends RecipeProvider {
 	@Override
 	protected void buildRecipes(@NotNull Consumer<FinishedRecipe> consumer) {
 		crushing(consumer);
+		alloy(consumer);
 	}
 
 	private void crushing(Consumer<FinishedRecipe> consumer) {
 		CrushingRecipeGen.register(consumer);
+	}
+
+	private void alloy(Consumer<FinishedRecipe> consumer) {
+		AlloyRecipeGen.register(consumer);
 	}
 }

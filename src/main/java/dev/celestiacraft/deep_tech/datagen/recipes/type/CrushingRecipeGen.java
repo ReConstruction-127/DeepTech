@@ -1,6 +1,6 @@
 package dev.celestiacraft.deep_tech.datagen.recipes.type;
 
-import dev.celestiacraft.deep_tech.api.server.recipe.builder.crushing.CrushingRecipeBuilder;
+import dev.celestiacraft.deep_tech.api.recipe.builder.crushing.CrushingRecipeBuilder;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;

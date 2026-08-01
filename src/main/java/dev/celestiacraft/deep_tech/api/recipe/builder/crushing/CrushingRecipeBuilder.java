@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.server.recipe.builder.crushing;
+package dev.celestiacraft.deep_tech.api.recipe.builder.crushing;
 
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;

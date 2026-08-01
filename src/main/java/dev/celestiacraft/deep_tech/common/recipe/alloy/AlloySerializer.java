@@ -1,6 +1,10 @@
 package dev.celestiacraft.deep_tech.common.recipe.alloy;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -10,10 +14,25 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class AlloySerializer implements RecipeSerializer<AlloyRecipe> {
 	@Override
 	public @NotNull AlloyRecipe fromJson(@NotNull ResourceLocation id, JsonObject json) {
-		Ingredient input = Ingredient.fromJson(json.get("inputs"));
+		JsonArray inputsArray = GsonHelper.getAsJsonArray(json, "inputs");
+		if (inputsArray.size() == 0) {
+			throw new JsonSyntaxException("Alloy recipe " + id + " must have at least one input");
+		}
+		List<IngredientWithCount> inputs = new ArrayList<>();
+		for (JsonElement element : inputsArray) {
+			int count = 1;
+			if (element.isJsonObject()) {
+				count = GsonHelper.getAsInt(element.getAsJsonObject(), "count", 1);
+			}
+			inputs.add(new IngredientWithCount(Ingredient.fromJson(element), count));
+		}
+
 		JsonObject result = GsonHelper.getAsJsonObject(json, "result");
 		String item = GsonHelper.getAsString(result, "item");
 		ItemStack output = new ItemStack(
@@ -24,28 +43,32 @@ public class AlloySerializer implements RecipeSerializer<AlloyRecipe> {
 		int energyCost = GsonHelper.getAsInt(json, "energy_cost", 50);
 		int processingTime = GsonHelper.getAsInt(json, "processing_time", 100);
 
-		return new AlloyRecipe(id, input, output, energyCost, processingTime);
+		return new AlloyRecipe(id, inputs, output, energyCost, processingTime);
 	}
 
 	@Override
 	public AlloyRecipe fromNetwork(@NotNull ResourceLocation id, @NotNull FriendlyByteBuf buffer) {
-		Ingredient input = Ingredient.fromNetwork(buffer);
+		int inputCount = buffer.readVarInt();
+		List<IngredientWithCount> inputs = new ArrayList<>(inputCount);
+		for (int i = 0; i < inputCount; i++) {
+			Ingredient ingredient = Ingredient.fromNetwork(buffer);
+			int count = buffer.readVarInt();
+			inputs.add(new IngredientWithCount(ingredient, count));
+		}
 		ItemStack output = buffer.readItem();
 		int energyCost = buffer.readInt();
 		int processingTime = buffer.readInt();
 
-		return new AlloyRecipe(
-				id,
-				input,
-				output,
-				energyCost,
-				processingTime
-		);
+		return new AlloyRecipe(id, inputs, output, energyCost, processingTime);
 	}
 
 	@Override
 	public void toNetwork(@NotNull FriendlyByteBuf buf, @NotNull AlloyRecipe recipe) {
-		recipe.getInput().toNetwork(buf);
+		buf.writeVarInt(recipe.getInputs().size());
+		for (IngredientWithCount input : recipe.getInputs()) {
+			input.getIngredient().toNetwork(buf);
+			buf.writeVarInt(input.getCount());
+		}
 		buf.writeItem(recipe.getOutput());
 		buf.writeInt(recipe.getEnergyCost());
 		buf.writeInt(recipe.getProcessingTime());

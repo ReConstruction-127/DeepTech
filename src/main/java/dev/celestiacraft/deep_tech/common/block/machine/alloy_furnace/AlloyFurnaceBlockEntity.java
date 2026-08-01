@@ -1,21 +1,31 @@
 package dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace;
 
+import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
+import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
+import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
+import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
+import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
+import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
+import com.lowdragmc.lowdraglib.utils.Position;
+import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
-import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
+import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
+import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBlockEntity> {
-	private final SimpleMachineInventory inventoryWrapper;
-
+public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBlockEntity> implements IUIHolder.BlockEntityUI {
 	public AlloyFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inventoryWrapper = new SimpleMachineInventory(getItemHandler());
 	}
 
 	@Override
@@ -77,7 +87,10 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 
 			// 进度完成
 			if (entity.getProgress() >= entity.getMaxProgress()) {
-				entity.getItemHandler().getStackInSlot(0).shrink(1);
+				// 按配方顺序, 每个输入槽消耗各自要求的数量
+				for (int i = 0; i < recipe.getInputs().size(); i++) {
+					entity.getItemHandler().getStackInSlot(i).shrink(recipe.getInputs().get(i).getCount());
+				}
 				if (currentOutput.isEmpty()) {
 					entity.getItemHandler().setStackInSlot(outputSlot, output.copy());
 				} else {
@@ -95,7 +108,7 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 
 	public AlloyRecipe findRecipe(AlloyFurnaceBlockEntity entity, BlockState state) {
 		AlloyRecipe recipe = level.getRecipeManager()
-				.getRecipeFor(DTRecipes.ALLOY.getRecipeType(), entity.inventoryWrapper, level)
+				.getRecipeFor(DTRecipes.ALLOY.getRecipeType(), entity.getInventory(), level)
 				.orElse(null);
 
 		// 无配方熄灭并重置进度
@@ -115,5 +128,74 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 
 		entity.setMaxProgress(recipe.getProcessingTime());
 		return recipe;
+	}
+
+	@Override
+	public ModularUI createUI(Player player) {
+		ModularUI ui = new ModularUI(176, 166, this, player);
+		ui.widget(createUIWidget(player));
+		return ui;
+	}
+
+	private WidgetGroup createUIWidget(Player player) {
+		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
+		group.setBackground(new ResourceTexture(DeepTech.loadGui("alloy_furnace")));
+
+		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.ALLOY_FURNACE.get().getName());
+		title.setColor(0xFF5D5F60);
+		group.addWidget(title);
+
+		group.addWidget(new EnergyBarWidget(
+				18,
+				25,
+				this::getEnergyStored,
+				getMaxEnergyStored()
+		));
+
+		group.addWidget(new ProgressBarWidget(
+				74, 39, 16, 16,
+				this::getProgress,
+				this::getMaxProgress,
+				new ResourceTexture(DeepTech.loadGui("elements/progress_crusher_back")),
+				new ResourceTexture(DeepTech.loadGui("elements/progress_crusher_front"))
+		));
+
+		// 3 个输入槽 + 1 个输出槽
+		MachineItemSlots.add(
+				group,
+				this,
+				getItemHandler(),
+				new Position(17, 38),
+				new Position(97, 38)
+		);
+
+		addPlayerInventory(group, player);
+		return group;
+	}
+
+	private void addPlayerInventory(WidgetGroup group, Player player) {
+		Container inventory = player.getInventory();
+
+		for (int row = 0; row < 3; row++) {
+			for (int col = 0; col < 9; col++) {
+				SlotWidget slot = new SlotWidget();
+				slot.initTemplate();
+				slot.setContainerSlot(inventory, col + row * 9 + 9);
+				slot.isPlayerContainer = true;
+				slot.setSelfPosition(new Position(7 + col * 18, 81 + row * 18));
+				slot.setBackground((ResourceTexture) null);
+				group.addWidget(slot);
+			}
+		}
+
+		for (int col = 0; col < 9; col++) {
+			SlotWidget slot = new SlotWidget();
+			slot.initTemplate();
+			slot.setContainerSlot(inventory, col);
+			slot.isPlayerContainer = true;
+			slot.setSelfPosition(new Position(7 + col * 18, 139));
+			slot.setBackground((ResourceTexture) null);
+			group.addWidget(slot);
+		}
 	}
 }
