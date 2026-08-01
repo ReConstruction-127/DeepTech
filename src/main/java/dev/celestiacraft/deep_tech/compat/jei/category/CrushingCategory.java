@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component;
 
 public class CrushingCategory {
 	public static SimpleJeiCategory<CrushingRecipe> builder(IGuiHelper helper) {
-		IDrawable slotDrawable = helper.getSlotDrawable();
+		IDrawable drawable = helper.getSlotDrawable();
 
 		return SimpleJeiCategory.builder(DTJeiRecipeType.CRUSHING, helper)
 				.setTitle(MachineBlocks.CRUSHER.get().getName())
@@ -30,9 +30,9 @@ public class CrushingCategory {
 				})
 				.setDraw((recipe, view, graphics, mouseX, mouseY) -> {
 					// 输入槽
-					slotDrawable.draw(graphics, 9, 19);
+					drawable.draw(graphics, 9, 19);
 					// 输出槽
-					slotDrawable.draw(graphics, 61, 19);
+					drawable.draw(graphics, 61, 19);
 					DTTextures.PROGRESS_FRONT.render(graphics, 36, 24);
 					DTTextures.ICON_CRUSHER.render(graphics, 88, 12);
 					Font font = Minecraft.getInstance().font;

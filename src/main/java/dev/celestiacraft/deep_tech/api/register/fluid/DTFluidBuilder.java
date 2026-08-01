@@ -213,7 +213,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		if (path.endsWith(".png")) {
 			path = path.substring(0, path.length() - ".png".length());
 		}
-		return new ResourceLocation(texture.getNamespace(), path);
+		return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), path);
 	}
 
 	private void checkTextures() {

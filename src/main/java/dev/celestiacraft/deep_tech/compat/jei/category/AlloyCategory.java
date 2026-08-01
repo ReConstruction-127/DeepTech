@@ -23,7 +23,7 @@ public class AlloyCategory {
 	private static final int OUTPUT_Y = 20;
 
 	public static SimpleJeiCategory<AlloyRecipe> builder(IGuiHelper helper) {
-		IDrawable slotDrawable = helper.getSlotDrawable();
+		IDrawable drawable = helper.getSlotDrawable();
 
 		return SimpleJeiCategory.builder(DTJeiRecipeType.ALLOY, helper)
 				.setTitle(MachineBlocks.ALLOY_FURNACE.get().getName())
@@ -42,11 +42,11 @@ public class AlloyCategory {
 				})
 				.setDraw((recipe, view, graphics, mouseX, mouseY) -> {
 					// 输入槽
-					slotDrawable.draw(graphics, INPUT_X[0] - 1, INPUT_Y - 1);
-					slotDrawable.draw(graphics, INPUT_X[1] - 1, INPUT_Y - 1);
-					slotDrawable.draw(graphics, INPUT_X[2] - 1, INPUT_Y - 1);
+					drawable.draw(graphics, INPUT_X[0] - 1, INPUT_Y - 1);
+					drawable.draw(graphics, INPUT_X[1] - 1, INPUT_Y - 1);
+					drawable.draw(graphics, INPUT_X[2] - 1, INPUT_Y - 1);
 					// 输出槽
-					slotDrawable.draw(graphics, OUTPUT_X - 1, OUTPUT_Y - 1);
+					drawable.draw(graphics, OUTPUT_X - 1, OUTPUT_Y - 1);
 					DTTextures.PROGRESS_FRONT.render(graphics, 66, 24);
 
 					Font font = Minecraft.getInstance().font;
@@ -55,9 +55,7 @@ public class AlloyCategory {
 					int slotCount = Math.min(inputs.size(), INPUT_X.length);
 					for (int i = 0; i < slotCount; i++) {
 						int count = inputs.get(i).getCount();
-						if (count > 1) {
-							graphics.drawString(font, "x" + count, INPUT_X[i] + 2, 39, 0xFF404040, true);
-						}
+						graphics.drawString(font, "x" + count, INPUT_X[i] + 2, 39, 0xFF404040, true);
 					}
 
 					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");

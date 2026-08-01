@@ -25,6 +25,11 @@ public class DTMaterial {
 		return this;
 	}
 
+	public DTMaterial nugget() {
+		parts.add(MaterialPart.NUGGET);
+		return this;
+	}
+
 	public DTMaterial plate() {
 		parts.add(MaterialPart.PLATE);
 		return this;
@@ -68,6 +73,10 @@ public class DTMaterial {
 
 	public ItemEntry<BasicItem> getIngot() {
 		return get(MaterialPart.INGOT);
+	}
+
+	public ItemEntry<BasicItem> getNugget() {
+		return get(MaterialPart.NUGGET);
 	}
 
 	public ItemEntry<BasicItem> getPlate() {

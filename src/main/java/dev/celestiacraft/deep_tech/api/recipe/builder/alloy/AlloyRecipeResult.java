@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import lombok.AllArgsConstructor;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+@AllArgsConstructor
 public class AlloyRecipeResult implements FinishedRecipe {
 	private final ResourceLocation id;
 	private final List<IngredientWithCount> inputs;
@@ -25,26 +27,8 @@ public class AlloyRecipeResult implements FinishedRecipe {
 	private final Advancement.Builder advancement;
 	private final ResourceLocation advancementId;
 
-	public AlloyRecipeResult(
-			ResourceLocation id,
-			List<IngredientWithCount> inputs,
-			ItemStack output,
-			int energyCost,
-			int processingTime,
-			Advancement.Builder advancement,
-			ResourceLocation advancementId
-	) {
-		this.id = id;
-		this.inputs = inputs;
-		this.output = output;
-		this.energyCost = energyCost;
-		this.processingTime = processingTime;
-		this.advancement = advancement;
-		this.advancementId = advancementId;
-	}
-
 	@Override
-	public void serializeRecipeData(JsonObject json) {
+	public void serializeRecipeData(@NotNull JsonObject json) {
 		JsonArray inputsArray = new JsonArray();
 		for (IngredientWithCount input : inputs) {
 			JsonElement element = input.getIngredient().toJson();

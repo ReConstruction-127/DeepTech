@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum MaterialPart {
 	INGOT("ingot", "ingots"),
+	NUGGET("nugget", "nuggets"),
 	PLATE("plate", "plates"),
 	DUST("dust", "dusts"),
 	RAW_MATERIAL("raw_material", "raw_materials");

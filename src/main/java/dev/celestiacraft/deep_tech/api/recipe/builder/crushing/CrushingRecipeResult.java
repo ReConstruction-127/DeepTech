@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.api.recipe.builder.crushing;
 
 import com.google.gson.JsonObject;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import lombok.AllArgsConstructor;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@AllArgsConstructor
 public class CrushingRecipeResult implements FinishedRecipe {
 	private final ResourceLocation id;
 	private final Ingredient input;
@@ -20,24 +22,6 @@ public class CrushingRecipeResult implements FinishedRecipe {
 
 	private final Advancement.Builder advancement;
 	private final ResourceLocation advancementId;
-
-	public CrushingRecipeResult(
-			ResourceLocation id,
-			Ingredient input,
-			ItemStack output,
-			int energyCost,
-			int processingTime,
-			Advancement.Builder advancement,
-			ResourceLocation advancementId
-	) {
-		this.id = id;
-		this.input = input;
-		this.output = output;
-		this.energyCost = energyCost;
-		this.processingTime = processingTime;
-		this.advancement = advancement;
-		this.advancementId = advancementId;
-	}
 
 	@Override
 	public void serializeRecipeData(JsonObject json) {

@@ -10,14 +10,29 @@ public class ItemLanguage extends LanguageGenerate {
 				"扳手"
 		);
 		addItemLanguage(
+				"sculk_alloy",
+				"Sculk Alloy",
+				"幽匿合金"
+		);
+		addItemLanguage(
 				"sculk_chunk",
 				"Sculk Chunk",
 				"幽匿碎块"
 		);
 		addItemLanguage(
-				"sculk_alloy",
-				"Sculk Alloy",
-				"幽匿合金"
+				"sculk_bone",
+				"Sculk Bone",
+				"幽匿之骨"
+		);
+		addItemLanguage(
+				"sculk_bonemeal",
+				"Sculk Bonemeal",
+				"幽匿骨粉"
+		);
+		addItemLanguage(
+				"sculk_circuit",
+				"Sculk Circuit",
+				"幽匿电路"
 		);
 	}
 }

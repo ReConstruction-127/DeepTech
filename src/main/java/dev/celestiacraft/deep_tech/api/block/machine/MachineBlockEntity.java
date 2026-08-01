@@ -45,6 +45,26 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		inventory = new SimpleMachineInventory(itemHandler);
 	}
 
+	@Override
+	public int getItemInputSlotCount() {
+		return 0;
+	}
+
+	@Override
+	public int getItemOutputSlotCount() {
+		return 0;
+	}
+
+	@Override
+	public int getMachineMaxEnergy() {
+		return 0;
+	}
+
+	@Override
+	public int getMaxReceive() {
+		return 0;
+	}
+
 	/**
 	 * 由于这属于处理机器
 	 * <p>

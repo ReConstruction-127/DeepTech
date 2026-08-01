@@ -9,26 +9,13 @@ public class DTMaterials {
 	private static final List<DTMaterial> MATERIALS = new ArrayList<>();
 
 	public static final DTMaterial
-			IRON,
 			COPPER;
 
 	static {
 		DTCreativeTabs.getTab("material");
 
-		/*
-		 * 平时调用只需要
-		 * DTMaterials.IRON.getDust()
-		 * DTMaterials.COPPER.getPlate()
-		 * 就可以了
-		 */
-
-		IRON = addMaterial("iron")
-				.plate()
-				.dust();
-
 		COPPER = addMaterial("copper")
-				.plate()
-				.dust();
+				.nugget();
 	}
 
 	private static DTMaterial addMaterial(String id) {
@@ -37,7 +24,7 @@ public class DTMaterials {
 		return material;
 	}
 
-//	public static void register() {
-//		MATERIALS.forEach(DTMaterial::registerMaterial);
-//	}
+	public static void register() {
+		MATERIALS.forEach(DTMaterial::registerMaterial);
+	}
 }

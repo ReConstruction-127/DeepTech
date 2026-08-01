@@ -19,7 +19,7 @@ public class DeepTech {
 	public static final Registrate REGISTRATE = Registrate.create(MODID);
 
 	public static ResourceLocation loadResource(String path) {
-		return new ResourceLocation(MODID, path);
+		return ResourceLocation.fromNamespaceAndPath(MODID, path);
 	}
 
 	public static ResourceLocation loadGui(String path) {
@@ -35,7 +35,7 @@ public class DeepTech {
 
 		DTBlocks.register();
 		DTItems.register();
-//		DTMaterials.register();
+		DTMaterials.register();
 		DTBlockEntities.register();
 		DTRecipes.register(bus);
 		DTFluids.register();
