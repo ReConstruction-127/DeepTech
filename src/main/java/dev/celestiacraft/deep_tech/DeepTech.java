@@ -19,7 +19,7 @@ public class DeepTech {
 	public static final Registrate REGISTRATE = Registrate.create(MODID);
 
 	public static ResourceLocation loadResource(String path) {
-		return ResourceLocation.fromNamespaceAndPath(MODID, path);
+		return new ResourceLocation(MODID, path);
 	}
 
 	public static ResourceLocation loadGui(String path) {

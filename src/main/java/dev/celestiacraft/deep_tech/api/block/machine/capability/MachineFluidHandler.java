@@ -75,7 +75,7 @@ public class MachineFluidHandler implements IFluidHandler, INBTSerializable<Comp
 		int amountToDrain = resource.getAmount();
 		for (int tank = 0; tank < fluids.length && amountToDrain > 0; tank++) {
 			FluidStack stored = fluids[tank];
-			if (stored.isEmpty() || !stored.isFluidEqual(resource) || machine.canDrainFluid(tank, stored)) {
+			if (stored.isEmpty() || !stored.isFluidEqual(resource) || !machine.canDrainFluid(tank, stored)) {
 				continue;
 			}
 
@@ -103,7 +103,7 @@ public class MachineFluidHandler implements IFluidHandler, INBTSerializable<Comp
 		int amountToDrain = maxDrain;
 		for (int tank = 0; tank < fluids.length && amountToDrain > 0; tank++) {
 			FluidStack stored = fluids[tank];
-			if (stored.isEmpty() || machine.canDrainFluid(tank, stored)) {
+			if (stored.isEmpty() || !machine.canDrainFluid(tank, stored)) {
 				continue;
 			}
 			if (!drained.isEmpty() && !drained.isFluidEqual(stored)) {
@@ -161,7 +161,7 @@ public class MachineFluidHandler implements IFluidHandler, INBTSerializable<Comp
 		if (!isTankValid(tank) || amount <= 0 || fluids[tank].isEmpty()) {
 			return FluidStack.EMPTY;
 		}
-		if (checkDrainPolicy && machine.canDrainFluid(tank, fluids[tank])) {
+		if (checkDrainPolicy && !machine.canDrainFluid(tank, fluids[tank])) {
 			return FluidStack.EMPTY;
 		}
 
