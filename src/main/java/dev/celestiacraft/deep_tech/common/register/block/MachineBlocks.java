@@ -6,6 +6,7 @@ import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.ResonanceNodeBlock;
 import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 import dev.celestiacraft.deep_tech.tags.DeepTechBlockTags;
 import dev.celestiacraft.deep_tech.tags.DeepTechItemTags;
@@ -14,6 +15,7 @@ public class MachineBlocks {
 	public static final BlockEntry<CrusherBlock> CRUSHER;
 	public static final BlockEntry<SculkFurnaceBlock> SCULK_FURNACE;
 	public static final BlockEntry<EXPGeneratorBlock> EXP_GENERATOR;
+	public static final BlockEntry<ResonanceNodeBlock> RESONANCE_NODE;
 
 	static {
 		DTCreativeTabs.getTab("machine");
@@ -42,6 +44,13 @@ public class MachineBlocks {
 				.model(ItemModelGen.withModel("block/machine_exp_generator_off"))
 				.build()
 				.blockstate(EXPGeneratorBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.register();
+		RESONANCE_NODE = DeepTech.REGISTRATE.block("resonance_node", ResonanceNodeBlock::new)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/resonance_node"))
+				.build()
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 	}

@@ -7,12 +7,17 @@ public class OtherLanguage extends LanguageGenerate {
 		addCreativeTabLang(
 				"material",
 				"Deep Tech: Material",
-				"Deep Tech: 材料"
+				"深邃科技: 材料"
 		);
 		addCreativeTabLang(
 				"machine",
 				"Deep Tech: Machine",
-				"Deep Tech: 机器"
+				"深邃科技: 机器"
+		);
+		addCreativeTabLang(
+				"tool",
+				"Deep Tech: Tool",
+				"深邃科技: 工具"
 		);
 	}
 }

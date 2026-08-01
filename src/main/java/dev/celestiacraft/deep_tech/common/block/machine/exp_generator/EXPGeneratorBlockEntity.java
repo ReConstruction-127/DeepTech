@@ -18,16 +18,23 @@ import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
 import dev.celestiacraft.deep_tech.tags.DeepTechFluidTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBlockEntity> implements IUIHolder.BlockEntityUI {
@@ -156,6 +163,18 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		if (!isWorking && entity.progress > 0) {
 			entity.progress = 0;
 			entity.setChanged();
+		}
+		if (level.getGameTime() % 2 == 0 && energy > 0) {
+			for (Direction dir : Direction.values()) {
+				BlockEntity target = level.getBlockEntity(pos.relative(dir));
+				if (target == null) continue;
+				target.getCapability(ForgeCapabilities.ENERGY, dir.getOpposite())
+						.ifPresent(storage -> {
+							int sent = storage.receiveEnergy(Math.min(energy, getMaxExtract()), false);
+							energy -= sent;
+							if (sent > 0) { setChanged(); sync(); }
+						});
+			}
 		}
 	}
 

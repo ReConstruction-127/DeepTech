@@ -14,5 +14,10 @@ public class GuiLanguage extends LanguageGenerate {
 				"Sculk Furnace",
 				"幽匿电炉"
 		);
+		addGuiLang(
+				"machine_exp_generator",
+				"EXP Generator",
+				"经验发电机"
+		);
 	}
 }

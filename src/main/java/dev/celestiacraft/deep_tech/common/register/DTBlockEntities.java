@@ -5,12 +5,14 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.ResonanceNodeBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 
 public class DTBlockEntities {
 	public static final BlockEntityEntry<CrusherBlockEntity> CRUSHER;
 	public static final BlockEntityEntry<SculkFurnaceBlockEntity> SCULK_FURNACE;
 	public static final BlockEntityEntry<EXPGeneratorBlockEntity> EXP_GENERATOR;
+	public static final BlockEntityEntry<ResonanceNodeBlockEntity> RESONANCE_NODE;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
@@ -22,6 +24,9 @@ public class DTBlockEntities {
 				.register();
 		EXP_GENERATOR = DeepTech.REGISTRATE.blockEntity("exp_generator", EXPGeneratorBlockEntity::new)
 				.validBlock(MachineBlocks.EXP_GENERATOR)
+				.register();
+		RESONANCE_NODE = DeepTech.REGISTRATE.blockEntity("resonance_node", ResonanceNodeBlockEntity::new)
+				.validBlock(MachineBlocks.RESONANCE_NODE)
 				.register();
 	}
 

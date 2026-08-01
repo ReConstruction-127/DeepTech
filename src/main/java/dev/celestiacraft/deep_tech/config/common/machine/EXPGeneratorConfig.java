@@ -20,7 +20,7 @@ public class EXPGeneratorConfig extends ConfigModule {
 	protected void addConfigs() {
 		MAX_ENERGY = builder.comment("最大能量存储 (FE)")
 				.comment("type: int")
-				.comment("default: 1000")
+				.comment("default: 10000")
 				.defineInRange("maxEnergy", 10000, 1000, 1000000);
 
 		MAX_EXTRACT = builder.comment("最大输出速率 (FE/tick)")
@@ -50,7 +50,7 @@ public class EXPGeneratorConfig extends ConfigModule {
 
 		FE_PER_MB = builder.comment("每 mB 液态经验产生的 FE")
 				.comment("type: int")
-				.comment("default: 20")
-				.defineInRange("fePerMb", 20, 1, 100);
+				.comment("default: 2000")
+				.defineInRange("fePerMb", 2000, 1, 10000);
 	}
 }

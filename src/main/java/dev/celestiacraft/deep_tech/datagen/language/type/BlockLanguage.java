@@ -24,5 +24,10 @@ public class BlockLanguage extends LanguageGenerate {
 				"Machine Frame",
 				"机器框架"
 		);
+		addBlockLanguage(
+				"resonance_node",
+				"Resonance Node",
+				"共振节点"
+		);
 	}
 }

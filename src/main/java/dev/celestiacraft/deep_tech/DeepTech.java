@@ -33,9 +33,9 @@ public class DeepTech {
 	public DeepTech(FMLJavaModLoadingContext context) {
 		IEventBus bus = context.getModEventBus();
 
+		DTBlocks.register();
 		DTItems.register();
 //		DTMaterials.register();
-		DTBlocks.register();
 		DTBlockEntities.register();
 		DTRecipes.register(bus);
 		DTFluids.register();
