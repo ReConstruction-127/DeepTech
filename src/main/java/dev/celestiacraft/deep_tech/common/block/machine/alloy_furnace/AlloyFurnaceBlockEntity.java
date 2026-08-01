@@ -87,14 +87,17 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 
 			// 进度完成
 			if (entity.getProgress() >= entity.getMaxProgress()) {
-				// 按配方顺序, 每个输入槽消耗各自要求的数量
-				for (int i = 0; i < recipe.getInputs().size(); i++) {
-					entity.getItemHandler().getStackInSlot(i).shrink(recipe.getInputs().get(i).getCount());
-				}
-				if (currentOutput.isEmpty()) {
-					entity.getItemHandler().setStackInSlot(outputSlot, output.copy());
-				} else {
-					currentOutput.grow(output.getCount());
+				// 重新匹配一次, 从实际匹配到的槽位消耗对应数量
+				int[] slots = recipe.matchSlots(entity.getInventory());
+				if (slots != null) {
+					for (int i = 0; i < recipe.getInputs().size(); i++) {
+						entity.getItemHandler().getStackInSlot(slots[i]).shrink(recipe.getInputs().get(i).getCount());
+					}
+					if (currentOutput.isEmpty()) {
+						entity.getItemHandler().setStackInSlot(outputSlot, output.copy());
+					} else {
+						currentOutput.grow(output.getCount());
+					}
 				}
 				entity.setProgress(0);
 				entity.setSyncCounter(0);

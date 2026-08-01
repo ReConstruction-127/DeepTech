@@ -19,9 +19,9 @@ import java.util.List;
 
 public class AlloySerializer implements RecipeSerializer<AlloyRecipe> {
 	@Override
-	public @NotNull AlloyRecipe fromJson(@NotNull ResourceLocation id, JsonObject json) {
+	public @NotNull AlloyRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json) {
 		JsonArray inputsArray = GsonHelper.getAsJsonArray(json, "inputs");
-		if (inputsArray.size() == 0) {
+		if (inputsArray.isEmpty()) {
 			throw new JsonSyntaxException("Alloy recipe " + id + " must have at least one input");
 		}
 		List<IngredientWithCount> inputs = new ArrayList<>();
