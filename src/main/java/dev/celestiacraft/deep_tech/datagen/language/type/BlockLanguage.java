@@ -15,6 +15,11 @@ public class BlockLanguage extends LanguageGenerate {
 				"幽匿电炉"
 		);
 		addBlockLanguage(
+				"machine_exp_generator",
+				"Experience Generator",
+				"经验发电机"
+		);
+		addBlockLanguage(
 				"machine_frame",
 				"Machine Frame",
 				"机器框架"

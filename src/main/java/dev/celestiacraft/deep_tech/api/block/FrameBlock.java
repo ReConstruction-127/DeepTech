@@ -20,7 +20,8 @@ import net.minecraftforge.client.model.generators.BlockModelProvider;
 public class FrameBlock extends BasicBlock {
 	public FrameBlock(Properties properties) {
 		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
-				.strength(5.0F, 5.0F));
+				.strength(5.0F, 5.0F)
+				.requiresCorrectToolForDrops());
 	}
 
 	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState(String name) {
