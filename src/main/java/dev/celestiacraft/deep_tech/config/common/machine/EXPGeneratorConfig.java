@@ -45,8 +45,8 @@ public class EXPGeneratorConfig extends ConfigModule {
 
 		MB_PER_TICK = builder.comment("每 tick 消耗的液态经验 (mB)")
 				.comment("type: int")
-				.comment("default: 5")
-				.defineInRange("mbPerTick", 5, 1, 100);
+				.comment("default: 1")
+				.defineInRange("mbPerTick", 1, 1, 100);
 
 		FE_PER_MB = builder.comment("每 mB 液态经验产生的 FE")
 				.comment("type: int")

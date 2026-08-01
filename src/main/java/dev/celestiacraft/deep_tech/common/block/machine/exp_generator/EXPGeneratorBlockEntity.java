@@ -183,7 +183,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 		group.addWidget(new FluidTankWidget(
 				42,
-				24,
+				26,
 				16,
 				40,
 				this::getFluidAmount,
