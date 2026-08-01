@@ -5,13 +5,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
+import dev.celestiacraft.deep_tech.common.recipe.utils.RecipeResultUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,11 +34,7 @@ public class AlloySerializer implements RecipeSerializer<AlloyRecipe> {
 		}
 
 		JsonObject result = GsonHelper.getAsJsonObject(json, "result");
-		String item = GsonHelper.getAsString(result, "item");
-		ItemStack output = new ItemStack(
-				ForgeRegistries.ITEMS.getValue(ResourceLocation.tryParse(item)),
-				GsonHelper.getAsInt(result, "count", 1)
-		);
+		ItemStack output = RecipeResultUtil.itemStackFromJson(result);
 
 		int energyCost = GsonHelper.getAsInt(json, "energy_cost", 50);
 		int processingTime = GsonHelper.getAsInt(json, "processing_time", 100);
