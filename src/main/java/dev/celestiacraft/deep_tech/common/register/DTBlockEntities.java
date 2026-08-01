@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.common.register;
 
 import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
@@ -13,6 +14,7 @@ public class DTBlockEntities {
 	public static final BlockEntityEntry<SculkFurnaceBlockEntity> SCULK_FURNACE;
 	public static final BlockEntityEntry<EXPGeneratorBlockEntity> EXP_GENERATOR;
 	public static final BlockEntityEntry<ResonanceNodeBlockEntity> RESONANCE_NODE;
+	public static final BlockEntityEntry<AlloyFurnaceBlockEntity> ALLOY_FURNACE;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
@@ -25,8 +27,13 @@ public class DTBlockEntities {
 		EXP_GENERATOR = DeepTech.REGISTRATE.blockEntity("exp_generator", EXPGeneratorBlockEntity::new)
 				.validBlock(MachineBlocks.EXP_GENERATOR)
 				.register();
+
 		RESONANCE_NODE = DeepTech.REGISTRATE.blockEntity("resonance_node", ResonanceNodeBlockEntity::new)
 				.validBlock(MachineBlocks.RESONANCE_NODE)
+				.register();
+
+		ALLOY_FURNACE = DeepTech.REGISTRATE.blockEntity("alloy_furnace", AlloyFurnaceBlockEntity::new)
+				.validBlock(MachineBlocks.ALLOY_FURNACE)
 				.register();
 	}
 

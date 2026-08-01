@@ -3,6 +3,7 @@ package dev.celestiacraft.deep_tech.common.register.block;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
+import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
@@ -16,6 +17,7 @@ public class MachineBlocks {
 	public static final BlockEntry<SculkFurnaceBlock> SCULK_FURNACE;
 	public static final BlockEntry<EXPGeneratorBlock> EXP_GENERATOR;
 	public static final BlockEntry<ResonanceNodeBlock> RESONANCE_NODE;
+	public static final BlockEntry<AlloyFurnaceBlock> ALLOY_FURNACE;
 
 	static {
 		DTCreativeTabs.getTab("machine");
@@ -53,6 +55,15 @@ public class MachineBlocks {
 				.model(ItemModelGen.withModel("block/resonance_node"))
 				.build()
 				.blockstate(ResonanceNodeBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.register();
+
+		ALLOY_FURNACE = DeepTech.REGISTRATE.block("alloy_furnace", AlloyFurnaceBlock::new)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine_sculk_furnace_off"))
+				.build()
+				.blockstate(SculkFurnaceBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 	}

@@ -9,10 +9,9 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
+import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
-import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
-import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
@@ -26,14 +25,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> implements IUIHolder.BlockEntityUI {
-	// 复用 inventoryWrapper，避免每 tick 创建
-	private final SimpleMachineInventory inventoryWrapper;
-	// 用于控制 sync 频率的计数器
-	private int syncCounter = 0;
-
 	public CrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inventoryWrapper = new SimpleMachineInventory(getItemHandler());
 	}
 
 	@Override
@@ -58,10 +51,12 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, CrusherBlockEntity entity) {
-		if (level.isClientSide()) return;
+		if (level.isClientSide()) {
+			return;
+		}
 
 		CrushingRecipe recipe = level.getRecipeManager()
-				.getRecipeFor(DTRecipes.CRUSHING.getRecipeType(), inventoryWrapper, level)
+				.getRecipeFor(DTRecipes.CRUSHING.getRecipeType(), entity.getInventory(), level)
 				.orElse(null);
 
 		// 无配方或无法处理
@@ -69,17 +64,17 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 			if (state.getValue(CrusherBlock.LIT)) {
 				level.setBlock(pos, state.setValue(CrusherBlock.LIT, false), 3);
 			}
-			if (entity.progress > 0) {
-				entity.progress = 0;
+			if (entity.getProgress() > 0) {
+				entity.setProgress(0);
 				entity.setChanged();
 				entity.sync();
-				entity.syncCounter = 0;
+				entity.setSyncCounter(0);
 			}
-			entity.maxProgress = 100;
+			entity.setMaxProgress(100);
 			return;
 		}
 
-		entity.maxProgress = recipe.getProcessingTime();
+		entity.setMaxProgress(recipe.getProcessingTime());
 
 		ItemStack output = recipe.getOutput();
 		int energyCost = recipe.getEnergyCost();
@@ -89,7 +84,7 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 				|| (ItemStack.isSameItemSameTags(currentOutput, output)
 				&& currentOutput.getCount() + output.getCount() <= currentOutput.getMaxStackSize());
 
-		boolean hasEnergy = entity.energy >= energyCost;
+		boolean hasEnergy = entity.getEnergy() >= energyCost;
 		boolean isWorking = canOutput && hasEnergy;
 
 		// 更新方块光照状态
@@ -98,29 +93,29 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 		}
 
 		if (isWorking) {
-			entity.energy -= energyCost;
-			entity.progress++;
+			entity.setEnergy(getEnergy() - energyCost);
+			entity.setProgress(getProgress() + 1);
 
-			if (++entity.syncCounter % 5 == 0) {
+			entity.setSyncCounter(entity.getSyncCounter() + 1);
+			if (entity.getSyncCounter() % 5 == 0) {
 				entity.sync();
 			}
 
 			// 进度完成
-			if (entity.progress >= entity.maxProgress) {
+			if (entity.getProgress() >= entity.getMaxProgress()) {
 				entity.getItemHandler().getStackInSlot(0).shrink(1);
 				if (currentOutput.isEmpty()) {
 					entity.getItemHandler().setStackInSlot(1, output.copy());
 				} else {
 					currentOutput.grow(output.getCount());
 				}
-				entity.progress = 0;
-				entity.syncCounter = 0;
-				// ✅ 完成时调用一次 setChanged 和 sync
+				entity.setProgress(0);
+				entity.setSyncCounter(0);
 				entity.setChanged();
 				entity.sync();
 			}
 		} else {
-			entity.syncCounter = 0;
+			entity.setSyncCounter(0);
 		}
 	}
 

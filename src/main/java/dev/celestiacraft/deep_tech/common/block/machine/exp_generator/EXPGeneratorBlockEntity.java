@@ -9,10 +9,9 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
+import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.FluidTankWidget;
-import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
-import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
@@ -27,23 +26,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBlockEntity> implements IUIHolder.BlockEntityUI {
-	private final SimpleMachineInventory inventoryWrapper;
-	private int syncCounter = 0;
-
 	public EXPGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		inventoryWrapper = new SimpleMachineInventory(getItemHandler());
 	}
 
 	@Override
@@ -138,7 +129,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				});
 
 		boolean generatedPower = false;
-		if (entity.energy < entity.getMachineMaxEnergy()) {
+		if (entity.getEnergy() < entity.getMachineMaxEnergy()) {
 			int mbPerTick = EXPGeneratorConfig.MB_PER_TICK.get();
 			FluidStack drainStack = entity.getFluidHandler().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.SIMULATE, false);
 
@@ -146,7 +137,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				entity.getFluidHandler().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.EXECUTE, false);
 				int fePerMb = EXPGeneratorConfig.FE_PER_MB.get();
 				int generated = fePerMb * mbPerTick;
-				entity.energy = Math.min(entity.energy + generated, entity.getMachineMaxEnergy());
+				entity.setEnergy(Math.min(entity.getEnergy() + generated, entity.getMachineMaxEnergy()));
 				entity.setChanged();
 				entity.sync();
 				generatedPower = true;
@@ -160,19 +151,24 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 			level.setBlockAndUpdate(pos, state.setValue(EXPGeneratorBlock.LIT, isWorking));
 		}
 
-		if (!isWorking && entity.progress > 0) {
-			entity.progress = 0;
+		if (!isWorking && entity.getProgress() > 0) {
+			entity.setProgress(0);
 			entity.setChanged();
 		}
-		if (level.getGameTime() % 2 == 0 && energy > 0) {
+		if (level.getGameTime() % 2 == 0 && getEnergy() > 0) {
 			for (Direction dir : Direction.values()) {
 				BlockEntity target = level.getBlockEntity(pos.relative(dir));
-				if (target == null) continue;
+				if (target == null) {
+					continue;
+				}
 				target.getCapability(ForgeCapabilities.ENERGY, dir.getOpposite())
 						.ifPresent(storage -> {
-							int sent = storage.receiveEnergy(Math.min(energy, getMaxExtract()), false);
-							energy -= sent;
-							if (sent > 0) { setChanged(); sync(); }
+							int sent = storage.receiveEnergy(Math.min(getEnergy(), getMaxExtract()), false);
+							setEnergy(getEnergy() - sent);
+							if (sent > 0) {
+								setChanged();
+								sync();
+							}
 						});
 			}
 		}

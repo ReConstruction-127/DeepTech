@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.recipe.crushing;
+package dev.celestiacraft.deep_tech.common.recipe.alloy;
 
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
@@ -10,10 +10,10 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-public class CrushingRecipeSerializer implements RecipeSerializer<CrushingRecipe> {
+public class AlloySerializer implements RecipeSerializer<AlloyRecipe> {
 	@Override
-	public @NotNull CrushingRecipe fromJson(@NotNull ResourceLocation id, JsonObject json) {
-		Ingredient input = Ingredient.fromJson(json.get("input"));
+	public @NotNull AlloyRecipe fromJson(@NotNull ResourceLocation id, JsonObject json) {
+		Ingredient input = Ingredient.fromJson(json.get("inputs"));
 		JsonObject result = GsonHelper.getAsJsonObject(json, "result");
 		String item = GsonHelper.getAsString(result, "item");
 		ItemStack output = new ItemStack(
@@ -24,17 +24,17 @@ public class CrushingRecipeSerializer implements RecipeSerializer<CrushingRecipe
 		int energyCost = GsonHelper.getAsInt(json, "energy_cost", 50);
 		int processingTime = GsonHelper.getAsInt(json, "processing_time", 100);
 
-		return new CrushingRecipe(id, input, output, energyCost, processingTime);
+		return new AlloyRecipe(id, input, output, energyCost, processingTime);
 	}
 
 	@Override
-	public CrushingRecipe fromNetwork(@NotNull ResourceLocation id, @NotNull FriendlyByteBuf buf) {
-		Ingredient input = Ingredient.fromNetwork(buf);
-		ItemStack output = buf.readItem();
-		int energyCost = buf.readInt();
-		int processingTime = buf.readInt();
+	public AlloyRecipe fromNetwork(@NotNull ResourceLocation id, @NotNull FriendlyByteBuf buffer) {
+		Ingredient input = Ingredient.fromNetwork(buffer);
+		ItemStack output = buffer.readItem();
+		int energyCost = buffer.readInt();
+		int processingTime = buffer.readInt();
 
-		return new CrushingRecipe(
+		return new AlloyRecipe(
 				id,
 				input,
 				output,
@@ -44,7 +44,7 @@ public class CrushingRecipeSerializer implements RecipeSerializer<CrushingRecipe
 	}
 
 	@Override
-	public void toNetwork(@NotNull FriendlyByteBuf buf, CrushingRecipe recipe) {
+	public void toNetwork(@NotNull FriendlyByteBuf buf, @NotNull AlloyRecipe recipe) {
 		recipe.getInput().toNetwork(buf);
 		buf.writeItem(recipe.getOutput());
 		buf.writeInt(recipe.getEnergyCost());

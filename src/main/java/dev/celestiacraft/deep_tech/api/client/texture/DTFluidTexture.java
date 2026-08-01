@@ -5,6 +5,7 @@ import com.tterrag.registrate.providers.RegistrateItemModelProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.libs.NebulaLibs;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -13,14 +14,10 @@ import net.minecraftforge.client.model.generators.loaders.DynamicFluidContainerM
 import net.minecraftforge.registries.ForgeRegistries;
 
 @Getter
+@AllArgsConstructor
 public class DTFluidTexture {
 	private final ResourceLocation flowing;
 	private final ResourceLocation still;
-
-	private DTFluidTexture(ResourceLocation flowing, ResourceLocation still) {
-		this.flowing = flowing;
-		this.still = still;
-	}
 
 	public static DTFluidTexture of(ResourceLocation flowing, ResourceLocation still) {
 		return new DTFluidTexture(flowing, still);

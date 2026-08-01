@@ -2,6 +2,8 @@ package dev.celestiacraft.deep_tech.common.register;
 
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.register.recipe.RecipeRegistry;
+import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
+import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloySerializer;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipeSerializer;
 import net.minecraft.core.registries.Registries;
@@ -19,12 +21,14 @@ public class DTRecipes {
 	private static final DeferredRegister<RecipeType<?>> TYPES;
 
 	public static final RecipeRegistry<CrushingRecipe> CRUSHING;
+	public static final RecipeRegistry<AlloyRecipe> ALLOY;
 
 	static {
 		SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, DeepTech.MODID);
 		TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, DeepTech.MODID);
 
 		CRUSHING = add("crushing", CrushingRecipeSerializer::new);
+		ALLOY = add("alloy", AlloySerializer::new);
 	}
 
 	public static void register(IEventBus bus) {

@@ -6,6 +6,7 @@ import dev.celestiacraft.deep_tech.api.block.machine.capability.MachineItemHandl
 import dev.celestiacraft.deep_tech.api.block.machine.config.IMachineEnergyConfig;
 import dev.celestiacraft.deep_tech.api.block.machine.config.IMachineFluidConfig;
 import dev.celestiacraft.deep_tech.api.block.machine.config.IMachineItemConfig;
+import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import lombok.Getter;
@@ -29,14 +30,19 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 
 @Getter
+@Setter
 public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends BasicBlockEntity implements ITickableBlockEntity<T>, IMachineItemConfig, IMachineFluidConfig, IMachineEnergyConfig {
-	public int progress = 0;
-	public int maxProgress = 100;
-	@Setter
-	public int energy = 0;
+	private int progress = 0;
+	private int maxProgress = 100;
+	private int energy = 0;
+	// 用于控制 sync 频率的计数器
+	private int syncCounter = 0;
+	// 复用 inventoryWrapper，避免每 tick 创建
+	private final SimpleMachineInventory inventory;
 
 	public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
+		inventory = new SimpleMachineInventory(itemHandler);
 	}
 
 	/**

@@ -17,7 +17,7 @@ public class MachineEnergyCapability implements IEnergyStorage {
 		}
 
 		int received = Math.min(maxReceive, machine.getMaxReceive());
-		received = Math.min(received, machine.getMachineMaxEnergy() - machine.energy);
+		received = Math.min(received, machine.getMachineMaxEnergy() - machine.getEnergy());
 		received = Math.max(received, 0);
 
 		if (!simulate && received > 0) {
@@ -36,11 +36,11 @@ public class MachineEnergyCapability implements IEnergyStorage {
 		}
 
 		int extracted = Math.min(maxExtract, machine.getMaxExtract());
-		extracted = Math.min(extracted, machine.energy);
+		extracted = Math.min(extracted, machine.getEnergy());
 		extracted = Math.max(extracted, 0);
 
 		if (!simulate && extracted > 0) {
-			machine.energy -= extracted;
+			machine.setEnergy(machine.getEnergy() - extracted);
 			machine.setChanged();
 			machine.sync();
 		}
@@ -50,7 +50,7 @@ public class MachineEnergyCapability implements IEnergyStorage {
 
 	@Override
 	public int getEnergyStored() {
-		return machine.energy;
+		return machine.getEnergy();
 	}
 
 	@Override

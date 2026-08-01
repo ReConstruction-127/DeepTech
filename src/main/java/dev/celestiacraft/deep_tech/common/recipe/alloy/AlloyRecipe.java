@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.recipe.crushing;
+package dev.celestiacraft.deep_tech.common.recipe.alloy;
 
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import lombok.AllArgsConstructor;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @AllArgsConstructor
-public class CrushingRecipe implements Recipe<Container> {
+public class AlloyRecipe implements Recipe<Container> {
 	private final ResourceLocation id;
 	private final Ingredient input;
 	private final ItemStack output;
@@ -25,7 +25,7 @@ public class CrushingRecipe implements Recipe<Container> {
 	private final int processingTime;
 
 	@Override
-	public boolean matches(Container container, @NotNull Level level) {
+	public boolean matches(@NotNull Container container, @NotNull Level level) {
 		return input.test(container.getItem(0));
 	}
 
@@ -51,12 +51,12 @@ public class CrushingRecipe implements Recipe<Container> {
 
 	@Override
 	public @NotNull RecipeSerializer<?> getSerializer() {
-		return DTRecipes.CRUSHING.getSerializer();
+		return DTRecipes.ALLOY.getSerializer();
 	}
 
 	@Override
 	public @NotNull RecipeType<?> getType() {
-		return DTRecipes.CRUSHING.getRecipeType();
+		return DTRecipes.ALLOY.getRecipeType();
 	}
 
 	@Override
