@@ -3,63 +3,65 @@ package dev.celestiacraft.deep_tech.common.block.machine.resonance_node;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
+import dev.celestiacraft.deep_tech.api.block.machine.MachineBlock;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
+import dev.celestiacraft.libs.api.register.block.BlockFacing;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.client.model.generators.BlockModelBuilder;
+import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
-import org.jetbrains.annotations.Nullable;
 
-public class ResonanceNodeBlock extends BaseEntityBlock {
+public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
+	public ResonanceNodeBlock(Properties properties) {
+		super(properties);
+	}
 
-    public ResonanceNodeBlock(Properties properties) {
-        super(properties);
-    }
+	@Override
+	protected BlockFacing useFacingType() {
+		return BlockFacing.FACING;
+	}
 
-    @Nullable
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new ResonanceNodeBlockEntity(DTBlockEntities.RESONANCE_NODE.get(), pos, state);
-    }
+	@Override
+	protected boolean useLitState() {
+		return false;
+	}
 
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return null;
-    }
+	@Override
+	public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
+		return 0;
+	}
 
-    @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
-    }
+	@Override
+	public BlockEntityType<ResonanceNodeBlockEntity> getBlockEntityType() {
+		return DTBlockEntities.RESONANCE_NODE.get();
+	}
 
-    @Override
-    public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-        return 0;
-    }
+	@Override
+	public Class<ResonanceNodeBlockEntity> getBlockEntityClass() {
+		return ResonanceNodeBlockEntity.class;
+	}
 
-    /**
-     * 数据生成：最简单的 cubeAll 模型
-     */
-    public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
-        return (context, provider) -> {
-            var model = provider.models().cubeAll(
-                    context.getName(),
-                    provider.modLoc("block/machine/resonance_node/resonance_node")
-            );
+	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
+		return (context, provider) -> {
+			BlockModelProvider models = provider.models();
+			BlockModelBuilder model = models.getBuilder(context.getName())
+					.parent(models.getExistingFile(provider.modLoc("block/machine/resonance_node")));
 
-            provider.getVariantBuilder(context.get())
-                    .forAllStates((state) -> ConfiguredModel.builder()
-                            .modelFile(model)
-                            .build()
-                    );
-        };
-    }
+			provider.getVariantBuilder(context.get())
+					.forAllStates((state) -> {
+						Direction facing = state.getValue(FACING);
+
+						return ConfiguredModel.builder()
+								.modelFile(model)
+								.rotationX(getXRotFromFacing(facing))
+								.rotationY(getYRotFromFacing(facing))
+								.build();
+					});
+		};
+	}
 }

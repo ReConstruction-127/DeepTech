@@ -46,11 +46,13 @@ public class MachineBlocks {
 				.blockstate(EXPGeneratorBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
+
 		RESONANCE_NODE = DeepTech.REGISTRATE.block("resonance_node", ResonanceNodeBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
 				.model(ItemModelGen.withModel("block/resonance_node"))
 				.build()
+				.blockstate(ResonanceNodeBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 	}
