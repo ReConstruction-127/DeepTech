@@ -55,7 +55,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	@Override
 	public int getItemInputSlotCount() {
-		return 1;
+		return 0;
 	}
 
 	@Override
@@ -174,17 +174,17 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 		group.addWidget(title);
 
 		group.addWidget(new EnergyBarWidget(
-				18,
+				99,
 				25,
 				this::getEnergyStored,
 				getMachineMaxEnergy()
 		));
 
 		group.addWidget(new FluidTankWidget(
-				36,
-				25,
-				14,
 				42,
+				24,
+				16,
+				40,
 				this::getFluidAmount,
 				getFluidCapacity(),
 				() -> getFluidStorage().getFluidInTank(getExperienceTank()),

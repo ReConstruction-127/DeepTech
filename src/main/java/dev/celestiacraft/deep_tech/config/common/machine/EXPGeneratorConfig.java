@@ -35,8 +35,8 @@ public class EXPGeneratorConfig extends ConfigModule {
 
 		EXP_TO_MB = builder.comment("每点经验转化为多少 mB 液态经验")
 				.comment("type: int")
-				.comment("default: 10")
-				.defineInRange("expToMb", 10, 1, 100);
+				.comment("default: 20")
+				.defineInRange("expToMb", 20, 1, 100);
 
 		PLAYER_EXP_PER_TICK = builder.comment("玩家每 tick 被吸取的经验值")
 				.comment("type: int")
@@ -50,7 +50,7 @@ public class EXPGeneratorConfig extends ConfigModule {
 
 		FE_PER_MB = builder.comment("每 mB 液态经验产生的 FE")
 				.comment("type: int")
-				.comment("default: 1")
-				.defineInRange("fePerMb", 10, 1, 100);
+				.comment("default: 20")
+				.defineInRange("fePerMb", 20, 1, 100);
 	}
 }
