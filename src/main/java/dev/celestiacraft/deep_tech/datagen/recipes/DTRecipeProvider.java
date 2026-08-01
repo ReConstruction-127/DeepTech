@@ -17,7 +17,7 @@ public class DTRecipeProvider extends RecipeProvider {
 	}
 
 	protected static ResourceLocation save(String path) {
-		return DeepTech.loadResource("recipes/" + path);
+		return DeepTech.loadResource(path);
 	}
 
 	@Override
