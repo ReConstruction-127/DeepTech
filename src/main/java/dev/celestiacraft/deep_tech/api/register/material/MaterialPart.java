@@ -8,7 +8,7 @@ public enum MaterialPart {
 	NUGGET("nugget", "nuggets"),
 	PLATE("plate", "plates"),
 	DUST("dust", "dusts"),
-	RAW_MATERIAL("raw_material", "raw_materials");
+	RAW_MATERIAL("raw", "raw_materials");
 
 	private final String path;
 	private final String tagFolder;
