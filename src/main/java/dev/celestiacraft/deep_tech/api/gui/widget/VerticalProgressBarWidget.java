@@ -55,7 +55,9 @@ public class VerticalProgressBarWidget extends Widget {
 		}
 
 		float ratio = (float) progress / maxProgress;
-		if (ratio > 1.0f) ratio = 1.0f;
+		if (ratio > 1.0f) {
+			ratio = 1.0f;
+		}
 
 		foreground.drawSubArea(
 				graphics,
