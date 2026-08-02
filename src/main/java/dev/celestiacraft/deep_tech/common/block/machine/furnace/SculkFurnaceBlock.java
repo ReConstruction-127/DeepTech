@@ -26,8 +26,8 @@ public class SculkFurnaceBlock extends MachineBlock<SculkFurnaceBlockEntity> {
 
 	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
 		return (context, provider) -> {
-			BlockModelBuilder modelOff = machineModel(provider, context.getName() + "_off", "furnace", false);
-			BlockModelBuilder modelOn = machineModel(provider, context.getName() + "_on", "furnace", true);
+			BlockModelBuilder modelOff = machineModel(provider, "furnace", "off");
+			BlockModelBuilder modelOn = machineModel(provider, "furnace", "on");
 			horizontalLitBlock(provider, context.get(), modelOff, modelOn);
 		};
 	}

@@ -26,8 +26,8 @@ public class CrusherBlock extends MachineBlock<CrusherBlockEntity> {
 
 	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
 		return (context, provider) -> {
-			BlockModelBuilder modelOff = machineModel(provider, context.getName() + "_off", "crusher", false);
-			BlockModelBuilder modelOn = machineModel(provider, context.getName() + "_on", "crusher", true);
+			BlockModelBuilder modelOff = machineModel(provider, "crusher", "off");
+			BlockModelBuilder modelOn = machineModel(provider, "crusher", "on");
 			horizontalLitBlock(provider, context.get(), modelOff, modelOn);
 		};
 	}

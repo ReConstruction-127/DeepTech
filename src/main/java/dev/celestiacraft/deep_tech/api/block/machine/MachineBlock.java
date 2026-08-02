@@ -88,10 +88,10 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 		});
 	}
 
-	public static <B extends BasicBlock> NonNullBiConsumer<DataGenContext<Block, B>, RegistrateBlockstateProvider> genBlockState(String textureFolder) {
+	public static <B extends BasicBlock> NonNullBiConsumer<DataGenContext<Block, B>, RegistrateBlockstateProvider> genBlockState(String machineName) {
 		return (context, provider) -> {
-			BlockModelBuilder modelOff = machineModel(provider, context.getName() + "_off", textureFolder, false);
-			BlockModelBuilder modelOn = machineModel(provider, context.getName() + "_on", textureFolder, true);
+			BlockModelBuilder modelOff = machineModel(provider, machineName, "off");
+			BlockModelBuilder modelOn = machineModel(provider, machineName, "on");
 
 			provider.getVariantBuilder(context.get())
 					.forAllStates((state) -> {
@@ -103,18 +103,17 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 		};
 	}
 
-	public static BlockModelBuilder machineModel(RegistrateBlockstateProvider provider, String name, String textureFolder, boolean lit) {
-		String suffix = lit ? "on" : "off";
-		String textureRoot = "block/machine/" + textureFolder + "/";
+	public static BlockModelBuilder machineModel(RegistrateBlockstateProvider provider, String machineName, String state) {
+		String textureRoot = "block/machine/" + machineName + "/";
 
 		BlockModelProvider models = provider.models();
 
 		return models.orientableWithBottom(
-				name,
-				provider.modLoc(textureRoot + "side_" + suffix),
-				provider.modLoc(textureRoot + "face_" + suffix),
+				"block/machine/" + machineName + "/" + state,
+				provider.modLoc(textureRoot + "side_" + state),
+				provider.modLoc(textureRoot + "face_" + state),
 				provider.modLoc(textureRoot + "bottom"),
-				provider.modLoc(textureRoot + "top_" + suffix)
+				provider.modLoc(textureRoot + "top_" + state)
 		);
 	}
 

@@ -5,17 +5,17 @@ import dev.celestiacraft.deep_tech.datagen.language.LanguageGenerate;
 public class BlockLanguage extends LanguageGenerate {
 	public static void addLang() {
 		addBlockLanguage(
-				"machine_crusher",
+				"crusher",
 				"Crusher",
 				"粉碎机"
 		);
 		addBlockLanguage(
-				"machine_sculk_furnace",
+				"sculk_furnace",
 				"Sculk Furnace",
 				"幽匿电炉"
 		);
 		addBlockLanguage(
-				"machine_exp_generator",
+				"exp_generator",
 				"Experience Generator",
 				"经验发电机"
 		);

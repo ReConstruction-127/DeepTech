@@ -31,8 +31,8 @@ public class EXPGeneratorBlock extends MachineBlock<EXPGeneratorBlockEntity> {
 
 	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
 		return (context, provider) -> {
-			BlockModelBuilder modelOff = machineModel(provider, context.getName() + "_off", "exp_generator", false);
-			BlockModelBuilder modelOn = machineModel(provider, context.getName() + "_on", "exp_generator", true);
+			BlockModelBuilder modelOff = machineModel(provider, "exp_generator", "off");
+			BlockModelBuilder modelOn = machineModel(provider, "exp_generator", "on");
 			horizontalLitBlock(provider, context.get(), modelOff, modelOn);
 		};
 	}

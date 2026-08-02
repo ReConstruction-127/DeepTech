@@ -22,28 +22,28 @@ public class MachineBlocks {
 	static {
 		DTCreativeTabs.getTab("machine");
 
-		CRUSHER = DeepTech.REGISTRATE.block("machine_crusher", CrusherBlock::new)
+		CRUSHER = DeepTech.REGISTRATE.block("crusher", CrusherBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine_crusher_off"))
+				.model(ItemModelGen.withModel("block/machine/crusher/off"))
 				.build()
 				.blockstate(CrusherBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 
-		SCULK_FURNACE = DeepTech.REGISTRATE.block("machine_sculk_furnace", SculkFurnaceBlock::new)
+		SCULK_FURNACE = DeepTech.REGISTRATE.block("sculk_furnace", SculkFurnaceBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine_sculk_furnace_off"))
+				.model(ItemModelGen.withModel("block/machine/furnace/off"))
 				.build()
 				.blockstate(SculkFurnaceBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 
-		EXP_GENERATOR = DeepTech.REGISTRATE.block("machine_exp_generator", EXPGeneratorBlock::new)
+		EXP_GENERATOR = DeepTech.REGISTRATE.block("exp_generator", EXPGeneratorBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine_exp_generator_off"))
+				.model(ItemModelGen.withModel("block/machine/exp_generator/off"))
 				.build()
 				.blockstate(EXPGeneratorBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -52,9 +52,9 @@ public class MachineBlocks {
 		ALLOY_FURNACE = DeepTech.REGISTRATE.block("alloy_furnace", AlloyFurnaceBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine_alloy_furnace_off"))
+				.model(ItemModelGen.withModel("block/machine/alloy_furnace/off"))
 				.build()
-				.blockstate(SculkFurnaceBlock.genBlockState())
+				.blockstate(AlloyFurnaceBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 
