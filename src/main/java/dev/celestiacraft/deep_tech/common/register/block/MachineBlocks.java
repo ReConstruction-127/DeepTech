@@ -49,21 +49,21 @@ public class MachineBlocks {
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 
+		ALLOY_FURNACE = DeepTech.REGISTRATE.block("alloy_furnace", AlloyFurnaceBlock::new)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine_alloy_furnace_off"))
+				.build()
+				.blockstate(SculkFurnaceBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.register();
+
 		RESONANCE_NODE = DeepTech.REGISTRATE.block("resonance_node", ResonanceNodeBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
 				.model(ItemModelGen.withModel("block/resonance_node"))
 				.build()
 				.blockstate(ResonanceNodeBlock.genBlockState())
-				.tag(DeepTechBlockTags.MACHINES)
-				.register();
-
-		ALLOY_FURNACE = DeepTech.REGISTRATE.block("alloy_furnace", AlloyFurnaceBlock::new)
-				.item()
-				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine_sculk_furnace_off"))
-				.build()
-				.blockstate(SculkFurnaceBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 	}

@@ -3,6 +3,7 @@ package dev.celestiacraft.deep_tech.common.block.machine.resonance_node;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -13,11 +14,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ResonanceNodeBlockEntity extends MachineBlockEntity<ResonanceNodeBlockEntity> {
-	private final LazyOptional<IEnergyStorage> nodeEnergyCap = LazyOptional.of(() -> new ResonanceNodeEnergyStorage(this));
+	private LazyOptional<IEnergyStorage> nodeEnergyCap;
+	private final ResonanceNodeClientHelper clientHelper;
 
 	public ResonanceNodeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
+		this.nodeEnergyCap = LazyOptional.of(() -> new ResonanceNodeEnergyStorage(this));
+		this.clientHelper = new ResonanceNodeClientHelper(this);
 	}
+
+
 
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction direction) {
@@ -36,5 +42,10 @@ public class ResonanceNodeBlockEntity extends MachineBlockEntity<ResonanceNodeBl
 	public void invalidateCaps() {
 		super.invalidateCaps();
 		nodeEnergyCap.invalidate();
+	}
+	// ✅ 客户端 Tick：由 Block 的 getTicker 调用
+	public void clientTick(Level level, BlockPos pos, BlockState state, ResonanceNodeBlockEntity entity) {
+		if (level == null || !level.isClientSide()) return;
+		clientHelper.tick(level);
 	}
 }

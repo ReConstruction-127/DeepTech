@@ -12,6 +12,7 @@ import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
@@ -40,7 +41,7 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 
 	@Override
 	public int getItemInputSlotCount() {
-		return 3;
+		return 2;
 	}
 
 	@Override
@@ -155,12 +156,12 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 				getMaxEnergyStored()
 		));
 
-		group.addWidget(new ProgressBarWidget(
-				74, 39, 16, 16,
+		group.addWidget(new VerticalProgressBarWidget(
+				74, 39, 14, 14,
 				this::getProgress,
 				this::getMaxProgress,
-				new ResourceTexture(DeepTech.loadGui("elements/progress_crusher_back")),
-				new ResourceTexture(DeepTech.loadGui("elements/progress_crusher_front"))
+				new ResourceTexture(DeepTech.loadGui("elements/progress_alloy_back")),
+				new ResourceTexture(DeepTech.loadGui("elements/progress_alloy_front"))
 		));
 
 		// 3 个输入槽 + 1 个输出槽
@@ -168,7 +169,7 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 				group,
 				this,
 				getItemHandler(),
-				new Position(17, 38),
+				new Position(41, 38),
 				new Position(97, 38)
 		);
 
