@@ -21,6 +21,6 @@ public class SculkFurnaceConfig extends ConfigModule {
 		MAX_RECEIVE = builder.comment("Sculk Furnace's max energy receive")
 				.comment("type: int")
 				.comment("default: 100")
-				.defineInRange("sculk_furnace_max_energy_receive", 100, 1, Integer.MAX_VALUE);
+				.defineInRange("sculk_furnace_max_energy_receive", 1000, 1, Integer.MAX_VALUE);
 	}
 }

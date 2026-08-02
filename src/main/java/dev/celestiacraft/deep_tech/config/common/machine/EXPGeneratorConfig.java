@@ -25,8 +25,8 @@ public class EXPGeneratorConfig extends ConfigModule {
 
 		MAX_EXTRACT = builder.comment("最大输出速率 (FE/tick)")
 				.comment("type: int")
-				.comment("default: 50")
-				.defineInRange("maxExtract", 50, 10, 10000);
+				.comment("default: 500")
+				.defineInRange("maxExtract", 500, 10, 10000);
 
 		FLUID_CAPACITY = builder.comment("液态经验存储容量 (mB)")
 				.comment("type: int")
