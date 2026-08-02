@@ -57,25 +57,16 @@ public class VerticalProgressBarWidget extends Widget {
 		float ratio = (float) progress / maxProgress;
 		if (ratio > 1.0f) ratio = 1.0f;
 
-		int displayHeight = (int) (getSize().height * ratio);
-
-		graphics.enableScissor(
-				getPosition().x,
-				getPosition().y + getSize().height - displayHeight,
-				getPosition().x + getSize().width,
-				getPosition().y + getSize().height
-		);
-
-		foreground.draw(
+		foreground.drawSubArea(
 				graphics,
-				mouseX,
-				mouseY,
 				getPosition().x,
-				getPosition().y,
+				getPosition().y + getSize().height * (1.0F - ratio),
 				getSize().width,
-				getSize().height
+				getSize().height * ratio,
+				0.0F,
+				1.0F - ratio,
+				1.0F,
+				ratio
 		);
-
-		graphics.disableScissor();
 	}
 }

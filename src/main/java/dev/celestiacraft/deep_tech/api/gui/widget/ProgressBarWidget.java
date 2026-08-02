@@ -56,25 +56,16 @@ public class ProgressBarWidget extends Widget {
 			ratio = 1.0f;
 		}
 
-		int displayWidth = (int) (getSize().width * ratio);
-
-		graphics.enableScissor(
-				getPosition().x,
-				getPosition().y,
-				getPosition().x + displayWidth,
-				getPosition().y + getSize().height
-		);
-
-		foreground.draw(
+		foreground.drawSubArea(
 				graphics,
-				mouseX,
-				mouseY,
 				getPosition().x,
 				getPosition().y,
-				getSize().width,
-				getSize().height
+				getSize().width * ratio,
+				getSize().height,
+				0.0F,
+				0.0F,
+				ratio,
+				1.0F
 		);
-
-		graphics.disableScissor();
 	}
 }

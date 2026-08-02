@@ -84,36 +84,32 @@ public class FluidTankWidget extends Widget {
 		if (ratio > 1.0f) {
 			ratio = 1.0f;
 		}
-		int displayHeight = (int) (getSize().height * ratio);
+		float fillHeight = getSize().height * ratio;
+		float fillY = getPosition().y + getSize().height - fillHeight;
 
-		graphics.enableScissor(
-				getPosition().x,
-				getPosition().y + getSize().height - displayHeight,
-				getPosition().x + getSize().width,
-				getPosition().y + getSize().height
-		);
 		FluidStack fluidStack = fluidStackGetter == null ? FluidStack.EMPTY : fluidStackGetter.get();
 		if (!fluidStack.isEmpty()) {
 			DrawerHelper.drawFluidForGui(
 					graphics,
 					FluidHelperImpl.toFluidStack(fluidStack),
 					getPosition().x,
-					getPosition().y,
+					fillY,
 					getSize().width,
-					getSize().height
+					fillHeight
 			);
 		} else if (foreground != null) {
-			foreground.draw(
+			foreground.drawSubArea(
 					graphics,
-					mouseX,
-					mouseY,
 					getPosition().x,
-					getPosition().y,
+					fillY,
 					getSize().width,
-					getSize().height
+					fillHeight,
+					0.0F,
+					1.0F - ratio,
+					1.0F,
+					ratio
 			);
 		}
-		graphics.disableScissor();
 	}
 
 	@Override

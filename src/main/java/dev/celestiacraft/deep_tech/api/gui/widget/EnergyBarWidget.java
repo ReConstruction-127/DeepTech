@@ -35,32 +35,27 @@ public class EnergyBarWidget extends Widget {
 				42
 		);
 
-		int height = (int) (42.0F * energy / maxEnergy);
-
-		if (height <= 0) {
+		if (energy <= 0 || maxEnergy <= 0) {
 			return;
 		}
 
-		graphics.enableScissor(
-				getPosition().x,
-				getPosition().y + 42 - height,
-				getPosition().x + 14,
-				getPosition().y + 42
-		);
+		float ratio = (float) energy / maxEnergy;
+		if (ratio > 1.0f) {
+			ratio = 1.0f;
+		}
 
-		FOREGROUND.draw(
+		FOREGROUND.drawSubArea(
 				graphics,
-				mouseX,
-				mouseY,
 				getPosition().x,
-				getPosition().y,
-				14,
-				42
+				getPosition().y + getSize().height * (1.0F - ratio),
+				getSize().width,
+				getSize().height * ratio,
+				0.0F,
+				1.0F - ratio,
+				1.0F,
+				ratio
 		);
-
-		graphics.disableScissor();
 	}
-
 
 	@Override
 	public void drawInForeground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
