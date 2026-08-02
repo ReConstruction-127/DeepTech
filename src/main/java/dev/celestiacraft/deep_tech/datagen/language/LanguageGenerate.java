@@ -1,10 +1,7 @@
 package dev.celestiacraft.deep_tech.datagen.language;
 
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.datagen.language.type.BlockLanguage;
-import dev.celestiacraft.deep_tech.datagen.language.type.GuiLanguage;
-import dev.celestiacraft.deep_tech.datagen.language.type.ItemLanguage;
-import dev.celestiacraft.deep_tech.datagen.language.type.OtherLanguage;
+import dev.celestiacraft.deep_tech.datagen.language.type.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +12,7 @@ public class LanguageGenerate {
 	public static void register() {
 		ItemLanguage.addLang();
 		BlockLanguage.addLang();
+		FluidLanguage.addLang();
 		GuiLanguage.addLang();
 		OtherLanguage.addLang();
 	}
@@ -46,12 +44,16 @@ public class LanguageGenerate {
 		TRANSLATION_LIST.add(newList);
 	}
 
+	protected static void addItemLanguage(String key, String english, String chinese) {
+		addLanguage("item", key, english, chinese);
+	}
+
 	protected static void addBlockLanguage(String key, String english, String chinese) {
 		addLanguage("block", key, english, chinese);
 	}
 
-	protected static void addItemLanguage(String key, String english, String chinese) {
-		addLanguage("item", key, english, chinese);
+	protected static void addFluidLanguage(String key, String english, String chinese) {
+		addLanguage("fluid", key, english, chinese);
 	}
 
 	protected static void addBiomeLanguage(String key, String english, String chinese) {

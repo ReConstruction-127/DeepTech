@@ -4,20 +4,17 @@ import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
-import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -157,7 +154,10 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 		));
 
 		group.addWidget(new VerticalProgressBarWidget(
-				74, 39, 14, 14,
+				78,
+				40,
+				14,
+				14,
 				this::getProgress,
 				this::getMaxProgress,
 				new ResourceTexture(DeepTech.loadGui("elements/progress_alloy_back")),
@@ -175,31 +175,5 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 
 		addPlayerInventory(group, player);
 		return group;
-	}
-
-	private void addPlayerInventory(WidgetGroup group, Player player) {
-		Container inventory = player.getInventory();
-
-		for (int row = 0; row < 3; row++) {
-			for (int col = 0; col < 9; col++) {
-				SlotWidget slot = new SlotWidget();
-				slot.initTemplate();
-				slot.setContainerSlot(inventory, col + row * 9 + 9);
-				slot.isPlayerContainer = true;
-				slot.setSelfPosition(new Position(7 + col * 18, 81 + row * 18));
-				slot.setBackground((ResourceTexture) null);
-				group.addWidget(slot);
-			}
-		}
-
-		for (int col = 0; col < 9; col++) {
-			SlotWidget slot = new SlotWidget();
-			slot.initTemplate();
-			slot.setContainerSlot(inventory, col);
-			slot.isPlayerContainer = true;
-			slot.setSelfPosition(new Position(7 + col * 18, 139));
-			slot.setBackground((ResourceTexture) null);
-			group.addWidget(slot);
-		}
 	}
 }

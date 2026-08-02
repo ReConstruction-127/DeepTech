@@ -4,7 +4,6 @@ import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
@@ -17,7 +16,6 @@ import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.CrusherConfig;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -164,31 +162,5 @@ public class CrusherBlockEntity extends MachineBlockEntity<CrusherBlockEntity> i
 
 		addPlayerInventory(group, player);
 		return group;
-	}
-
-	private void addPlayerInventory(WidgetGroup group, Player player) {
-		Container inventory = player.getInventory();
-
-		for (int row = 0; row < 3; row++) {
-			for (int col = 0; col < 9; col++) {
-				SlotWidget slot = new SlotWidget();
-				slot.initTemplate();
-				slot.setContainerSlot(inventory, col + row * 9 + 9);
-				slot.isPlayerContainer = true;
-				slot.setSelfPosition(new Position(7 + col * 18, 81 + row * 18));
-				slot.setBackground((ResourceTexture) null);
-				group.addWidget(slot);
-			}
-		}
-
-		for (int col = 0; col < 9; col++) {
-			SlotWidget slot = new SlotWidget();
-			slot.initTemplate();
-			slot.setContainerSlot(inventory, col);
-			slot.isPlayerContainer = true;
-			slot.setSelfPosition(new Position(7 + col * 18, 139));
-			slot.setBackground((ResourceTexture) null);
-			group.addWidget(slot);
-		}
 	}
 }

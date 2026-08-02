@@ -1,5 +1,9 @@
 package dev.celestiacraft.deep_tech.api.block.machine;
 
+import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
+import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
+import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
+import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.api.block.machine.capability.MachineEnergyCapability;
 import dev.celestiacraft.deep_tech.api.block.machine.capability.MachineFluidHandler;
 import dev.celestiacraft.deep_tech.api.block.machine.capability.MachineItemHandler;
@@ -17,6 +21,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -194,5 +200,31 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 
 	public int getMaxEnergyStored() {
 		return getMachineMaxEnergy();
+	}
+
+	protected void addPlayerInventory(WidgetGroup group, Player player) {
+		Container inventory = player.getInventory();
+
+		for (int row = 0; row < 3; row++) {
+			for (int col = 0; col < 9; col++) {
+				SlotWidget slot = new SlotWidget();
+				slot.initTemplate();
+				slot.setContainerSlot(inventory, col + row * 9 + 9);
+				slot.isPlayerContainer = true;
+				slot.setSelfPosition(new Position(7 + col * 18, 81 + row * 18));
+				slot.setBackground((ResourceTexture) null);
+				group.addWidget(slot);
+			}
+		}
+
+		for (int col = 0; col < 9; col++) {
+			SlotWidget slot = new SlotWidget();
+			slot.initTemplate();
+			slot.setContainerSlot(inventory, col);
+			slot.isPlayerContainer = true;
+			slot.setSelfPosition(new Position(7 + col * 18, 139));
+			slot.setBackground((ResourceTexture) null);
+			group.addWidget(slot);
+		}
 	}
 }

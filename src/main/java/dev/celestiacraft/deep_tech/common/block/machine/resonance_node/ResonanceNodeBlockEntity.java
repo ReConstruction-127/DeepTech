@@ -19,11 +19,16 @@ public class ResonanceNodeBlockEntity extends MachineBlockEntity<ResonanceNodeBl
 
 	public ResonanceNodeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		this.nodeEnergyCap = LazyOptional.of(() -> new ResonanceNodeEnergyStorage(this));
-		this.clientHelper = new ResonanceNodeClientHelper(this);
+		nodeEnergyCap = LazyOptional.of(() -> new ResonanceNodeEnergyStorage(this));
+		clientHelper = new ResonanceNodeClientHelper(this);
 	}
 
-
+	public void clientTick(Level level, BlockPos pos, BlockState state, ResonanceNodeBlockEntity entity) {
+		if (isLevelNotNull() || !level.isClientSide()) {
+			return;
+		}
+		clientHelper.tick(level);
+	}
 
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction direction) {
@@ -42,10 +47,5 @@ public class ResonanceNodeBlockEntity extends MachineBlockEntity<ResonanceNodeBl
 	public void invalidateCaps() {
 		super.invalidateCaps();
 		nodeEnergyCap.invalidate();
-	}
-	// ✅ 客户端 Tick：由 Block 的 getTicker 调用
-	public void clientTick(Level level, BlockPos pos, BlockState state, ResonanceNodeBlockEntity entity) {
-		if (level == null || !level.isClientSide()) return;
-		clientHelper.tick(level);
 	}
 }
