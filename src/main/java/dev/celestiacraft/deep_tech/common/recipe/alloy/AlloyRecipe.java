@@ -1,6 +1,6 @@
 package dev.celestiacraft.deep_tech.common.recipe.alloy;
 
-import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
+import dev.celestiacraft.deep_tech.api.ingredient.IngredientWithCount;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

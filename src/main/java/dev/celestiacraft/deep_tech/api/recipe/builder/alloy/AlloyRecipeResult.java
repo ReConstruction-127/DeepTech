@@ -3,7 +3,7 @@ package dev.celestiacraft.deep_tech.api.recipe.builder.alloy;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
+import dev.celestiacraft.deep_tech.api.ingredient.IngredientWithCount;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import lombok.AllArgsConstructor;
 import net.minecraft.advancements.Advancement;

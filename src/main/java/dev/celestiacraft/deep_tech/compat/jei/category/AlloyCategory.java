@@ -2,7 +2,7 @@ package dev.celestiacraft.deep_tech.compat.jei.category;
 
 import dev.celestiacraft.deep_tech.api.client.texture.DTTextures;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
-import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
+import dev.celestiacraft.deep_tech.api.ingredient.IngredientWithCount;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;

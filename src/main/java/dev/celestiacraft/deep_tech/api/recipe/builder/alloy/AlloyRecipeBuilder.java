@@ -1,6 +1,6 @@
 package dev.celestiacraft.deep_tech.api.recipe.builder.alloy;
 
-import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
+import dev.celestiacraft.deep_tech.api.ingredient.IngredientWithCount;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
