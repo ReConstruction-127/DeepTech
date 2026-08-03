@@ -1,9 +1,6 @@
 package dev.celestiacraft.deep_tech.config;
 
-import dev.celestiacraft.deep_tech.config.common.machine.CrusherConfig;
-import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
-import dev.celestiacraft.deep_tech.config.common.machine.EnergyCellConfig;
-import dev.celestiacraft.deep_tech.config.common.machine.SculkFurnaceConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.*;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class CommonConfig {
@@ -13,6 +10,7 @@ public class CommonConfig {
 	public static final CrusherConfig CRUSHER;
 	public static final SculkFurnaceConfig SCULK_FURNACE;
 	public static final EXPGeneratorConfig EXP_GENERATOR;
+	public static final AlloyFurnaceConfig ALLOY_FURNACE;
 	public static final EnergyCellConfig ENERGY_CELL;
 
 	static {
@@ -23,6 +21,7 @@ public class CommonConfig {
 		SCULK_FURNACE = new SculkFurnaceConfig(BUILDER);
 		EXP_GENERATOR = new EXPGeneratorConfig(BUILDER);
 		ENERGY_CELL = new EnergyCellConfig(BUILDER);
+		ALLOY_FURNACE = new AlloyFurnaceConfig(BUILDER);
 
 		SPEC = BUILDER.build();
 		BUILDER.pop();

@@ -44,8 +44,13 @@ public class PlateCraft {
 				result = new ItemStack(DTMaterials.IRON.getPlate().get());
 			}
 			spawnItem(level, pos, result);
+
+			if (!player.isCreative()) {
+				held.shrink(1);
+			}
 		}
 		return true;
+
 	}
 
 	private static void spawnItem(Level level, BlockPos pos, ItemStack stack) {

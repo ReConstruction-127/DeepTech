@@ -16,11 +16,11 @@ public class AlloyFurnaceConfig extends ConfigModule {
 		MAX_ENERGY = builder.comment("Alloy Furnace's max energy stored")
 				.comment("type: int")
 				.comment("default: 50000")
-				.defineInRange("sculk_furnace_max_energy_stored", 50000, 1, Integer.MAX_VALUE);
+				.defineInRange("alloy_furnace_max_energy_stored", 50000, 1, Integer.MAX_VALUE);
 
 		MAX_RECEIVE = builder.comment("Alloy Furnace's max energy receive")
 				.comment("type: int")
 				.comment("default: 100")
-				.defineInRange("sculk_furnace_max_energy_receive", 1000, 1, Integer.MAX_VALUE);
+				.defineInRange("alloy_furnace_max_energy_receive", 1000, 1, Integer.MAX_VALUE);
 	}
 }
