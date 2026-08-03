@@ -9,13 +9,23 @@ public class DTMaterials {
 	private static final List<DTMaterial> MATERIALS = new ArrayList<>();
 
 	public static final DTMaterial
-			COPPER;
+			COPPER,
+			IRON,
+			GOLD;
 
 	static {
 		DTCreativeTabs.getTab("material");
 
 		COPPER = addMaterial("copper")
-				.nugget();
+				.nugget()
+				.dust()
+				.plate();
+		IRON = addMaterial("iron")
+				.dust()
+				.plate();
+		GOLD = addMaterial("gold")
+				.dust()
+				.plate();
 	}
 
 	private static DTMaterial addMaterial(String id) {
