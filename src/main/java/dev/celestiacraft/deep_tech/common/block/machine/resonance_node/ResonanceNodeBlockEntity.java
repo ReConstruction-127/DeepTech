@@ -23,6 +23,7 @@ public class ResonanceNodeBlockEntity extends MachineBlockEntity<ResonanceNodeBl
 		clientHelper = new ResonanceNodeClientHelper(this);
 	}
 
+	@Override
 	public void clientTick(Level level, BlockPos pos, BlockState state, ResonanceNodeBlockEntity entity) {
 		if (isLevelNotNull() || !level.isClientSide()) {
 			return;
