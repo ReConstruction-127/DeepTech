@@ -7,37 +7,44 @@ import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 import dev.celestiacraft.libs.api.register.item.BasicItem;
 import dev.celestiacraft.libs.tags.TagsBuilder;
 
-import java.util.EnumMap;
-import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class DTMaterial {
 	private final String id;
 
-	private final EnumSet<MaterialPart> parts = EnumSet.noneOf(MaterialPart.class);
-	private final EnumMap<MaterialPart, ItemEntry<BasicItem>> entries = new EnumMap<>(MaterialPart.class);
+	private final Set<IMaterialPart> parts = new LinkedHashSet<>();
+	private final Map<IMaterialPart, ItemEntry<BasicItem>> entries = new LinkedHashMap<>();
 
 	public DTMaterial(String id) {
 		this.id = id;
 	}
 
-	public DTMaterial ingot() {
-		parts.add(MaterialPart.INGOT);
+	public DTMaterial part(IMaterialPart part) {
+		parts.add(part);
 		return this;
+	}
+
+	public DTMaterial ingot() {
+		return part(IMaterialPart.INGOT);
 	}
 
 	public DTMaterial nugget() {
-		parts.add(MaterialPart.NUGGET);
-		return this;
+		return part(IMaterialPart.NUGGET);
 	}
 
 	public DTMaterial plate() {
-		parts.add(MaterialPart.PLATE);
-		return this;
+		return part(IMaterialPart.PLATE);
 	}
 
 	public DTMaterial dust() {
-		parts.add(MaterialPart.DUST);
-		return this;
+		return part(IMaterialPart.DUST);
+	}
+
+	public DTMaterial raw() {
+		return part(IMaterialPart.RAW_MATERIAL);
 	}
 
 	public void registerMaterial() {
@@ -46,44 +53,38 @@ public class DTMaterial {
 		});
 	}
 
-	private ItemEntry<BasicItem> registerPart(MaterialPart part) {
-		String registryName = String.format(
-				"%s_%s",
-				id,
-				part.getPath()
-		);
-
-		String modelPath = String.format(
-				"item/material/%s/%s",
-				part.getPath(),
-				id
-		);
+	private ItemEntry<BasicItem> registerPart(IMaterialPart part) {
+		String registryName = String.format("%s_%s", id, part.getPath());
 
 		return DeepTech.REGISTRATE.item(registryName, BasicItem::new)
-				.model(ItemModelGen.generated(modelPath))
+				.model(ItemModelGen.generated(part.getModelPath(id)))
 				.tab(DTCreativeTabs.getTabKey("material"))
 				.tag(TagsBuilder.item(part.getTagFolder()).forge())
 				.tag(TagsBuilder.item(part.getMaterialTag(id)).forge())
 				.register();
 	}
 
-	public ItemEntry<BasicItem> get(MaterialPart part) {
+	public ItemEntry<BasicItem> get(IMaterialPart part) {
 		return entries.get(part);
 	}
 
 	public ItemEntry<BasicItem> getIngot() {
-		return get(MaterialPart.INGOT);
+		return get(IMaterialPart.INGOT);
 	}
 
 	public ItemEntry<BasicItem> getNugget() {
-		return get(MaterialPart.NUGGET);
+		return get(IMaterialPart.NUGGET);
 	}
 
 	public ItemEntry<BasicItem> getPlate() {
-		return get(MaterialPart.PLATE);
+		return get(IMaterialPart.PLATE);
 	}
 
 	public ItemEntry<BasicItem> getDust() {
-		return get(MaterialPart.DUST);
+		return get(IMaterialPart.DUST);
+	}
+
+	public ItemEntry<BasicItem> getRaw() {
+		return get(IMaterialPart.RAW_MATERIAL);
 	}
 }

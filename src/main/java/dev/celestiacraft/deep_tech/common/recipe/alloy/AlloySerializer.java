@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import dev.celestiacraft.deep_tech.api.ingredien.IngredientWithCount;
+import dev.celestiacraft.deep_tech.api.ingredient.IngredientWithCount;
 import dev.celestiacraft.deep_tech.common.recipe.utils.RecipeResultUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;

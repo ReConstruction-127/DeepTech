@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.ingredien;
+package dev.celestiacraft.deep_tech.api.ingredient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

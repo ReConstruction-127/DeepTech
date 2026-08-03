@@ -15,6 +15,7 @@ public class LanguageGenerate {
 		FluidLanguage.addLang();
 		GuiLanguage.addLang();
 		OtherLanguage.addLang();
+		MaterialLanguage.addLang();
 	}
 
 	protected static void addLanguage(String type, String key, String english, String chinese) {
@@ -54,6 +55,7 @@ public class LanguageGenerate {
 
 	protected static void addFluidLanguage(String key, String english, String chinese) {
 		addLanguage("fluid", key, english, chinese);
+		addItemLanguage(key + "_bucket", english + " Bucket", chinese + "桶");
 	}
 
 	protected static void addBiomeLanguage(String key, String english, String chinese) {
@@ -86,5 +88,13 @@ public class LanguageGenerate {
 
 	protected static void addGuiLang(String key, String english, String chinese) {
 		addLanguage("gui", key, english, chinese);
+	}
+
+	protected static void addMaterialLang(String key, String english, String chinese) {
+		addItemLanguage(key + "_ingot", english + " Ingot", chinese + "锭");
+		addItemLanguage(key + "_plate", english + " Plate", chinese + "板");
+		addItemLanguage(key + "_dust", english + " Dust", chinese + "粉");
+		addItemLanguage(key + "_nugget", english + " Nugget", chinese + "粒");
+		addItemLanguage("raw_" + key, "Raw " + english, "粗" + chinese);
 	}
 }
