@@ -25,7 +25,7 @@ public class ResonanceNodeBlockEntity extends MachineBlockEntity<ResonanceNodeBl
 
 	@Override
 	public void clientTick(Level level, BlockPos pos, BlockState state, ResonanceNodeBlockEntity entity) {
-		if (isLevelNotNull() || !level.isClientSide()) {
+		if (!isLevelNotNull() || !level.isClientSide()) {
 			return;
 		}
 		clientHelper.tick(level);
@@ -33,9 +33,11 @@ public class ResonanceNodeBlockEntity extends MachineBlockEntity<ResonanceNodeBl
 
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction direction) {
+		BlockState state = getBlockState();
+
 		if (capability == ForgeCapabilities.ENERGY) {
 			// 紫水晶指向 FACING, 基座在 FACING 的反面; 只有节点自身的基座面能进行能量交互
-			Direction baseSide = getBlockState().getValue(ResonanceNodeBlock.FACING).getOpposite();
+			Direction baseSide = state.getValue(ResonanceNodeBlock.FACING).getOpposite();
 			if (direction == baseSide || direction == null) {
 				return nodeEnergyCap.cast();
 			}

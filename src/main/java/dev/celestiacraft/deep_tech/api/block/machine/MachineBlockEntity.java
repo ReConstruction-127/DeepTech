@@ -132,20 +132,30 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	@Override
 	protected void saveAdditional(@NotNull CompoundTag tag) {
 		super.saveAdditional(tag);
-		tag.put("Inventory", itemHandler.serializeNBT());
-		tag.putInt("Energy", energy);
+		if (getMaxMachineSlot() > 0) {
+			tag.put("Inventory", itemHandler.serializeNBT());
+		}
+		if (getMachineMaxEnergy() > 0) {
+			tag.putInt("Energy", energy);
+		}
 		tag.putInt("Progress", progress);
 		tag.putInt("MaxProgress", maxProgress);
-		tag.put("Fluids", fluidHandler.serializeNBT());
+		if (getMaxMachineTank() > 0) {
+			tag.put("Fluids", fluidHandler.serializeNBT());
+		}
 	}
 
 	@Override
 	public @NotNull CompoundTag getUpdateTag() {
 		CompoundTag tag = super.getUpdateTag();
-		tag.putInt("Energy", energy);
+		if (getMachineMaxEnergy() > 0) {
+			tag.putInt("Energy", energy);
+		}
 		tag.putInt("Progress", progress);
 		tag.putInt("MaxProgress", maxProgress);
-		tag.put("Fluids", fluidHandler.serializeNBT());
+		if (getMaxMachineTank() > 0) {
+			tag.put("Fluids", fluidHandler.serializeNBT());
+		}
 		return tag;
 	}
 
@@ -177,7 +187,9 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	@Override
 	public void load(@NotNull CompoundTag tag) {
 		super.load(tag);
-		itemHandler.deserializeNBT(tag.getCompound("Inventory"));
+		if (tag.contains("Inventory")) {
+			itemHandler.deserializeNBT(tag.getCompound("Inventory"));
+		}
 		energy = tag.getInt("Energy");
 		progress = tag.getInt("Progress");
 		maxProgress = tag.getInt("MaxProgress");
