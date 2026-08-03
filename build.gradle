@@ -184,6 +184,9 @@ dependencies {
 	// TEST ONLY CC&A
 	runtimeOnly fg.deobf("curse.maven:createaddition-439890:6306951")
 
+	// TEST ONLY Mekanism
+	runtimeOnly fg.deobf("maven.modrinth:mekanism:10.4.12.68")
+
 	// Create + Flywheel + Registrate
 	implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }
 	implementation fg.deobf("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")

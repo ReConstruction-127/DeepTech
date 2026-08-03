@@ -5,6 +5,7 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.energy_cell.EnergyCellBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.ResonanceNodeBlock;
@@ -18,6 +19,7 @@ public class MachineBlocks {
 	public static final BlockEntry<EXPGeneratorBlock> EXP_GENERATOR;
 	public static final BlockEntry<ResonanceNodeBlock> RESONANCE_NODE;
 	public static final BlockEntry<AlloyFurnaceBlock> ALLOY_FURNACE;
+	public static final BlockEntry<EnergyCellBlock> ENERGY_CELL;
 
 	static {
 		DTCreativeTabs.getTab("machine");
@@ -25,7 +27,7 @@ public class MachineBlocks {
 		CRUSHER = DeepTech.REGISTRATE.block("crusher", CrusherBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine/crusher/off"))
+				.model(ItemModelGen.withModel("block/machine/crusher/on"))
 				.build()
 				.blockstate(CrusherBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -34,7 +36,7 @@ public class MachineBlocks {
 		SCULK_FURNACE = DeepTech.REGISTRATE.block("sculk_furnace", SculkFurnaceBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine/furnace/off"))
+				.model(ItemModelGen.withModel("block/machine/furnace/on"))
 				.build()
 				.blockstate(SculkFurnaceBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -43,7 +45,7 @@ public class MachineBlocks {
 		EXP_GENERATOR = DeepTech.REGISTRATE.block("exp_generator", EXPGeneratorBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine/exp_generator/off"))
+				.model(ItemModelGen.withModel("block/machine/exp_generator/on"))
 				.build()
 				.blockstate(EXPGeneratorBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -52,7 +54,7 @@ public class MachineBlocks {
 		ALLOY_FURNACE = DeepTech.REGISTRATE.block("alloy_furnace", AlloyFurnaceBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/machine/alloy_furnace/off"))
+				.model(ItemModelGen.withModel("block/machine/alloy_furnace/on"))
 				.build()
 				.blockstate(AlloyFurnaceBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -66,6 +68,15 @@ public class MachineBlocks {
 				.blockstate(ResonanceNodeBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
+		ENERGY_CELL = DeepTech.REGISTRATE.block("energy_cell", EnergyCellBlock::new)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/energy_cell"))
+				.build()
+				.blockstate(EnergyCellBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.register();
+
 	}
 
 	public static void register() {
