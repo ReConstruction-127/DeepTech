@@ -164,7 +164,6 @@ public class AlloyFurnaceBlockEntity extends MachineBlockEntity<AlloyFurnaceBloc
 				new ResourceTexture(DeepTech.loadGui("elements/progress_alloy_front"))
 		));
 
-		// 3 个输入槽 + 1 个输出槽
 		MachineItemSlots.add(
 				group,
 				this,
