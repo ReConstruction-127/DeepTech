@@ -20,7 +20,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class EnergyCellBlockEntity extends MachineBlockEntity<EnergyCellBlockEntity> implements IUIHolder.BlockEntityUI {
 	public EnergyCellBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -58,16 +63,121 @@ public class EnergyCellBlockEntity extends MachineBlockEntity<EnergyCellBlockEnt
 		return 1; // 1 个输入槽
 	}
 
+	// ========== Capability：方向限制（一刀切） ==========
+
+	@Override
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
+		if (capability == ForgeCapabilities.ENERGY) {
+			if (side == null) {
+				return super.getCapability(capability, side);
+			}
+
+			// ✅ 顶部和底部：只输出
+			if (side == Direction.UP || side == Direction.DOWN) {
+				return LazyOptional.of(() -> new OutputOnlyEnergyStorage()).cast();
+			}
+
+			// ✅ 侧面：只输入
+			return LazyOptional.of(() -> new InputOnlyEnergyStorage()).cast();
+		}
+		return super.getCapability(capability, side);
+	}
+
+	// ========== 内部类：侧面只输入 ==========
+
+	private class InputOnlyEnergyStorage implements IEnergyStorage {
+		@Override
+		public int receiveEnergy(int maxReceive, boolean simulate) {
+			int received = Math.min(maxReceive, getMachineMaxEnergy() - getEnergy());
+			if (!simulate && received > 0) {
+				setEnergy(getEnergy() + received);
+				setChanged();
+				sync();
+			}
+			return received;
+		}
+
+		@Override
+		public int extractEnergy(int maxExtract, boolean simulate) {
+			return 0;
+		}
+
+		@Override
+		public int getEnergyStored() {
+			return getEnergy();
+		}
+
+		@Override
+		public int getMaxEnergyStored() {
+			return getMachineMaxEnergy();
+		}
+
+		@Override
+		public boolean canExtract() {
+			return false;
+		}
+
+		@Override
+		public boolean canReceive() {
+			return true;
+		}
+	}
+
+	// ========== 内部类：顶部/底部只输出 ==========
+
+	private class OutputOnlyEnergyStorage implements IEnergyStorage {
+		@Override
+		public int receiveEnergy(int maxReceive, boolean simulate) {
+			return 0;
+		}
+
+		@Override
+		public int extractEnergy(int maxExtract, boolean simulate) {
+			int extracted = Math.min(maxExtract, getEnergy());
+			if (!simulate && extracted > 0) {
+				setEnergy(getEnergy() - extracted);
+				setChanged();
+				sync();
+			}
+			return extracted;
+		}
+
+		@Override
+		public int getEnergyStored() {
+			return getEnergy();
+		}
+
+		@Override
+		public int getMaxEnergyStored() {
+			return getMachineMaxEnergy();
+		}
+
+		@Override
+		public boolean canExtract() {
+			return true;
+		}
+
+		@Override
+		public boolean canReceive() {
+			return false;
+		}
+	}
+
+	// ========== Server Tick ==========
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, EnergyCellBlockEntity entity) {
 		if (level.isClientSide()) return;
 
-		// 主动推送
+		// ===== 主动推送：从顶部和底部向外推送 =====
 		if (level.getGameTime() % 2 == 0 && getEnergy() > 0) {
 			for (Direction dir : Direction.values()) {
+				// ✅ 只从顶部和底部推送
+				if (dir != Direction.UP && dir != Direction.DOWN) continue;
+
 				BlockEntity target = level.getBlockEntity(pos.relative(dir));
 				if (target == null) continue;
+
 				target.getCapability(ForgeCapabilities.ENERGY, dir.getOpposite())
 						.ifPresent(storage -> {
 							int sent = storage.receiveEnergy(Math.min(getEnergy(), getMaxExtract()), false);
