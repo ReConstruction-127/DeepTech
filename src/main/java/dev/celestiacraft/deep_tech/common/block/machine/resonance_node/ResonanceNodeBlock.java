@@ -10,8 +10,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
@@ -55,6 +58,18 @@ public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 	@Override
 	public Class<ResonanceNodeBlockEntity> getBlockEntityClass() {
 		return ResonanceNodeBlockEntity.class;
+	}
+
+	@Override
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+		if (level.isClientSide()) {
+			return (lvl, pos, st, be) -> {
+				if (be instanceof ResonanceNodeBlockEntity node) {
+					node.clientTick(lvl, pos, st, node);
+				}
+			};
+		}
+		return null;
 	}
 
 	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
