@@ -1,9 +1,9 @@
 package dev.celestiacraft.deep_tech.datagen.recipes.type;
 
 import dev.celestiacraft.deep_tech.api.recipe.builder.interaction.InteractionRecipeBuilder;
+import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionType;
 import dev.celestiacraft.deep_tech.common.register.DTMaterials;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
-import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.function.Consumer;
 
 public class InteractionRecipeGen extends DTRecipeProvider {
-	// 构造函数（如果需要）
 	public InteractionRecipeGen(PackOutput output) {
 		super(output);
 	}
@@ -27,9 +26,9 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.result(Items.IRON_NUGGET, 8, 25)
 				.result(DTMaterials.IRON.getDust().get(), 25)
 				.result(DTMaterials.IRON.getPlate().get(), 50)
-				.extraEffect(0.1f, Blocks.DEEPSLATE, MaterialItems.SCULK_BONEMEAL.get())
+				.extraEffect(0.1, Blocks.DEEPSLATE, MaterialItems.SCULK_BONEMEAL.get())
 				.consume(true)
-				.type(InteractionRecipe.InteractionType.LEFT_CLICK)
+				.type(InteractionType.LEFT_CLICK)
 				.save(consumer, save("interaction/iron_plate_craft"));
 
 		InteractionRecipeBuilder.builder()
@@ -38,9 +37,9 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.result(DTMaterials.COPPER.getNugget().get(), 8, 25)
 				.result(DTMaterials.COPPER.getDust().get(), 25)
 				.result(DTMaterials.COPPER.getPlate().get(), 50)
-				.extraEffect(0.1f, Blocks.DEEPSLATE, MaterialItems.SCULK_BONEMEAL.get())
+				.extraEffect(0.1, Blocks.DEEPSLATE, MaterialItems.SCULK_BONEMEAL.get())
 				.consume(true)
-				.type(InteractionRecipe.InteractionType.LEFT_CLICK)
+				.type(InteractionType.LEFT_CLICK)
 				.save(consumer, save("interaction/copper_plate_craft"));
 
 		InteractionRecipeBuilder.builder()
@@ -49,9 +48,9 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.result(Items.GOLD_NUGGET, 8, 25)
 				.result(DTMaterials.GOLD.getDust().get(), 25)
 				.result(DTMaterials.GOLD.getPlate().get(), 50)
-				.extraEffect(0.1f, Blocks.DEEPSLATE, MaterialItems.SCULK_BONEMEAL.get())
+				.extraEffect(0.1, Blocks.DEEPSLATE, MaterialItems.SCULK_BONEMEAL.get())
 				.consume(true)
-				.type(InteractionRecipe.InteractionType.LEFT_CLICK)
+				.type(InteractionType.LEFT_CLICK)
 				.save(consumer, save("interaction/gold_plate_craft"));
 
 		// 强化深板岩修复：右键
@@ -59,9 +58,9 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.trigger(MaterialItems.SCULK_BONE)
 				.target(Blocks.DEEPSLATE)
 				.result(Items.AIR, 1)
-				.extraEffect(1.0f, Blocks.REINFORCED_DEEPSLATE)
+				.extraEffect(1.0, Blocks.REINFORCED_DEEPSLATE)
 				.consume(true)
-				.type(InteractionRecipe.InteractionType.RIGHT_CLICK)
+				.type(InteractionType.RIGHT_CLICK)
 				.save(consumer, save("interaction/sculk_bone_repair"));
 
 		// TEST：右键
@@ -69,10 +68,9 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.trigger(Items.COPPER_INGOT)
 				.target(Blocks.DIAMOND_BLOCK)
 				.result(Items.AIR, 1)
-				.extraEffect(1.0f, Blocks.EMERALD_BLOCK)
+				.extraEffect(1.0, Blocks.EMERALD_BLOCK)
 				.consume(false)
-				.type(InteractionRecipe.InteractionType.RIGHT_CLICK)
+				.type(InteractionType.RIGHT_CLICK)
 				.save(consumer, save("interaction/test_only"));
-
 	}
 }
