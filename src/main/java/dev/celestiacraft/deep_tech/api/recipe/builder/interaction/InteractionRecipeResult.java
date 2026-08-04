@@ -1,0 +1,96 @@
+package dev.celestiacraft.deep_tech.api.recipe.builder.interaction;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import lombok.AllArgsConstructor;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
+@AllArgsConstructor
+public class InteractionRecipeResult implements FinishedRecipe {
+	private final ResourceLocation id;
+	private final Ingredient triggerItem;
+	private final BlockState targetState;
+	private final List<InteractionRecipeBuilder.WeightedResult> results;
+	private final InteractionRecipeBuilder.ExtraEffect extraEffect;
+	private final boolean consumeTrigger;
+	private final Advancement.Builder advancement;
+	private final ResourceLocation advancementId;
+
+	@Override
+	public void serializeRecipeData(JsonObject json) {
+		json.add("trigger_item", triggerItem.toJson());
+		json.addProperty("target_block", ForgeRegistries.BLOCKS.getKey(targetState.getBlock()).toString());
+
+		JsonArray resultsArray = new JsonArray();
+		for (var wr : results) {
+			JsonObject obj = new JsonObject();
+			obj.addProperty("item", ForgeRegistries.ITEMS.getKey(wr.stack.getItem()).toString());
+			if (wr.stack.getCount() != 1) {
+				obj.addProperty("count", wr.stack.getCount());
+			}
+			if (wr.weight != 1) {
+				obj.addProperty("weight", wr.weight);
+			}
+			resultsArray.add(obj);
+		}
+		json.add("results", resultsArray);
+
+		if (extraEffect != null) {
+			JsonObject extraObj = new JsonObject();
+			extraObj.addProperty("chance", extraEffect.chance);
+			extraObj.addProperty("to_block", ForgeRegistries.BLOCKS.getKey(extraEffect.toState.getBlock()).toString());
+
+			if (!extraEffect.extraDrops.isEmpty()) {
+				JsonArray dropsArray = new JsonArray();
+				for (ItemStack drop : extraEffect.extraDrops) {
+					JsonObject dropObj = new JsonObject();
+					dropObj.addProperty("item", ForgeRegistries.ITEMS.getKey(drop.getItem()).toString());
+					if (drop.getCount() != 1) {
+						dropObj.addProperty("count", drop.getCount());
+					}
+					dropsArray.add(dropObj);
+				}
+				extraObj.add("drops", dropsArray);
+			}
+			json.add("extra_effect", extraObj);
+		}
+
+		if (consumeTrigger) {
+			json.addProperty("consume_trigger", true);
+		}
+	}
+
+	@Override
+	public @NotNull ResourceLocation getId() {
+		return id;
+	}
+
+	@Override
+	public @NotNull RecipeSerializer<?> getType() {
+		return DTRecipes.INTERACTION.getSerializer();
+	}
+
+	@Nullable
+	@Override
+	public JsonObject serializeAdvancement() {
+		return advancement.serializeToJson();
+	}
+
+	@Nullable
+	@Override
+	public ResourceLocation getAdvancementId() {
+		return advancementId;
+	}
+}

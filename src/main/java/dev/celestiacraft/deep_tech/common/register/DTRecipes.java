@@ -6,6 +6,8 @@ import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloySerializer;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipeSerializer;
+import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
+import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipeSerializer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
@@ -22,6 +24,7 @@ public class DTRecipes {
 
 	public static final RecipeRegistry<CrushingRecipe> CRUSHING;
 	public static final RecipeRegistry<AlloyRecipe> ALLOY;
+	public static final RecipeRegistry<InteractionRecipe> INTERACTION;
 
 	static {
 		SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, DeepTech.MODID);
@@ -29,6 +32,7 @@ public class DTRecipes {
 
 		CRUSHING = add("crushing", CrushingRecipeSerializer::new);
 		ALLOY = add("alloy", AlloySerializer::new);
+		INTERACTION = add("interaction", InteractionRecipeSerializer::new);
 	}
 
 	public static void register(IEventBus bus) {
