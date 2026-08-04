@@ -3,7 +3,6 @@ package dev.celestiacraft.deep_tech.common.recipe.interaction;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.celestiacraft.deep_tech.common.recipe.utils.RecipeResultUtil;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -26,7 +25,8 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		Ingredient trigger = Ingredient.fromJson(json.get("trigger_item"));
 
 		String blockName = GsonHelper.getAsString(json, "target_block");
-		Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName));
+		ResourceLocation blockId = ResourceLocation.tryParse(blockName);
+		Block block = blockId != null ? ForgeRegistries.BLOCKS.getValue(blockId) : null;
 		BlockState targetState = (block == null ? Blocks.AIR : block).defaultBlockState();
 
 		List<InteractionRecipe.WeightedResult> results = new ArrayList<>();
@@ -43,7 +43,8 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 			JsonObject extraObj = json.getAsJsonObject("extra_effect");
 			float chance = GsonHelper.getAsFloat(extraObj, "chance", 0.1f);
 			String toBlockName = GsonHelper.getAsString(extraObj, "to_block", "minecraft:air");
-			Block toBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(toBlockName));
+			ResourceLocation toBlockId = ResourceLocation.tryParse(toBlockName);
+			Block toBlock = toBlockId != null ? ForgeRegistries.BLOCKS.getValue(toBlockId) : null;
 			BlockState toState = (toBlock == null ? Blocks.AIR : toBlock).defaultBlockState();
 			List<ItemStack> extraDrops = new ArrayList<>();
 			if (extraObj.has("drops")) {
@@ -57,14 +58,23 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 
 		boolean consume = GsonHelper.getAsBoolean(json, "consume_trigger", false);
 
-		return new InteractionRecipe(id, trigger, targetState, results, extraEffect, consume);
+		// 解析交互类型（默认为 ANY）
+		InteractionRecipe.InteractionType type = InteractionRecipe.InteractionType.ANY;
+		if (json.has("interaction_type")) {
+			String typeStr = GsonHelper.getAsString(json, "interaction_type");
+			try {
+				type = InteractionRecipe.InteractionType.valueOf(typeStr.toUpperCase());
+			} catch (IllegalArgumentException ignored) {}
+		}
+
+		return new InteractionRecipe(id, trigger, targetState, results, extraEffect, consume, type);
 	}
 
 	@Override
 	public InteractionRecipe fromNetwork(@NotNull ResourceLocation id, @NotNull FriendlyByteBuf buf) {
 		Ingredient trigger = Ingredient.fromNetwork(buf);
-		// 使用 BuiltInRegistries.BLOCK 读取方块
-		Block targetBlock = buf.readById(BuiltInRegistries.BLOCK);
+		ResourceLocation targetBlockId = buf.readResourceLocation();
+		Block targetBlock = ForgeRegistries.BLOCKS.getValue(targetBlockId);
 		BlockState targetState = (targetBlock == null ? Blocks.AIR : targetBlock).defaultBlockState();
 
 		int resultCount = buf.readInt();
@@ -79,7 +89,8 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		InteractionRecipe.ExtraEffect extra = null;
 		if (hasExtra) {
 			float chance = buf.readFloat();
-			Block toBlock = buf.readById(BuiltInRegistries.BLOCK);
+			ResourceLocation toBlockId = buf.readResourceLocation();
+			Block toBlock = ForgeRegistries.BLOCKS.getValue(toBlockId);
 			BlockState toState = (toBlock == null ? Blocks.AIR : toBlock).defaultBlockState();
 			int dropCount = buf.readInt();
 			List<ItemStack> extraDrops = new ArrayList<>();
@@ -90,14 +101,16 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		}
 
 		boolean consume = buf.readBoolean();
-		return new InteractionRecipe(id, trigger, targetState, results, extra, consume);
+		InteractionRecipe.InteractionType type = buf.readEnum(InteractionRecipe.InteractionType.class);
+
+		return new InteractionRecipe(id, trigger, targetState, results, extra, consume, type);
 	}
 
 	@Override
 	public void toNetwork(@NotNull FriendlyByteBuf buf, InteractionRecipe recipe) {
 		recipe.getTriggerItem().toNetwork(buf);
-		// 使用 BuiltInRegistries.BLOCK 写入方块
-		buf.writeId(BuiltInRegistries.BLOCK, recipe.getTargetBlockState().getBlock());
+		ResourceLocation targetBlockId = ForgeRegistries.BLOCKS.getKey(recipe.getTargetBlockState().getBlock());
+		buf.writeResourceLocation(targetBlockId);
 
 		List<InteractionRecipe.WeightedResult> results = recipe.getResults();
 		buf.writeInt(results.size());
@@ -110,7 +123,8 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		buf.writeBoolean(extra != null);
 		if (extra != null) {
 			buf.writeFloat(extra.chance);
-			buf.writeId(BuiltInRegistries.BLOCK, extra.toState.getBlock());
+			ResourceLocation toBlockId = ForgeRegistries.BLOCKS.getKey(extra.toState.getBlock());
+			buf.writeResourceLocation(toBlockId);
 			buf.writeInt(extra.extraDrops.size());
 			for (ItemStack drop : extra.extraDrops) {
 				buf.writeItem(drop);
@@ -118,5 +132,6 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		}
 
 		buf.writeBoolean(recipe.isConsumeTrigger());
+		buf.writeEnum(recipe.getInteractionType());
 	}
 }

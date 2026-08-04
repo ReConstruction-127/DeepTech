@@ -3,6 +3,7 @@ package dev.celestiacraft.deep_tech.api.recipe.builder.interaction;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
 import lombok.AllArgsConstructor;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -25,6 +26,7 @@ public class InteractionRecipeResult implements FinishedRecipe {
 	private final List<InteractionRecipeBuilder.WeightedResult> results;
 	private final InteractionRecipeBuilder.ExtraEffect extraEffect;
 	private final boolean consumeTrigger;
+	private final InteractionRecipe.InteractionType interactionType; // 新增
 	private final Advancement.Builder advancement;
 	private final ResourceLocation advancementId;
 
@@ -37,12 +39,8 @@ public class InteractionRecipeResult implements FinishedRecipe {
 		for (var wr : results) {
 			JsonObject obj = new JsonObject();
 			obj.addProperty("item", ForgeRegistries.ITEMS.getKey(wr.stack.getItem()).toString());
-			if (wr.stack.getCount() != 1) {
-				obj.addProperty("count", wr.stack.getCount());
-			}
-			if (wr.weight != 1) {
-				obj.addProperty("weight", wr.weight);
-			}
+			if (wr.stack.getCount() != 1) obj.addProperty("count", wr.stack.getCount());
+			if (wr.weight != 1) obj.addProperty("weight", wr.weight);
 			resultsArray.add(obj);
 		}
 		json.add("results", resultsArray);
@@ -51,15 +49,12 @@ public class InteractionRecipeResult implements FinishedRecipe {
 			JsonObject extraObj = new JsonObject();
 			extraObj.addProperty("chance", extraEffect.chance);
 			extraObj.addProperty("to_block", ForgeRegistries.BLOCKS.getKey(extraEffect.toState.getBlock()).toString());
-
 			if (!extraEffect.extraDrops.isEmpty()) {
 				JsonArray dropsArray = new JsonArray();
 				for (ItemStack drop : extraEffect.extraDrops) {
 					JsonObject dropObj = new JsonObject();
 					dropObj.addProperty("item", ForgeRegistries.ITEMS.getKey(drop.getItem()).toString());
-					if (drop.getCount() != 1) {
-						dropObj.addProperty("count", drop.getCount());
-					}
+					if (drop.getCount() != 1) dropObj.addProperty("count", drop.getCount());
 					dropsArray.add(dropObj);
 				}
 				extraObj.add("drops", dropsArray);
@@ -67,30 +62,16 @@ public class InteractionRecipeResult implements FinishedRecipe {
 			json.add("extra_effect", extraObj);
 		}
 
-		if (consumeTrigger) {
-			json.addProperty("consume_trigger", true);
+		if (consumeTrigger) json.addProperty("consume_trigger", true);
+
+		// 写入交互类型（如果非 ANY）
+		if (interactionType != InteractionRecipe.InteractionType.ANY) {
+			json.addProperty("interaction_type", interactionType.name().toLowerCase());
 		}
 	}
 
-	@Override
-	public @NotNull ResourceLocation getId() {
-		return id;
-	}
-
-	@Override
-	public @NotNull RecipeSerializer<?> getType() {
-		return DTRecipes.INTERACTION.getSerializer();
-	}
-
-	@Nullable
-	@Override
-	public JsonObject serializeAdvancement() {
-		return advancement.serializeToJson();
-	}
-
-	@Nullable
-	@Override
-	public ResourceLocation getAdvancementId() {
-		return advancementId;
-	}
+	@Override public @NotNull ResourceLocation getId() { return id; }
+	@Override public @NotNull RecipeSerializer<?> getType() { return DTRecipes.INTERACTION.getSerializer(); }
+	@Nullable @Override public JsonObject serializeAdvancement() { return advancement.serializeToJson(); }
+	@Nullable @Override public ResourceLocation getAdvancementId() { return advancementId; }
 }

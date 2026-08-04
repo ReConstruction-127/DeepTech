@@ -19,7 +19,7 @@ public class AlloyCategory {
 	// 3 个输入槽的位置
 	private static final int[] INPUT_X = {8, 26, 44};
 	private static final int INPUT_Y = 20;
-	private static final int OUTPUT_X = 84;
+	private static final int OUTPUT_X = 65;
 	private static final int OUTPUT_Y = 20;
 
 	public static SimpleJeiCategory<AlloyRecipe> builder(IGuiHelper helper) {
@@ -27,7 +27,7 @@ public class AlloyCategory {
 
 		return SimpleJeiCategory.builder(DTJeiRecipeType.ALLOY, helper)
 				.setTitle(MachineBlocks.ALLOY_FURNACE.get().getName())
-				.setSize(128, 72)
+				.setSize(128, 64)
 				.setIcon(MachineBlocks.ALLOY_FURNACE.asStack())
 				.setRecipe((builder, recipe, group) -> {
 					List<IngredientWithCount> inputs = recipe.getInputs();
@@ -44,10 +44,10 @@ public class AlloyCategory {
 					// 输入槽
 					drawable.draw(graphics, INPUT_X[0] - 1, INPUT_Y - 1);
 					drawable.draw(graphics, INPUT_X[1] - 1, INPUT_Y - 1);
-					drawable.draw(graphics, INPUT_X[2] - 1, INPUT_Y - 1);
 					// 输出槽
 					drawable.draw(graphics, OUTPUT_X - 1, OUTPUT_Y - 1);
-					DTTextures.PROGRESS_FRONT.render(graphics, 66, 24);
+					DTTextures.PROGRESS_ALLOYER.render(graphics, 49, 20);
+					DTTextures.ICON_ALLOYER.render(graphics, 88, 12);
 
 					Font font = Minecraft.getInstance().font;
 

@@ -2,12 +2,16 @@ package dev.celestiacraft.deep_tech.api.client.texture;
 
 public class DTTextures {
 	public static final Guis
-			PROGRESS_FRONT,
-			ICON_CRUSHER;
+			PROGRESS_CRUSHER,
+			PROGRESS_ALLOYER,
+			ICON_CRUSHER,
+			ICON_ALLOYER;
 
 	static {
-		PROGRESS_FRONT = addGuiTexture("elements/jei/elements", 0, 0, 16, 7);
+		PROGRESS_CRUSHER = addGuiTexture("elements/jei/elements", 0, 0, 16, 7);
+		PROGRESS_ALLOYER = addGuiTexture("elements/jei/elements", 0, 7, 10, 15);
 		ICON_CRUSHER = addGuiTexture("elements/jei/elements", 224, 0, 32, 32);
+		ICON_ALLOYER = addGuiTexture("elements/jei/elements", 224, 32, 32, 32);
 	}
 
 	public static Guis addGuiTexture(String path, int startX, int startY, int width, int height) {

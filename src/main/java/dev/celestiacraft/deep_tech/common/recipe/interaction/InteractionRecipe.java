@@ -22,61 +22,46 @@ import java.util.Random;
 @Getter
 @AllArgsConstructor
 public class InteractionRecipe implements Recipe<Container> {
+	public enum InteractionType {
+		LEFT_CLICK,
+		RIGHT_CLICK,
+		ANY
+	}
+
 	private final ResourceLocation id;
 	private final Ingredient triggerItem;
 	private final BlockState targetBlockState;
 	private final List<WeightedResult> results;
 	private final ExtraEffect extraEffect;
 	private final boolean consumeTrigger;
+	private final InteractionType interactionType;
 
-	@Override
-	public boolean matches(Container container, @NotNull Level level) {
-		// 容器第0格放触发物品，第1格放目标方块（但Container无法直接存BlockState）
-		// 所以我们用辅助方法，在查找时传入自定义容器
+	public boolean matches(ItemStack trigger, BlockState target, boolean isRightClick) {
+		// 先检查物品和方块
+		if (!triggerItem.test(trigger) || !target.equals(targetBlockState)) {
+			return false;
+		}
+		// 再检查交互类型
+		if (interactionType == InteractionType.ANY) return true;
+		if (interactionType == InteractionType.LEFT_CLICK && !isRightClick) return true;
+		if (interactionType == InteractionType.RIGHT_CLICK && isRightClick) return true;
 		return false;
 	}
 
-	// 手动匹配方法（在处理器中使用）
-	public boolean matches(ItemStack trigger, BlockState target) {
-		return triggerItem.test(trigger) && target.equals(targetBlockState);
-	}
+
+	// 原 matches(Container, Level) 保留空实现
+	@Override
+	public boolean matches(Container container, @NotNull Level level) { return false; }
 
 	@Override
-	public @NotNull ItemStack assemble(@NotNull Container container, @NotNull RegistryAccess access) {
-		return ItemStack.EMPTY;
-	}
+	public @NotNull ItemStack assemble(@NotNull Container container, @NotNull RegistryAccess access) { return ItemStack.EMPTY; }
+	@Override public boolean canCraftInDimensions(int width, int height) { return true; }
+	@Override public @NotNull ItemStack getResultItem(@NotNull RegistryAccess access) { return results.isEmpty() ? ItemStack.EMPTY : results.get(0).stack; }
+	@Override public @NotNull ResourceLocation getId() { return id; }
+	@Override public @NotNull RecipeSerializer<?> getSerializer() { return DTRecipes.INTERACTION.getSerializer(); }
+	@Override public @NotNull RecipeType<?> getType() { return DTRecipes.INTERACTION.getRecipeType(); }
+	@Override public @NotNull NonNullList<Ingredient> getIngredients() { return NonNullList.of(triggerItem); }
 
-	@Override
-	public boolean canCraftInDimensions(int width, int height) {
-		return true;
-	}
-
-	@Override
-	public @NotNull ItemStack getResultItem(@NotNull RegistryAccess access) {
-		return results.isEmpty() ? ItemStack.EMPTY : results.get(0).stack;
-	}
-
-	@Override
-	public @NotNull ResourceLocation getId() {
-		return id;
-	}
-
-	@Override
-	public @NotNull RecipeSerializer<?> getSerializer() {
-		return DTRecipes.INTERACTION.getSerializer();
-	}
-
-	@Override
-	public @NotNull RecipeType<?> getType() {
-		return DTRecipes.INTERACTION.getRecipeType();
-	}
-
-	@Override
-	public @NotNull NonNullList<Ingredient> getIngredients() {
-		return NonNullList.of(triggerItem);
-	}
-
-	// ----- 辅助方法 -----
 	public ItemStack getRandomResult(Random random) {
 		int total = results.stream().mapToInt(wr -> wr.weight).sum();
 		int roll = random.nextInt(total);
@@ -90,10 +75,7 @@ public class InteractionRecipe implements Recipe<Container> {
 	public static class WeightedResult {
 		public final ItemStack stack;
 		public final int weight;
-		public WeightedResult(ItemStack stack, int weight) {
-			this.stack = stack;
-			this.weight = weight;
-		}
+		public WeightedResult(ItemStack stack, int weight) { this.stack = stack; this.weight = weight; }
 	}
 
 	public static class ExtraEffect {

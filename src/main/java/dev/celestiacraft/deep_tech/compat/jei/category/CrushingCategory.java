@@ -33,7 +33,7 @@ public class CrushingCategory {
 					drawable.draw(graphics, 9, 19);
 					// 输出槽
 					drawable.draw(graphics, 61, 19);
-					DTTextures.PROGRESS_FRONT.render(graphics, 36, 24);
+					DTTextures.PROGRESS_CRUSHER.render(graphics, 36, 24);
 					DTTextures.ICON_CRUSHER.render(graphics, 88, 12);
 					Font font = Minecraft.getInstance().font;
 
