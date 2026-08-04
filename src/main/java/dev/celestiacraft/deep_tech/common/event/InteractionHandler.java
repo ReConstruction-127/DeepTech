@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common;
+package dev.celestiacraft.deep_tech.common.event;
 
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
@@ -17,14 +17,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.Random;
 
 public class InteractionHandler {
-	private static final Random RANDOM = new Random();
+	private static final Random RANDOM = new SecureRandom();
 
 	public static boolean process(Level level, BlockPos pos, Player player, boolean isRightClick) {
-		if (level.isClientSide) return false;
+		if (level.isClientSide()) {
+			return false;
+		}
 
 		ItemStack held = player.getMainHandItem();
 		BlockState state = level.getBlockState(pos);
@@ -50,9 +53,9 @@ public class InteractionHandler {
 		if (level instanceof ServerLevel serverLevel) {
 			ItemParticleOption particle = new ItemParticleOption(ParticleTypes.ITEM, held.copy());
 			for (int i = 0; i < 15; i++) {
-				double x = pos.getX() + 0.5 + (RANDOM.nextDouble() - 0.5) * 1.0;
+				double x = pos.getX() + 0.5 + (RANDOM.nextDouble() - 0.5);
 				double y = pos.getY() + 0.8 + (RANDOM.nextDouble() - 0.5) * 0.8;
-				double z = pos.getZ() + 0.5 + (RANDOM.nextDouble() - 0.5) * 1.0;
+				double z = pos.getZ() + 0.5 + (RANDOM.nextDouble() - 0.5);
 				double speedX = (RANDOM.nextDouble() - 0.5) * 0.3;
 				double speedY = RANDOM.nextDouble() * 0.2 + 0.1;
 				double speedZ = (RANDOM.nextDouble() - 0.5) * 0.3;
@@ -61,8 +64,8 @@ public class InteractionHandler {
 		}
 
 		// 3. 额外效果（方块转化 + 额外掉落）
-		if (r.getExtraEffect() != null && RANDOM.nextFloat() < r.getExtraEffect().chance) {
-			BlockState toState = r.getExtraEffect().toState;
+		if (r.getExtraEffect() != null && RANDOM.nextFloat() < r.getExtraEffect().getChance()) {
+			BlockState toState = r.getExtraEffect().getState();
 			if (toState != null && !toState.isAir()) {
 				if (level instanceof ServerLevel serverLevel) {
 					BlockParticleOption breakParticle = new BlockParticleOption(ParticleTypes.BLOCK, state);
@@ -79,7 +82,7 @@ public class InteractionHandler {
 				}
 				level.setBlockAndUpdate(pos, toState);
 			}
-			for (ItemStack drop : r.getExtraEffect().extraDrops) {
+			for (ItemStack drop : r.getExtraEffect().getExtraDrops()) {
 				spawnItem(level, pos, drop.copy());
 			}
 		}

@@ -2,7 +2,7 @@ package dev.celestiacraft.deep_tech.compat.jei.category;
 
 import dev.celestiacraft.deep_tech.api.client.texture.DTTextures;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
-import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
+import dev.celestiacraft.deep_tech.common.recipe.interaction.WeightedResult;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -49,8 +49,11 @@ public class InteractionCategory {
 							.addIngredients(recipe.getTriggerItem());
 
 					// 输出槽（所有可能的产物）
-					List<InteractionRecipe.WeightedResult> results = recipe.getResults();
-					int totalWeight = results.stream().mapToInt(r -> r.weight).sum();
+					List<WeightedResult> results = recipe.getResults();
+					int totalWeight = results.stream()
+							.mapToInt((result) -> {
+								return result.weight;
+							}).sum();
 
 					for (int i = 0; i < results.size() && i < 9; i++) {
 						int row = i / OUTPUT_COLS;
@@ -69,22 +72,22 @@ public class InteractionCategory {
 
 					// 方块输出（转化后的方块，如果有额外效果且转化方块不为空）
 					if (recipe.getExtraEffect() != null &&
-							recipe.getExtraEffect().toState != null &&
-							!recipe.getExtraEffect().toState.isAir()) {
+							recipe.getExtraEffect().getState() != null &&
+							!recipe.getExtraEffect().getState().isAir()) {
 						builder.addSlot(RecipeIngredientRole.OUTPUT, BLOCK_OUTPUT_X, BLOCK_OUTPUT_Y)
-								.addItemStack(new ItemStack(recipe.getExtraEffect().toState.getBlock()));
+								.addItemStack(new ItemStack(recipe.getExtraEffect().getState().getBlock()));
 					}
 
 					// 额外掉落物（如果配置了额外掉落）
 					if (recipe.getExtraEffect() != null &&
-							recipe.getExtraEffect().extraDrops != null &&
-							!recipe.getExtraEffect().extraDrops.isEmpty()) {
+							recipe.getExtraEffect().getExtraDrops() != null &&
+							!recipe.getExtraEffect().getExtraDrops().isEmpty()) {
 						// 如果有多个额外掉落，显示在方块输出旁边，这里简单起见只显示第一个
 						// 或者可以加更多槽，但受限于空间，我们只显示一个代表
 						int extraX = BLOCK_OUTPUT_X + OUTPUT_SLOT_SIZE + 4;
 						if (extraX < 150) {
 							builder.addSlot(RecipeIngredientRole.OUTPUT, extraX, BLOCK_OUTPUT_Y)
-									.addItemStack(recipe.getExtraEffect().extraDrops.get(0));
+									.addItemStack(recipe.getExtraEffect().getExtraDrops().get(0));
 						}
 					}
 				})
@@ -93,8 +96,11 @@ public class InteractionCategory {
 					slotDrawable.draw(graphics, INPUT_X - 1, INPUT_Y - 1); // 输入槽
 
 					// 绘制所有输出槽背景
-					List<InteractionRecipe.WeightedResult> results = recipe.getResults();
-					int totalWeight = results.stream().mapToInt(r -> r.weight).sum();
+					List<WeightedResult> results = recipe.getResults();
+					int totalWeight = results.stream()
+							.mapToInt((result) -> {
+								return result.weight;
+							}).sum();
 
 					for (int i = 0; i < results.size() && i < 9; i++) {
 						int row = i / OUTPUT_COLS;
@@ -107,8 +113,8 @@ public class InteractionCategory {
 					// 方块输入/输出槽背景
 					slotDrawable.draw(graphics, BLOCK_INPUT_X - 1, BLOCK_INPUT_Y - 1);
 					if (recipe.getExtraEffect() != null &&
-							recipe.getExtraEffect().toState != null &&
-							!recipe.getExtraEffect().toState.isAir()) {
+							recipe.getExtraEffect().getState() != null &&
+							!recipe.getExtraEffect().getState().isAir()) {
 						slotDrawable.draw(graphics, BLOCK_OUTPUT_X - 1, BLOCK_OUTPUT_Y - 1);
 					}
 
@@ -116,13 +122,13 @@ public class InteractionCategory {
 
 					// 绘制权重/概率文字（在输出槽下方）
 					for (int i = 0; i < results.size() && i < 9; i++) {
-						InteractionRecipe.WeightedResult wr = results.get(i);
+						WeightedResult result = results.get(i);
 						int row = i / OUTPUT_COLS;
 						int col = i % OUTPUT_COLS;
 						int x = OUTPUT_START_X + col * OUTPUT_SLOT_SIZE;
 						int y = OUTPUT_START_Y + row * OUTPUT_SLOT_SIZE + OUTPUT_SLOT_SIZE + 2;
 
-						float probability = (float) wr.weight / totalWeight;
+						float probability = (float) result.weight / totalWeight;
 						String probText = PERCENT_FORMAT.format(probability);
 						graphics.drawString(font, probText, x, y, 0xFF808080, true);
 					}
@@ -145,14 +151,13 @@ public class InteractionCategory {
 
 					// 额外效果提示
 					if (recipe.getExtraEffect() != null) {
-						float chance = recipe.getExtraEffect().chance;
+						double chance = recipe.getExtraEffect().getChance();
 						if (chance > 0) {
 							String extraText = "Extra: " + PERCENT_FORMAT.format(chance);
 							graphics.drawString(font, extraText, BLOCK_INPUT_X - 4, BLOCK_INPUT_Y + OUTPUT_SLOT_SIZE + 2, 0xFFAA00, true);
 						}
 					}
 
-					// 箭头图标（用已有纹理或简单绘制）
 					DTTextures.ICON_CRUSHER.render(graphics, 88, 12);
 				})
 				.build();

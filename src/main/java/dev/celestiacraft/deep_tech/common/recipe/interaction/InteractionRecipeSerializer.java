@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.common.recipe.interaction;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.celestiacraft.deep_tech.common.recipe.utils.RecipeResultUtil;
 import net.minecraft.network.FriendlyByteBuf;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InteractionRecipeSerializer implements RecipeSerializer<InteractionRecipe> {
-
 	@Override
 	public @NotNull InteractionRecipe fromJson(@NotNull ResourceLocation id, JsonObject json) {
 		Ingredient trigger = Ingredient.fromJson(json.get("trigger_item"));
@@ -29,16 +29,17 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		Block block = blockId != null ? ForgeRegistries.BLOCKS.getValue(blockId) : null;
 		BlockState targetState = (block == null ? Blocks.AIR : block).defaultBlockState();
 
-		List<InteractionRecipe.WeightedResult> results = new ArrayList<>();
+		List<WeightedResult> results = new ArrayList<>();
 		JsonArray resultsArray = GsonHelper.getAsJsonArray(json, "results");
-		for (var elem : resultsArray) {
-			JsonObject obj = elem.getAsJsonObject();
+
+		for (JsonElement element : resultsArray) {
+			JsonObject obj = element.getAsJsonObject();
 			ItemStack stack = RecipeResultUtil.itemStackFromJson(obj);
 			int weight = GsonHelper.getAsInt(obj, "weight", 1);
-			results.add(new InteractionRecipe.WeightedResult(stack, weight));
+			results.add(new WeightedResult(stack, weight));
 		}
 
-		InteractionRecipe.ExtraEffect extraEffect = null;
+		ExtraEffect extraEffect = null;
 		if (json.has("extra_effect")) {
 			JsonObject extraObj = json.getAsJsonObject("extra_effect");
 			float chance = GsonHelper.getAsFloat(extraObj, "chance", 0.1f);
@@ -47,24 +48,27 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 			Block toBlock = toBlockId != null ? ForgeRegistries.BLOCKS.getValue(toBlockId) : null;
 			BlockState toState = (toBlock == null ? Blocks.AIR : toBlock).defaultBlockState();
 			List<ItemStack> extraDrops = new ArrayList<>();
+
 			if (extraObj.has("drops")) {
 				JsonArray dropsArray = extraObj.getAsJsonArray("drops");
-				for (var dropElem : dropsArray) {
-					extraDrops.add(RecipeResultUtil.itemStackFromJson(dropElem.getAsJsonObject()));
+
+				for (JsonElement element : dropsArray) {
+					extraDrops.add(RecipeResultUtil.itemStackFromJson(element.getAsJsonObject()));
 				}
 			}
-			extraEffect = new InteractionRecipe.ExtraEffect(chance, toState, extraDrops);
+			extraEffect = new ExtraEffect(chance, toState, extraDrops);
 		}
 
 		boolean consume = GsonHelper.getAsBoolean(json, "consume_trigger", false);
 
 		// 解析交互类型（默认为 ANY）
-		InteractionRecipe.InteractionType type = InteractionRecipe.InteractionType.ANY;
+		InteractionType type = InteractionType.ANY;
 		if (json.has("interaction_type")) {
 			String typeStr = GsonHelper.getAsString(json, "interaction_type");
 			try {
-				type = InteractionRecipe.InteractionType.valueOf(typeStr.toUpperCase());
-			} catch (IllegalArgumentException ignored) {}
+				type = InteractionType.valueOf(typeStr.toUpperCase());
+			} catch (IllegalArgumentException ignored) {
+			}
 		}
 
 		return new InteractionRecipe(id, trigger, targetState, results, extraEffect, consume, type);
@@ -78,15 +82,17 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		BlockState targetState = (targetBlock == null ? Blocks.AIR : targetBlock).defaultBlockState();
 
 		int resultCount = buf.readInt();
-		List<InteractionRecipe.WeightedResult> results = new ArrayList<>();
+		List<WeightedResult> results = new ArrayList<>();
+
 		for (int i = 0; i < resultCount; i++) {
 			ItemStack stack = buf.readItem();
 			int weight = buf.readInt();
-			results.add(new InteractionRecipe.WeightedResult(stack, weight));
+			results.add(new WeightedResult(stack, weight));
 		}
 
 		boolean hasExtra = buf.readBoolean();
-		InteractionRecipe.ExtraEffect extra = null;
+		ExtraEffect extra = null;
+
 		if (hasExtra) {
 			float chance = buf.readFloat();
 			ResourceLocation toBlockId = buf.readResourceLocation();
@@ -97,11 +103,11 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 			for (int i = 0; i < dropCount; i++) {
 				extraDrops.add(buf.readItem());
 			}
-			extra = new InteractionRecipe.ExtraEffect(chance, toState, extraDrops);
+			extra = new ExtraEffect(chance, toState, extraDrops);
 		}
 
 		boolean consume = buf.readBoolean();
-		InteractionRecipe.InteractionType type = buf.readEnum(InteractionRecipe.InteractionType.class);
+		InteractionType type = buf.readEnum(InteractionType.class);
 
 		return new InteractionRecipe(id, trigger, targetState, results, extra, consume, type);
 	}
@@ -112,21 +118,23 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		ResourceLocation targetBlockId = ForgeRegistries.BLOCKS.getKey(recipe.getTargetBlockState().getBlock());
 		buf.writeResourceLocation(targetBlockId);
 
-		List<InteractionRecipe.WeightedResult> results = recipe.getResults();
+		List<WeightedResult> results = recipe.getResults();
 		buf.writeInt(results.size());
-		for (var wr : results) {
-			buf.writeItem(wr.stack);
-			buf.writeInt(wr.weight);
+
+		for (WeightedResult result : results) {
+			buf.writeItem(result.stack);
+			buf.writeInt(result.weight);
 		}
 
-		InteractionRecipe.ExtraEffect extra = recipe.getExtraEffect();
+		ExtraEffect extra = recipe.getExtraEffect();
 		buf.writeBoolean(extra != null);
+
 		if (extra != null) {
-			buf.writeFloat(extra.chance);
-			ResourceLocation toBlockId = ForgeRegistries.BLOCKS.getKey(extra.toState.getBlock());
+			buf.writeDouble(extra.getChance());
+			ResourceLocation toBlockId = ForgeRegistries.BLOCKS.getKey(extra.getState().getBlock());
 			buf.writeResourceLocation(toBlockId);
-			buf.writeInt(extra.extraDrops.size());
-			for (ItemStack drop : extra.extraDrops) {
+			buf.writeInt(extra.getExtraDrops().size());
+			for (ItemStack drop : extra.getExtraDrops()) {
 				buf.writeItem(drop);
 			}
 		}
