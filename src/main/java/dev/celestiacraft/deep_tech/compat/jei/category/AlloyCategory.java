@@ -5,6 +5,7 @@ import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
 import dev.celestiacraft.deep_tech.api.ingredient.IngredientWithCount;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
+import dev.celestiacraft.libs.compat.jei.api.DoubleIcon;
 import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
@@ -16,8 +17,7 @@ import net.minecraft.network.chat.Component;
 import java.util.List;
 
 public class AlloyCategory {
-	// 3 个输入槽的位置
-	private static final int[] INPUT_X = {8, 26, 44};
+	private static final int[] INPUT_X = {8, 26};
 	private static final int INPUT_Y = 20;
 	private static final int OUTPUT_X = 65;
 	private static final int OUTPUT_Y = 20;
@@ -28,10 +28,15 @@ public class AlloyCategory {
 		return SimpleJeiCategory.builder(DTJeiRecipeType.ALLOY, helper)
 				.setTitle(MachineBlocks.ALLOY_FURNACE.get().getName())
 				.setSize(128, 64)
-				.setIcon(MachineBlocks.ALLOY_FURNACE.asStack())
+//				.setIcon(MachineBlocks.ALLOY_FURNACE.asStack())
+				.setIcon(DoubleIcon.ofItem(
+						MachineBlocks.ALLOY_FURNACE::asStack,
+						MachineBlocks.CRUSHER::asStack
+				))
 				.setRecipe((builder, recipe, group) -> {
 					List<IngredientWithCount> inputs = recipe.getInputs();
 					int slotCount = Math.min(inputs.size(), INPUT_X.length);
+
 					for (int i = 0; i < slotCount; i++) {
 						builder.addSlot(RecipeIngredientRole.INPUT, INPUT_X[i], INPUT_Y)
 								.addIngredients(inputs.get(i).getIngredient());
