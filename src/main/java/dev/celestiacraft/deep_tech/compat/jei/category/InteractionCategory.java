@@ -16,13 +16,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
 public class InteractionCategory {
-	private static final ThreadLocal<DecimalFormat> PERCENT_FORMAT = ThreadLocal.withInitial(() -> {
-		return new DecimalFormat("0.0%");
-	});
 	// ✅ 新（只在需要时显示小数）
 	private static final NumberFormat PERCENT_FORMAT = NumberFormat.getPercentInstance();
 
