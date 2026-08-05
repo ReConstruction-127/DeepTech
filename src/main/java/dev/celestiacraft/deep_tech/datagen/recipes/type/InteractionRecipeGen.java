@@ -62,37 +62,13 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.type(InteractionType.RIGHT_CLICK)
 				.save(consumer, save("interaction/sculk_bone_repair"));
 
-		// TEST：右键
+		// 幽匿骨粉复原：左键
 		InteractionRecipeBuilder.builder()
-				.trigger(Items.COPPER_INGOT)
-				.target(Blocks.DIAMOND_BLOCK)
-				.extraEffect(1.0, Blocks.EMERALD_BLOCK)
-				.consume(false)
-				.type(InteractionType.RIGHT_CLICK)
-				.save(consumer, save("interaction/test_only"));
-
-		// TEST：右键
-		InteractionRecipeBuilder.builder()
-				.trigger(Items.COPPER_INGOT)
-				.target(Blocks.GRASS_BLOCK)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_INGOT,1,1)
-				.result(Items.COPPER_BLOCK,1,1)
-				.result(Items.COPPER_BLOCK,1,1)
-				.result(Items.COPPER_BLOCK,1,1)
-				.result(Items.COPPER_BLOCK,1,1)
-				.result(Items.COPPER_BLOCK,1,1)
-				.result(Items.COPPER_BLOCK,1,1)
-				.extraEffect(1.0, Blocks.DIRT)
-				.consume(false)
-				.type(InteractionType.RIGHT_CLICK)
-				.save(consumer, save("interaction/test_only_3"));
+				.trigger(MaterialItems.SCULK_BONEMEAL)
+				.target(Blocks.SCULK)
+				.extraEffect(0.5, Blocks.SCULK_CATALYST)
+				.consume(true)
+				.type(InteractionType.LEFT_CLICK)
+				.save(consumer, save("interaction/sculk_catalyst"));
 	}
 }

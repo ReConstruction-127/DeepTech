@@ -8,7 +8,9 @@ import dev.celestiacraft.deep_tech.common.register.DTMaterials;
 import dev.celestiacraft.deep_tech.common.register.block.FrameBlocks;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
+import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -19,6 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import slimeknights.mantle.registration.adapter.BlockRegistryAdapter;
 
+import javax.tools.Tool;
 import java.util.function.Consumer;
 
 
@@ -103,6 +106,41 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.define('C', MaterialItems.SCULK_CHUNK)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/machine/resonance_node"));
+
+		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MaterialItems.SCULK_CIRCUIT.get())
+				.pattern(" A ")
+				.pattern("BCB")
+				.pattern(" D ")
+				.define('A', MaterialItems.SCULK_BONE)
+				.define('B', Items.REDSTONE)
+				.define('C', MaterialItems.SCULK_CHUNK)
+				.define('D', DTMaterials.GOLD.getPlate().get())
+				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
+				.save(consumer, save("shaped/basic_circuit"));
+
+		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ToolItems.WRENCH.get())
+				.pattern(" A ")
+				.pattern(" AA")
+				.pattern("A  ")
+				.define('A', MaterialItems.SCULK_ALLOY)
+				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
+				.save(consumer, save("shaped/wrench"));
+
+		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.SCULK)
+				.pattern("AA")
+				.pattern("AA")
+				.define('A', MaterialItems.SCULK_CHUNK)
+				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
+				.save(consumer, save("shaped/sculk_block"));
+
+		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.SCULK_CATALYST)
+				.pattern(" A ")
+				.pattern("ABA")
+				.pattern(" A ")
+				.define('A', MaterialItems.SCULK_BONE)
+				.define('B', MaterialItems.SCULK_CHUNK)
+				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
+				.save(consumer, save("shaped/sculk_catalyst"));
 
 
 //		ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, MachineBlocks.RESONANCE_NODE.get())

@@ -4,7 +4,6 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.texture.DTTextures;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.ChanceResult;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
-import dev.celestiacraft.deep_tech.common.recipe.interaction.WeightedResult;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;
 import mezz.jei.api.gui.drawable.IDrawable;

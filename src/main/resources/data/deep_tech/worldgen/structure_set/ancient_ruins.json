@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "deep_tech:ancient_ruins",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 30,
+    "separation": 10,
+    "salt": 1787876927
+  }
+}

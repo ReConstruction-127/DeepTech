@@ -40,12 +40,10 @@ public class InteractionHandler {
 				.findFirst();
 
 		if (recipe.isEmpty()) {
-			DeepTech.LOGGER.debug("No matching interaction recipe found");
 			return false;
 		}
 
 		InteractionRecipe r = recipe.get();
-		DeepTech.LOGGER.info("Executing interaction: {}", r.getId());
 
 		// 1. 挥手动效
 		player.swing(InteractionHand.MAIN_HAND);
