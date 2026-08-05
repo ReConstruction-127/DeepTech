@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -87,10 +88,10 @@ public class InteractionHandler {
 			}
 		}
 
-		// 4. 主产物掉落
-		ItemStack result = r.getRandomResult(RANDOM);
-		if (!result.isEmpty()) {
-			spawnItem(level, pos, result);
+		// ✅ 改为
+		List<ItemStack> results = r.getTriggeredResults(RANDOM);
+		for (ItemStack result : results) {
+			if (!result.isEmpty()) spawnItem(level, pos, result);
 		}
 
 		// 5. 统一音效：物品损坏

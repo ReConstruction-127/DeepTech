@@ -19,5 +19,15 @@ public class GuiLanguage extends LanguageGenerate {
 				"EXP Generator",
 				"经验发电机"
 		);
+		addGuiLang(
+				"machine_alloy_furnace",
+				"Alloy Furnace",
+				"合金炉"
+		);
+		addGuiLang(
+				"energy_cell",
+				"Energy Cell",
+				"能量单元"
+		);
 	}
 }

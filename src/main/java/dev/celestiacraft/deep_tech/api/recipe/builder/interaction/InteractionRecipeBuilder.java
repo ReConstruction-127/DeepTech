@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.api.recipe.builder.interaction;
 
+import dev.celestiacraft.deep_tech.common.recipe.interaction.ChanceResult;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionType;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
@@ -27,7 +28,7 @@ import java.util.function.Consumer;
 public class InteractionRecipeBuilder implements RecipeBuilder {
 	private Ingredient triggerItem;
 	private BlockState targetState;
-	private final List<WeightedResult> results = new ArrayList<>();
+	private final List<ChanceResult> results = new ArrayList<>();
 	private ExtraEffect extraEffect;
 	private boolean consumeTrigger = false;
 	private InteractionType interactionType = InteractionType.ANY;
@@ -66,18 +67,25 @@ public class InteractionRecipeBuilder implements RecipeBuilder {
 		return this;
 	}
 
-	public InteractionRecipeBuilder result(ItemLike item, double weight) {
-		results.add(new WeightedResult(new ItemStack(item), weight));
+	// ✅ result 方法改为使用 chance
+	public InteractionRecipeBuilder result(ItemLike item, double chance) {
+		if (chance > 0 && chance <= 1) {
+			results.add(new ChanceResult(new ItemStack(item), chance));
+		}
 		return this;
 	}
 
-	public InteractionRecipeBuilder result(ItemLike item, int count, double weight) {
-		results.add(new WeightedResult(new ItemStack(item, count), weight));
+	public InteractionRecipeBuilder result(ItemLike item, int count, double chance) {
+		if (chance > 0 && chance <= 1) {
+			results.add(new ChanceResult(new ItemStack(item, count), chance));
+		}
 		return this;
 	}
 
-	public InteractionRecipeBuilder result(ItemStack stack, double weight) {
-		results.add(new WeightedResult(stack.copy(), weight));
+	public InteractionRecipeBuilder result(ItemStack stack, double chance) {
+		if (stack != null && !stack.isEmpty() && chance > 0 && chance <= 1) {
+			results.add(new ChanceResult(stack.copy(), chance));
+		}
 		return this;
 	}
 
@@ -130,8 +138,8 @@ public class InteractionRecipeBuilder implements RecipeBuilder {
 		if (targetState == null) {
 			throw new IllegalStateException("Missing target block");
 		}
-		if (results.isEmpty()) {
-			throw new IllegalStateException("Missing results");
+		if (results.isEmpty() && extraEffect == null) {
+			throw new IllegalStateException("Recipe must have at least one result or an extra effect");
 		}
 
 		advancement.parent(ResourceLocation.tryParse("recipes/root"))

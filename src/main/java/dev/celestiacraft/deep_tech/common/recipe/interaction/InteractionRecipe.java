@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -25,7 +26,7 @@ public class InteractionRecipe implements Recipe<Container> {
 	private final ResourceLocation id;
 	private final Ingredient triggerItem;
 	private final BlockState targetBlockState;
-	private final List<WeightedResult> results;
+	private final List<ChanceResult> results;
 	private final ExtraEffect extraEffect;
 	private final boolean consumeTrigger;
 	private final InteractionType interactionType;
@@ -86,17 +87,14 @@ public class InteractionRecipe implements Recipe<Container> {
 		return NonNullList.of(triggerItem);
 	}
 
-	public ItemStack getRandomResult(Random random) {
-		int total = results.stream()
-				.mapToInt((result) -> {
-					return result.weight;
-				})
-				.sum();
-		int roll = random.nextInt(total);
-		for (WeightedResult wr : results) {
-			roll -= wr.weight;
-			if (roll < 0) return wr.stack.copy();
+	// ✅ 替换 getRandomResult 为 getTriggeredResults
+	public List<ItemStack> getTriggeredResults(Random random) {
+		List<ItemStack> triggered = new ArrayList<>();
+		for (ChanceResult cr : results) {
+			if (random.nextDouble() < cr.chance) {
+				triggered.add(cr.stack.copy());
+			}
 		}
-		return results.isEmpty() ? ItemStack.EMPTY : results.get(0).stack.copy();
+		return triggered;
 	}
 }

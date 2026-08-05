@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.api.recipe.builder.interaction;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dev.celestiacraft.deep_tech.common.recipe.interaction.ChanceResult;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionType;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class InteractionRecipeResult implements FinishedRecipe {
 	private final ResourceLocation id;
 	private final Ingredient triggerItem;
 	private final BlockState targetState;
-	private final List<WeightedResult> results;
+	private final List<ChanceResult> results;
 	private final ExtraEffect extraEffect;
 	private final boolean consumeTrigger;
 	private final InteractionType interactionType;
@@ -36,11 +37,12 @@ public class InteractionRecipeResult implements FinishedRecipe {
 		json.addProperty("target_block", ForgeRegistries.BLOCKS.getKey(targetState.getBlock()).toString());
 
 		JsonArray resultsArray = new JsonArray();
-		for (WeightedResult wr : results) {
+		for (ChanceResult wr : results) {
 			JsonObject obj = new JsonObject();
 			obj.addProperty("item", ForgeRegistries.ITEMS.getKey(wr.stack.getItem()).toString());
 			if (wr.stack.getCount() != 1) obj.addProperty("count", wr.stack.getCount());
-			if (wr.weight != 1) obj.addProperty("weight", wr.weight);
+// ✅ 写入 chance（不再写入 weight）
+			obj.addProperty("chance", wr.chance);
 			resultsArray.add(obj);
 		}
 		json.add("results", resultsArray);

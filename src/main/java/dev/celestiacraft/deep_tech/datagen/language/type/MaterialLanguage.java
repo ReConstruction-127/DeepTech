@@ -6,5 +6,6 @@ public class MaterialLanguage extends LanguageGenerate {
 	public static void addLang() {
 		addMaterialLang("copper", "Copper", "铜");
 		addMaterialLang("iron", "Iron", "铁");
+		addMaterialLang("gold", "Gold", "金");
 	}
 }

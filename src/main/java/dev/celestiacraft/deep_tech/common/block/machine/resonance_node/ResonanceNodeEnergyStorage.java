@@ -179,7 +179,5 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 		if (cachedNodes.size() > 100) {
 			cachedNodes = cachedNodes.subList(0, 100);
 		}
-
-		DeepTech.LOGGER.debug("ResonanceNode at {} found {} nodes in range", entity.getBlockPos(), cachedNodes.size());
 	}
 }

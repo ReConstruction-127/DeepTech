@@ -34,5 +34,10 @@ public class BlockLanguage extends LanguageGenerate {
 				"Resonance Node",
 				"共振节点"
 		);
+		addBlockLanguage(
+				"energy_cell",
+				"Energy Cell",
+				"能量单元"
+		);
 	}
 }

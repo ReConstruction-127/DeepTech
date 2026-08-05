@@ -29,14 +29,14 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		Block block = blockId != null ? ForgeRegistries.BLOCKS.getValue(blockId) : null;
 		BlockState targetState = (block == null ? Blocks.AIR : block).defaultBlockState();
 
-		List<WeightedResult> results = new ArrayList<>();
+		List<ChanceResult> results = new ArrayList<>();
 		JsonArray resultsArray = GsonHelper.getAsJsonArray(json, "results");
-
-		for (JsonElement element : resultsArray) {
-			JsonObject obj = element.getAsJsonObject();
+		for (var elem : resultsArray) {
+			JsonObject obj = elem.getAsJsonObject();
 			ItemStack stack = RecipeResultUtil.itemStackFromJson(obj);
-			int weight = GsonHelper.getAsInt(obj, "weight", 1);
-			results.add(new WeightedResult(stack, weight));
+			// ✅ 读取 chance，默认 1.0（100%）
+			double chance = GsonHelper.getAsDouble(obj, "chance", 1.0);
+			results.add(new ChanceResult(stack, chance));
 		}
 
 		ExtraEffect extraEffect = null;
@@ -82,12 +82,12 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		BlockState targetState = (targetBlock == null ? Blocks.AIR : targetBlock).defaultBlockState();
 
 		int resultCount = buf.readInt();
-		List<WeightedResult> results = new ArrayList<>();
+		List<ChanceResult> results = new ArrayList<>();
 
 		for (int i = 0; i < resultCount; i++) {
 			ItemStack stack = buf.readItem();
 			int weight = buf.readInt();
-			results.add(new WeightedResult(stack, weight));
+			results.add(new ChanceResult(stack, weight));
 		}
 
 		boolean hasExtra = buf.readBoolean();
@@ -118,12 +118,11 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		ResourceLocation targetBlockId = ForgeRegistries.BLOCKS.getKey(recipe.getTargetBlockState().getBlock());
 		buf.writeResourceLocation(targetBlockId);
 
-		List<WeightedResult> results = recipe.getResults();
+		List<ChanceResult> results = recipe.getResults();
 		buf.writeInt(results.size());
-
-		for (WeightedResult result : results) {
-			buf.writeItem(result.stack);
-			buf.writeInt(result.weight);
+		for (var cr : results) {
+			buf.writeItem(cr.stack);
+			buf.writeDouble(cr.chance);
 		}
 
 		ExtraEffect extra = recipe.getExtraEffect();

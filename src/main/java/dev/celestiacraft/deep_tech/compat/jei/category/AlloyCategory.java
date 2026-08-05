@@ -59,10 +59,10 @@ public class AlloyCategory {
 					}
 
 					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");
-					graphics.drawString(font, energyText, 8, 52, 0xFF0095e0, true);
+					graphics.drawString(font, energyText, 8, 49, 0xFF0095e0, true);
 
 					Component timeText = Component.literal("⏱ " + recipe.getProcessingTime() + " tick");
-					graphics.drawString(font, timeText, 8, 62, 0xFFe08500, true);
+					graphics.drawString(font, timeText, 8, 59, 0xFFe08500, true);
 				})
 				.build();
 	}
