@@ -18,7 +18,9 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 public class InteractionCategory {
-	private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.0%");
+	private static final ThreadLocal<DecimalFormat> PERCENT_FORMAT = ThreadLocal.withInitial(() -> {
+		return new DecimalFormat("0.0%");
+	});
 
 	// 槽位布局
 	private static final int INPUT_X = 8;
@@ -129,7 +131,7 @@ public class InteractionCategory {
 						int y = OUTPUT_START_Y + row * OUTPUT_SLOT_SIZE + OUTPUT_SLOT_SIZE + 2;
 
 						float probability = (float) result.weight / totalWeight;
-						String probText = PERCENT_FORMAT.format(probability);
+						String probText = PERCENT_FORMAT.get().format(probability);
 						graphics.drawString(font, probText, x, y, 0xFF808080, true);
 					}
 
@@ -153,7 +155,7 @@ public class InteractionCategory {
 					if (recipe.getExtraEffect() != null) {
 						double chance = recipe.getExtraEffect().getChance();
 						if (chance > 0) {
-							String extraText = "Extra: " + PERCENT_FORMAT.format(chance);
+							String extraText = "Extra: " + PERCENT_FORMAT.get().format(chance);
 							graphics.drawString(font, extraText, BLOCK_INPUT_X - 4, BLOCK_INPUT_Y + OUTPUT_SLOT_SIZE + 2, 0xFFAA00, true);
 						}
 					}
