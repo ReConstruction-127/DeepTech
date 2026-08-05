@@ -140,7 +140,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.define('A', MaterialItems.SCULK_BONE)
 				.define('B', MaterialItems.SCULK_CHUNK)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
-				.save(consumer, save("shaped/sculk_catalyst"));
+				.save(consumer, save("shaped/sculk_catalyst")); 
 
 
 //		ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, MachineBlocks.RESONANCE_NODE.get())
