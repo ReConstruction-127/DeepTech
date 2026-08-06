@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.common.block.machine.resonance_node;
 
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.capability.ResonanceNodeEnergyStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

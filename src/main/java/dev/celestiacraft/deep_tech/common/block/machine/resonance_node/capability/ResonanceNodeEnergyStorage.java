@@ -1,6 +1,7 @@
-package dev.celestiacraft.deep_tech.common.block.machine.resonance_node;
+package dev.celestiacraft.deep_tech.common.block.machine.resonance_node.capability;
 
-import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.ResonanceNodeBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.ResonanceNodeBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
