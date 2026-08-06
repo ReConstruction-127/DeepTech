@@ -1,19 +1,16 @@
 package dev.celestiacraft.deep_tech.common.block.machine.energy_cell.capability;
 
-import dev.celestiacraft.deep_tech.common.block.machine.energy_cell.EnergyCellBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.energy_cell.AbstractEnergyCellBlockEntity;
 import lombok.AllArgsConstructor;
 import net.minecraftforge.energy.IEnergyStorage;
 
 @AllArgsConstructor
 public class InputOnlyEnergyStorage implements IEnergyStorage {
-	private final EnergyCellBlockEntity entity;
+	private final AbstractEnergyCellBlockEntity entity;
 
 	@Override
 	public int receiveEnergy(int maxReceive, boolean simulate) {
-		int received = Math.min(
-				maxReceive,
-				entity.getMachineMaxEnergy() - entity.getEnergy()
-		);
+		int received = Math.min(maxReceive, entity.getMachineMaxEnergy() - entity.getEnergy());
 
 		if (!simulate && received > 0) {
 			entity.setEnergy(entity.getEnergy() + received);

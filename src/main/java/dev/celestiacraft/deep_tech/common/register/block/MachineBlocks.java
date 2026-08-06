@@ -25,59 +25,58 @@ public class MachineBlocks {
 		DTCreativeTabs.getTab("machine");
 
 		CRUSHER = DeepTech.REGISTRATE.block("crusher", CrusherBlock::new)
+				.blockstate(CrusherBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
 				.model(ItemModelGen.withModel("block/machine/crusher/on"))
 				.build()
-				.blockstate(CrusherBlock.genBlockState())
-				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 
 		SCULK_FURNACE = DeepTech.REGISTRATE.block("sculk_furnace", SculkFurnaceBlock::new)
+				.blockstate(SculkFurnaceBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
 				.model(ItemModelGen.withModel("block/machine/furnace/on"))
 				.build()
-				.blockstate(SculkFurnaceBlock.genBlockState())
-				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 
 		EXP_GENERATOR = DeepTech.REGISTRATE.block("exp_generator", EXPGeneratorBlock::new)
+				.blockstate(EXPGeneratorBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
 				.model(ItemModelGen.withModel("block/machine/exp_generator/on"))
 				.build()
-				.blockstate(EXPGeneratorBlock.genBlockState())
-				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 
 		ALLOY_FURNACE = DeepTech.REGISTRATE.block("alloy_furnace", AlloyFurnaceBlock::new)
+				.blockstate(AlloyFurnaceBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)
 				.model(ItemModelGen.withModel("block/machine/alloy_furnace/on"))
 				.build()
-				.blockstate(AlloyFurnaceBlock.genBlockState())
-				.tag(DeepTechBlockTags.MACHINES)
 				.register();
 
 		RESONANCE_NODE = DeepTech.REGISTRATE.block("resonance_node", ResonanceNodeBlock::new)
-				.item()
-				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/resonance_node"))
-				.build()
 				.blockstate(ResonanceNodeBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/resonance_node"))
+				.build()
 				.register();
 
 		ENERGY_CELL = DeepTech.REGISTRATE.block("energy_cell", EnergyCellBlock::new)
-				.item()
-				.tag(DeepTechItemTags.MACHINES)
-				.model(ItemModelGen.withModel("block/energy_cell"))
-				.build()
 				.blockstate(EnergyCellBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
 				.register();
-
 	}
 
 	public static void register() {

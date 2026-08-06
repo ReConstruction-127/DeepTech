@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.client.model.generators.BlockModelBuilder;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import org.jetbrains.annotations.NotNull;
@@ -83,8 +83,7 @@ public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
 		return (context, provider) -> {
 			BlockModelProvider models = provider.models();
-			BlockModelBuilder model = models.getBuilder(context.getName())
-					.parent(models.getExistingFile(provider.modLoc("block/machine/resonance_node")));
+			ModelFile model = models.getExistingFile(provider.modLoc("block/machine/resonance_node"));
 
 			provider.getVariantBuilder(context.get())
 					.forAllStates((state) -> {
