@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.event;
+package dev.celestiacraft.deep_tech.event;
 
 import dev.celestiacraft.deep_tech.DeepTech;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;

@@ -1,6 +1,5 @@
-package dev.celestiacraft.deep_tech.common.event;
+package dev.celestiacraft.deep_tech.event;
 
-import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.core.BlockPos;
@@ -33,22 +32,22 @@ public class InteractionHandler {
 		ItemStack held = player.getMainHandItem();
 		BlockState state = level.getBlockState(pos);
 
-		Optional<InteractionRecipe> recipe = level.getRecipeManager()
+		Optional<InteractionRecipe> manager = level.getRecipeManager()
 				.getAllRecipesFor(DTRecipes.INTERACTION.getRecipeType())
 				.stream()
-				.filter(r -> r.matches(held, state, isRightClick))
+				.filter((recipe) -> {
+					return recipe.matches(held, state, isRightClick);
+				})
 				.findFirst();
 
-		if (recipe.isEmpty()) {
+		if (manager.isEmpty()) {
 			return false;
 		}
 
-		InteractionRecipe r = recipe.get();
+		InteractionRecipe recipe = manager.get();
 
-		// 1. 挥手动效
 		player.swing(InteractionHand.MAIN_HAND);
 
-		// 2. 自动粒子（使用触发物品）
 		if (level instanceof ServerLevel serverLevel) {
 			ItemParticleOption particle = new ItemParticleOption(ParticleTypes.ITEM, held.copy());
 			for (int i = 0; i < 15; i++) {
@@ -62,9 +61,8 @@ public class InteractionHandler {
 			}
 		}
 
-		// 3. 额外效果（方块转化 + 额外掉落）
-		if (r.getExtraEffect() != null && RANDOM.nextFloat() < r.getExtraEffect().getChance()) {
-			BlockState toState = r.getExtraEffect().getState();
+		if (recipe.getExtraEffect() != null && RANDOM.nextFloat() < recipe.getExtraEffect().getChance()) {
+			BlockState toState = recipe.getExtraEffect().getState();
 			if (toState != null && !toState.isAir()) {
 				if (level instanceof ServerLevel serverLevel) {
 					BlockParticleOption breakParticle = new BlockParticleOption(ParticleTypes.BLOCK, state);
@@ -81,22 +79,26 @@ public class InteractionHandler {
 				}
 				level.setBlockAndUpdate(pos, toState);
 			}
-			for (ItemStack drop : r.getExtraEffect().getExtraDrops()) {
+			for (ItemStack drop : recipe.getExtraEffect().getExtraDrops()) {
 				spawnItem(level, pos, drop.copy());
 			}
 		}
 
-		// ✅ 改为
-		List<ItemStack> results = r.getTriggeredResults(RANDOM);
+		List<ItemStack> results = recipe.getTriggeredResults(RANDOM);
 		for (ItemStack result : results) {
 			if (!result.isEmpty()) spawnItem(level, pos, result);
 		}
 
-		// 5. 统一音效：物品损坏
-		level.playSound(null, pos, SoundEvents.ITEM_BREAK, SoundSource.PLAYERS, 1.0f, 1.0f);
+		level.playSound(
+				null,
+				pos,
+				SoundEvents.ITEM_BREAK,
+				SoundSource.PLAYERS,
+				1.0f,
+				1.0f
+		);
 
-		// 6. 消耗触发物品
-		if (r.isConsumeTrigger() && !player.isCreative()) {
+		if (recipe.isConsumeTrigger() && !player.isCreative()) {
 			held.shrink(1);
 		}
 
