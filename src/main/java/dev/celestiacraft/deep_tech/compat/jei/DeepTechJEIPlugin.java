@@ -12,11 +12,13 @@ import dev.celestiacraft.deep_tech.compat.jei.category.AlloyCategory;
 import dev.celestiacraft.deep_tech.compat.jei.category.CrushingCategory;
 import dev.celestiacraft.deep_tech.compat.jei.category.InteractionCategory;
 import dev.celestiacraft.deep_tech.compat.jei.handler.MachineGuiHandler;
+import dev.celestiacraft.libs.compat.jei.api.ingredient.JeiIngredientTypes;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -44,6 +46,11 @@ public class DeepTechJEIPlugin implements IModPlugin {
 				AlloyCategory.builder(helper),
 				InteractionCategory.builder(helper)
 		);
+	}
+
+	@Override
+	public void registerIngredients(@NotNull IModIngredientRegistration registration) {
+		JeiIngredientTypes.register(registration);
 	}
 
 	@Override

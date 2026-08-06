@@ -1,30 +1,20 @@
 package dev.celestiacraft.deep_tech.datagen.recipes.type;
 
-import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.block.FrameBlock;
-import dev.celestiacraft.deep_tech.api.recipe.builder.crushing.CrushingRecipeBuilder;
-import dev.celestiacraft.deep_tech.common.register.DTBlocks;
+import com.simibubi.create.AllBlocks;
+import com.simibubi.create.Create;
 import dev.celestiacraft.deep_tech.common.register.DTMaterials;
 import dev.celestiacraft.deep_tech.common.register.block.FrameBlocks;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
 import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
-import slimeknights.mantle.registration.adapter.BlockRegistryAdapter;
 
-import javax.tools.Tool;
 import java.util.function.Consumer;
-
-
 
 public class CraftingRecipeGen extends DTRecipeProvider {
 	public CraftingRecipeGen(PackOutput output) {
@@ -32,6 +22,11 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 	}
 
 	public static void register(Consumer<FinishedRecipe> consumer) {
+		addShapedRecipe(consumer);
+		addCompatRecipe(consumer);
+	}
+
+	private static void addShapedRecipe(Consumer<FinishedRecipe> consumer) {
 		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, FrameBlocks.MACHINE_FRAME.get())
 				.pattern("ABA")
 				.pattern("BCB")
@@ -97,7 +92,6 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/machine/energy_cell"));
 
-
 		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MachineBlocks.RESONANCE_NODE.get())
 				.pattern(" A ")
 				.pattern("BCB")
@@ -140,13 +134,21 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.define('A', MaterialItems.SCULK_BONE)
 				.define('B', MaterialItems.SCULK_CHUNK)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
-				.save(consumer, save("shaped/sculk_catalyst")); 
+				.save(consumer, save("shaped/sculk_catalyst"));
+	}
 
-
-//		ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, MachineBlocks.RESONANCE_NODE.get())
-//
-//				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
-//
-//				.save(consumer, save("shaped/machine/resonance_node"));
+	private static void addCompatRecipe(Consumer<FinishedRecipe> consumer) {
+		addModCompatRecipe(Create.ID, "exp_generator_from_create", consumer, (recipe) -> {
+			ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MachineBlocks.EXP_GENERATOR.get())
+					.pattern("BAB")
+					.pattern("BCB")
+					.pattern("BDB")
+					.define('A', MaterialItems.SCULK_CIRCUIT)
+					.define('B', MaterialItems.SCULK_CHUNK.get())
+					.define('C', FrameBlocks.MACHINE_FRAME)
+					.define('D', AllBlocks.BASIN)
+					.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
+					.save(recipe, save("compat/create/exp_generator_from_create"));
+		});
 	}
 }

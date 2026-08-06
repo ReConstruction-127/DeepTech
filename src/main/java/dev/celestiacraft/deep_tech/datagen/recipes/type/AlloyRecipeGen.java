@@ -1,5 +1,9 @@
 package dev.celestiacraft.deep_tech.datagen.recipes.type;
 
+import com.simibubi.create.AllBlocks;
+import com.simibubi.create.AllItems;
+import com.simibubi.create.Create;
+import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import dev.celestiacraft.deep_tech.api.recipe.builder.alloy.AlloyRecipeBuilder;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
@@ -17,6 +21,7 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 
 	public static void register(Consumer<FinishedRecipe> consumer) {
 		addSculkAlloy(consumer);
+		addCompatRecipe(consumer);
 	}
 
 	private static void addSculkAlloy(Consumer<FinishedRecipe> consumer) {
@@ -35,5 +40,47 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 				.energyCost(100)
 				.processingTime(20 * 20)
 				.save(consumer, save("alloy/sculk_alloy/echo_shard"));
+	}
+
+	private static void addCompatRecipe(Consumer<FinishedRecipe> consumer) {
+		addModCompatRecipe(Create.ID, "andestie_alloy_1", consumer, (recipe) -> {
+			AlloyRecipeBuilder.builder()
+					.input(Tags.Items.NUGGETS_IRON)
+					.input(Items.ANDESITE)
+					.output(AllItems.ANDESITE_ALLOY, 1)
+					.energyCost(100)
+					.processingTime(20 * 10)
+					.save(recipe, save("compat/create/andestie_alloy_1"));
+		});
+
+		addModCompatRecipe(Create.ID, "andestie_alloy_2", consumer, (recipe) -> {
+			AlloyRecipeBuilder.builder()
+					.input(CommonMetal.ZINC.nuggets)
+					.input(Items.ANDESITE)
+					.output(AllItems.ANDESITE_ALLOY, 1)
+					.energyCost(100)
+					.processingTime(20 * 10)
+					.save(recipe, save("compat/create/andestie_alloy_2"));
+		});
+
+		addModCompatRecipe(Create.ID, "andestie_alloy_3", consumer, (recipe) -> {
+			AlloyRecipeBuilder.builder()
+					.input(Tags.Items.INGOTS_IRON)
+					.input(Items.ANDESITE, 9)
+					.output(AllBlocks.ANDESITE_ALLOY_BLOCK)
+					.energyCost(100 * 9)
+					.processingTime(20 * (10 * 9))
+					.save(recipe, save("compat/create/andestie_alloy_3"));
+		});
+
+		addModCompatRecipe(Create.ID, "andestie_alloy_4", consumer, (recipe) -> {
+			AlloyRecipeBuilder.builder()
+					.input(CommonMetal.ZINC.nuggets)
+					.input(Items.ANDESITE, 9)
+					.output(AllBlocks.ANDESITE_ALLOY_BLOCK)
+					.energyCost(100 * 9)
+					.processingTime(20 * (10 * 9))
+					.save(recipe, save("compat/create/andestie_alloy_4"));
+		});
 	}
 }

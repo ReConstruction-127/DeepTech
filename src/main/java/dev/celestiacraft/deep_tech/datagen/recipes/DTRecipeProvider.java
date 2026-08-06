@@ -9,6 +9,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.crafting.ConditionalRecipe;
+import net.minecraftforge.common.crafting.conditions.ModLoadedCondition;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -20,6 +22,19 @@ public class DTRecipeProvider extends RecipeProvider {
 
 	protected static ResourceLocation save(String path) {
 		return DeepTech.loadResource(path);
+	}
+
+	protected static void addModCompatRecipe(
+			String modId,
+			String name,
+			Consumer<FinishedRecipe> consumer,
+			Consumer<Consumer<FinishedRecipe>> recipe
+	) {
+		String path = String.format("compat/%s/%s", modId, name);
+		ConditionalRecipe.builder()
+				.addCondition(new ModLoadedCondition(modId))
+				.addRecipe(recipe)
+				.build(consumer, save(path));
 	}
 
 	@Override

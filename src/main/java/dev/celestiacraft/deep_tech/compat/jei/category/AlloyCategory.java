@@ -1,11 +1,12 @@
 package dev.celestiacraft.deep_tech.compat.jei.category;
 
 import dev.celestiacraft.deep_tech.api.client.texture.DTTextures;
-import dev.celestiacraft.deep_tech.api.ingredient.IngredientWithCount;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
+import dev.celestiacraft.libs.api.recipe.ingredient.item.IngredientWithCount;
 import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;
+import dev.celestiacraft.libs.compat.jei.api.ingredient.JeiIngredientTypes;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -34,7 +35,7 @@ public class AlloyCategory {
 
 					for (int i = 0; i < slotCount; i++) {
 						builder.addSlot(RecipeIngredientRole.INPUT, INPUT_X[i], INPUT_Y)
-								.addIngredients(inputs.get(i).getIngredient());
+								.addIngredient(JeiIngredientTypes.INGREDIENT_WITH_COUNT, inputs.get(i));
 					}
 
 					builder.addSlot(RecipeIngredientRole.OUTPUT, OUTPUT_X, OUTPUT_Y)
@@ -51,18 +52,11 @@ public class AlloyCategory {
 
 					Font font = Minecraft.getInstance().font;
 
-					List<IngredientWithCount> inputs = recipe.getInputs();
-					int slotCount = Math.min(inputs.size(), INPUT_X.length);
-					for (int i = 0; i < slotCount; i++) {
-						int count = inputs.get(i).getCount();
-						graphics.drawString(font, "x" + count, INPUT_X[i] + 2, 39, 0xFF404040, true);
-					}
-
 					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");
-					graphics.drawString(font, energyText, 8, 49, 0xFF0095e0, true);
+					graphics.drawString(font, energyText, 8, 44, 0xFF0095e0, true);
 
 					Component timeText = Component.literal("⏱ " + recipe.getProcessingTime() + " tick");
-					graphics.drawString(font, timeText, 8, 59, 0xFFe08500, true);
+					graphics.drawString(font, timeText, 8, 54, 0xFFe08500, true);
 				})
 				.build();
 	}

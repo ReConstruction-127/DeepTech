@@ -10,19 +10,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
+import net.minecraftforge.client.model.generators.ModelFile;
 import org.jetbrains.annotations.NotNull;
 
 public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
@@ -51,11 +49,20 @@ public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 
 	@Override
 	public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter getter, @NotNull BlockPos pos, @NotNull CollisionContext context) {
-		return Shapes.or(
+		final VoxelShape BASE_SHAPE = Shapes.or(
 				Block.box(5, 0, 5, 11, 2, 11),
 				Block.box(6, 2, 6, 10, 3, 10),
 				Block.box(7, 3, 7, 9, 8, 9)
 		);
+
+		return switch (state.getValue(FACING)) {
+			case UP -> BASE_SHAPE;
+			case DOWN -> rotateShape(BASE_SHAPE, Direction.DOWN);
+			case NORTH -> rotateShape(BASE_SHAPE, Direction.NORTH);
+			case SOUTH -> rotateShape(BASE_SHAPE, Direction.SOUTH);
+			case EAST -> rotateShape(BASE_SHAPE, Direction.EAST);
+			case WEST -> rotateShape(BASE_SHAPE, Direction.WEST);
+		};
 	}
 
 	@Override
@@ -66,18 +73,6 @@ public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 	@Override
 	public Class<ResonanceNodeBlockEntity> getBlockEntityClass() {
 		return ResonanceNodeBlockEntity.class;
-	}
-
-	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
-		if (level.isClientSide()) {
-			return (lvl, pos, st, be) -> {
-				if (be instanceof ResonanceNodeBlockEntity node) {
-					node.clientTick(lvl, pos, st, node);
-				}
-			};
-		}
-		return null;
 	}
 
 	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
@@ -113,5 +108,67 @@ public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 			case WEST -> 270;
 			default -> 0;
 		};
+	}
+
+	private static VoxelShape rotateShape(VoxelShape shape, Direction direction) {
+		VoxelShape result = Shapes.empty();
+
+		for (AABB box : shape.toAabbs()) {
+			double minX = box.minX;
+			double minY = box.minY;
+			double minZ = box.minZ;
+			double maxX = box.maxX;
+			double maxY = box.maxY;
+			double maxZ = box.maxZ;
+
+			switch (direction) {
+				case DOWN -> result = Shapes.or(result, Block.box(
+						minX * 16,
+						(16 - maxY * 16),
+						minZ * 16,
+						maxX * 16,
+						(16 - minY * 16),
+						maxZ * 16
+				));
+
+				case NORTH -> result = Shapes.or(result, Block.box(
+						minX * 16,
+						minZ * 16,
+						(16 - maxY * 16),
+						maxX * 16,
+						maxZ * 16,
+						(16 - minY * 16)
+				));
+
+				case SOUTH -> result = Shapes.or(result, Block.box(
+						minX * 16,
+						minZ * 16,
+						minY * 16,
+						maxX * 16,
+						maxZ * 16,
+						maxY * 16
+				));
+
+				case EAST -> result = Shapes.or(result, Block.box(
+						minY * 16,
+						minX * 16,
+						minZ * 16,
+						maxY * 16,
+						maxX * 16,
+						maxZ * 16
+				));
+
+				case WEST -> result = Shapes.or(result, Block.box(
+						(16 - maxY * 16),
+						minX * 16,
+						minZ * 16,
+						(16 - minY * 16),
+						maxX * 16,
+						maxZ * 16
+				));
+			}
+		}
+
+		return result;
 	}
 }
