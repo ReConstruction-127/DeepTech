@@ -68,6 +68,7 @@ public class MachineBlocks {
 				.blockstate(ResonanceNodeBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)
 				.register();
+
 		ENERGY_CELL = DeepTech.REGISTRATE.block("energy_cell", EnergyCellBlock::new)
 				.item()
 				.tag(DeepTechItemTags.MACHINES)

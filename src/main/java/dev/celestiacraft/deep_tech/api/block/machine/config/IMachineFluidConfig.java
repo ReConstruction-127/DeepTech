@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.api.block.machine.config;
 
 import net.minecraftforge.fluids.FluidStack;
 
+@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public interface IMachineFluidConfig {
 	/**
 	 * 获取机器总流体罐数量

@@ -17,9 +17,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
+import org.jetbrains.annotations.NotNull;
 
 public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 	public ResonanceNodeBlock(Properties properties) {
@@ -46,8 +50,12 @@ public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 	}
 
 	@Override
-	public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-		return 0;
+	public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter getter, @NotNull BlockPos pos, @NotNull CollisionContext context) {
+		return Shapes.or(
+				Block.box(5, 0, 5, 11, 2, 11),
+				Block.box(6, 2, 6, 10, 3, 10),
+				Block.box(7, 3, 7, 9, 8, 9)
+		);
 	}
 
 	@Override
@@ -61,7 +69,7 @@ public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 	}
 
 	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
 		if (level.isClientSide()) {
 			return (lvl, pos, st, be) -> {
 				if (be instanceof ResonanceNodeBlockEntity node) {

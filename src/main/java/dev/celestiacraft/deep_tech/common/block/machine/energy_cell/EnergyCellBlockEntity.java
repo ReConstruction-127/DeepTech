@@ -50,20 +50,14 @@ public class EnergyCellBlockEntity extends MachineBlockEntity<EnergyCellBlockEnt
 	}
 
 	@Override
-	public int getItemOutputSlotCount() {
-		return 0;
+	public int getMaxExtract() {
+		return EnergyCellConfig.MAX_EXTRACT.get();
 	}
 
-	@Override
-	public int getMaxExtract() {
-		return EnergyCellConfig.MAX_EXTRACT.get(); // ✅ 支持输出
-	}
 	@Override
 	public int getMaxMachineSlot() {
-		return 1; // 1 个输入槽
+		return 1;
 	}
-
-	// ========== Capability：方向限制（一刀切） ==========
 
 	@Override
 	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction side) {
