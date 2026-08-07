@@ -1,56 +1,29 @@
 package dev.celestiacraft.deep_tech.common.register;
 
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.register.recipe.RecipeRegistry;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloySerializer;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipeSerializer;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipeSerializer;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
+import dev.celestiacraft.libs.api.register.recipe.RecipeEntry;
 
 public class DTRecipes {
-	private static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS;
-	private static final DeferredRegister<RecipeType<?>> TYPES;
-
-	public static final RecipeRegistry<CrushingRecipe> CRUSHING;
-	public static final RecipeRegistry<AlloyRecipe> ALLOY;
-	public static final RecipeRegistry<InteractionRecipe> INTERACTION;
+	public static final RecipeEntry<CrushingRecipe> CRUSHING;
+	public static final RecipeEntry<AlloyRecipe> ALLOY;
+	public static final RecipeEntry<InteractionRecipe> INTERACTION;
 
 	static {
-		SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, DeepTech.MODID);
-		TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, DeepTech.MODID);
-
-		CRUSHING = add("crushing", CrushingRecipeSerializer::new);
-		ALLOY = add("alloy", AlloySerializer::new);
-		INTERACTION = add("interaction", InteractionRecipeSerializer::new);
+		CRUSHING = DeepTech.REGISTRATE.recipe("crushing", CrushingRecipeSerializer::new)
+				.register();
+		ALLOY = DeepTech.REGISTRATE.recipe("alloy", AlloySerializer::new)
+				.register();
+		INTERACTION = DeepTech.REGISTRATE.recipe("interaction", InteractionRecipeSerializer::new)
+				.register();
 	}
 
-	public static void register(IEventBus bus) {
-		SERIALIZERS.register(bus);
-		TYPES.register(bus);
-	}
-
-	private static <T extends Recipe<?>> RecipeRegistry<T> add(
-			String name,
-			Supplier<? extends RecipeSerializer<T>> serializer
-	) {
-		return new RecipeRegistry<>(ResourceLocation.tryParse(name), TYPES.register(name, () -> {
-			return new RecipeType<>() {
-				@Override
-				public String toString() {
-					return DeepTech.loadResource(name).toString();
-				}
-			};
-		}), SERIALIZERS.register(name, serializer));
+	public static void register() {
+		DeepTech.registerLog("Recipe Type");
 	}
 }

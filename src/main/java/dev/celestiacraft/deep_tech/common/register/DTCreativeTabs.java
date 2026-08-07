@@ -1,10 +1,10 @@
 package dev.celestiacraft.deep_tech.common.register;
 
-import com.tterrag.registrate.Registrate;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
 import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
+import dev.celestiacraft.libs.register.NebulaRegistrate;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -41,7 +41,7 @@ public class DTCreativeTabs {
 		});
 	}
 
-	public static Registrate getTab(String name) {
+	public static NebulaRegistrate getTab(String name) {
 		return DeepTech.REGISTRATE.defaultCreativeTab(getTabKey(name));
 	}
 

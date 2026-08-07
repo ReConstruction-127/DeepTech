@@ -67,7 +67,9 @@ public class SculkShearHandler {
 		}
 
 		// 6. 消耗剪刀耐久（1点）
-		mainHand.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(player.getUsedItemHand()));
+		mainHand.hurtAndBreak(1, player, (entity) -> {
+			entity.broadcastBreakEvent(player.getUsedItemHand());
+		});
 
 		DeepTech.LOGGER.debug("Sheared {} at {}, dropped items", state.getBlock(), pos);
 	}

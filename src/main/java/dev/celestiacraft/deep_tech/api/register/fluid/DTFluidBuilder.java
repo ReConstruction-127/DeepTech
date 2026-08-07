@@ -1,6 +1,5 @@
 package dev.celestiacraft.deep_tech.api.register.fluid;
 
-import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.FluidBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
@@ -11,6 +10,7 @@ import com.tterrag.registrate.util.nullness.NonNullFunction;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.texture.DTFluidTexture;
 import dev.celestiacraft.libs.api.register.fluid.BasicFluidType;
+import dev.celestiacraft.libs.register.NebulaRegistrate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BucketItem;
@@ -31,7 +31,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		void tick(Level level, BlockPos pos, FluidState state);
 	}
 
-	private final Registrate registrate;
+	private final NebulaRegistrate registrate;
 	private final String name;
 	private final FluidBuilder.FluidTypeFactory typeFactory;
 	private final NonNullFunction<ForgeFlowingFluid.Properties, T> fluidFactory;
@@ -39,11 +39,11 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 	private ResourceLocation flowingTexture;
 	private ResourceLocation stillTexture;
 	private int tintColor = 0xFFFFFFFF;
-	private FluidBuilder<T, Registrate> builder;
+	private FluidBuilder<T, NebulaRegistrate> builder;
 	private boolean sourceConfigured;
 	private FluidTickHandler tickHandler;
 
-	private DTFluidBuilder(Registrate registrate, String name, FluidBuilder.FluidTypeFactory typeFactory, NonNullFunction<ForgeFlowingFluid.Properties, T> fluidFactory) {
+	private DTFluidBuilder(NebulaRegistrate registrate, String name, FluidBuilder.FluidTypeFactory typeFactory, NonNullFunction<ForgeFlowingFluid.Properties, T> fluidFactory) {
 		this.registrate = registrate;
 		this.name = name;
 		this.typeFactory = typeFactory;
@@ -54,7 +54,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		return of(DeepTech.REGISTRATE, name);
 	}
 
-	public static DTFluidBuilder<ForgeFlowingFluid.Flowing> of(Registrate registrate, String name) {
+	public static DTFluidBuilder<ForgeFlowingFluid.Flowing> of(NebulaRegistrate registrate, String name) {
 		return of(registrate, name, null);
 	}
 
@@ -62,7 +62,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		return of(DeepTech.REGISTRATE, name, typeFactory);
 	}
 
-	public static DTFluidBuilder<ForgeFlowingFluid.Flowing> of(Registrate registrate, String name, FluidBuilder.FluidTypeFactory typeFactory) {
+	public static DTFluidBuilder<ForgeFlowingFluid.Flowing> of(NebulaRegistrate registrate, String name, FluidBuilder.FluidTypeFactory typeFactory) {
 		return of(registrate, name, typeFactory, ForgeFlowingFluid.Flowing::new);
 	}
 
@@ -70,7 +70,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		return of(DeepTech.REGISTRATE, name, typeFactory, fluidFactory);
 	}
 
-	public static <T extends ForgeFlowingFluid> DTFluidBuilder<T> of(Registrate registrate, String name, FluidBuilder.FluidTypeFactory typeFactory, NonNullFunction<ForgeFlowingFluid.Properties, T> fluidFactory) {
+	public static <T extends ForgeFlowingFluid> DTFluidBuilder<T> of(NebulaRegistrate registrate, String name, FluidBuilder.FluidTypeFactory typeFactory, NonNullFunction<ForgeFlowingFluid.Properties, T> fluidFactory) {
 		return new DTFluidBuilder<>(registrate, name, typeFactory, fluidFactory);
 	}
 
@@ -132,7 +132,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		return this;
 	}
 
-	public FluidBuilder<T, Registrate> builder() {
+	public FluidBuilder<T, NebulaRegistrate> builder() {
 		if (builder == null) {
 			checkTextures();
 			FluidBuilder.FluidTypeFactory factory = typeFactory == null ? this::createBasicFluidType : typeFactory;
@@ -140,7 +140,9 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 				builder = registrate.fluid(name, stillTexture, flowingTexture, factory, fluidFactory);
 			} else {
 				FluidTickHandler handler = tickHandler;
-				builder = registrate.fluid(name, stillTexture, flowingTexture, factory, properties -> createTickedFlowing(properties, handler));
+				builder = registrate.fluid(name, stillTexture, flowingTexture, factory, (properties) -> {
+					return createTickedFlowing(properties, handler);
+				});
 			}
 		}
 		return builder;
@@ -156,7 +158,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		};
 	}
 
-	public FluidBuilder<T, Registrate> source() {
+	public FluidBuilder<T, NebulaRegistrate> source() {
 		if (tickHandler == null) {
 			return source(ForgeFlowingFluid.Source::new);
 		}
@@ -170,8 +172,8 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		});
 	}
 
-	public FluidBuilder<T, Registrate> source(NonNullFunction<ForgeFlowingFluid.Properties, ? extends ForgeFlowingFluid> factory) {
-		FluidBuilder<T, Registrate> fluid = builder();
+	public FluidBuilder<T, NebulaRegistrate> source(NonNullFunction<ForgeFlowingFluid.Properties, ? extends ForgeFlowingFluid> factory) {
+		FluidBuilder<T, NebulaRegistrate> fluid = builder();
 		if (!sourceConfigured) {
 			fluid.source(factory);
 			sourceConfigured = true;
@@ -179,19 +181,19 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 		return fluid;
 	}
 
-	public BlockBuilder<LiquidBlock, FluidBuilder<T, Registrate>> block() {
+	public BlockBuilder<LiquidBlock, FluidBuilder<T, NebulaRegistrate>> block() {
 		return builder().block();
 	}
 
-	public ItemBuilder<BucketItem, FluidBuilder<T, Registrate>> bucket() {
+	public ItemBuilder<BucketItem, FluidBuilder<T, NebulaRegistrate>> bucket() {
 		return source().bucket();
 	}
 
-	public <I extends BucketItem> ItemBuilder<I, FluidBuilder<T, Registrate>> bucket(NonNullBiFunction<Supplier<? extends ForgeFlowingFluid>, Item.Properties, ? extends I> factory) {
+	public <I extends BucketItem> ItemBuilder<? extends I, FluidBuilder<T, NebulaRegistrate>> bucket(NonNullBiFunction<Supplier<? extends ForgeFlowingFluid>, Item.Properties, ? extends I> factory) {
 		return source().bucket(factory);
 	}
 
-	public FluidBuilder<T, Registrate> noBucket() {
+	public FluidBuilder<T, NebulaRegistrate> noBucket() {
 		return builder().noBucket();
 	}
 
