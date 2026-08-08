@@ -277,19 +277,6 @@ tasks.named('jar', Jar).configure {
 	finalizedBy 'reobfJar'
 }
 
-publishing {
-	publications {
-		register('mavenJava', MavenPublication) {
-			artifact jar
-		}
-	}
-	repositories {
-		maven {
-			url "file://${project.projectDir}/mcmodsrepo"
-		}
-	}
-}
-
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.compilerArgs << "-parameters"
