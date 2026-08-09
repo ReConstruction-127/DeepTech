@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.compat.jei.category;
 
+import dev.celestiacraft.deep_tech.api.client.lang.JeiLang;
 import dev.celestiacraft.deep_tech.api.client.texture.DTTextures;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.ChanceResult;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
@@ -10,7 +11,6 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
@@ -41,7 +41,7 @@ public class InteractionCategory {
 		IDrawable drawable = helper.getSlotDrawable();
 
 		return SimpleJeiCategory.builder(DTJeiRecipeType.INTERACTION, helper)
-				.setTitle(Component.literal("Interaction Crafting"))
+				.setTitle(JeiLang.setTranCategoryTitle("interaction_crafting"))
 				.setSize(110, 72)
 				.setIcon(new ItemStack(Blocks.REINFORCED_DEEPSLATE))
 				.setRecipe((builder, recipe, group) -> {
