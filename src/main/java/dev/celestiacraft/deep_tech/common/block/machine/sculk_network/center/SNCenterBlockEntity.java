@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center;
 
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
@@ -8,14 +9,19 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -39,6 +45,14 @@ public class SNCenterBlockEntity extends BlockEntity {
 	// ========== 扫描结果（用于视觉标记） ==========
 	private Set<BlockPos> currentScanResult = new HashSet<>();
 	private Set<BlockPos> previousScanResult = new HashSet<>();
+
+	// ========== 扫描结果:网络组件列表（按距离由近到远排序） ==========
+	private final List<BlockPos> foundReservoirs = new ArrayList<>();
+	private final List<BlockPos> foundItemInputPorts = new ArrayList<>();
+
+	// ========== 物品转运控制 ==========
+	private int tickCounter = 0;
+	private static final int TRANSFER_INTERVAL = 10; // 每 10 Tick 转运一次
 
 	public SNCenterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -66,6 +80,12 @@ public class SNCenterBlockEntity extends BlockEntity {
 			be.cleanupDebugMarkers((ServerLevel) level);
 			be.applyDebugMarkers((ServerLevel) level);
 		}
+
+		// 4. 物品转运：从网络中的输入端口抽取物品存入最近的贮存器
+		be.tickCounter++;
+		if (be.tickCounter % TRANSFER_INTERVAL == 0) {
+			be.transferItemsFromInputPorts((ServerLevel) level);
+		}
 	}
 
 	// ============================================================
@@ -83,6 +103,8 @@ public class SNCenterBlockEntity extends BlockEntity {
 		// 保存旧结果
 		previousScanResult = new HashSet<>(currentScanResult);
 		currentScanResult = new HashSet<>();
+		foundReservoirs.clear();
+		foundItemInputPorts.clear();
 
 		// BFS 队列
 		Queue<BlockPos> queue = new ArrayDeque<>();
@@ -108,6 +130,15 @@ public class SNCenterBlockEntity extends BlockEntity {
 				}
 			}
 
+			// 收集网络组件（物品贮存器 / 物品输入端口）
+			var blockAt = level.getBlockState(current).getBlock();
+			if (blockAt == MachineBlocks.SN_ITEM_RESERVOIR.get()) {
+				foundReservoirs.add(current);
+			}
+			if (blockAt == MachineBlocks.SN_ITEM_INPUT_PORT.get()) {
+				foundItemInputPorts.add(current);
+			}
+
 			if (distance >= 16) continue;
 
 			for (Direction dir : Direction.values()) {
@@ -120,6 +151,10 @@ public class SNCenterBlockEntity extends BlockEntity {
 				}
 			}
 		}
+
+		// 组件按到中枢的距离由近到远排序
+		foundReservoirs.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
+		foundItemInputPorts.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
 
 		// ----- 冲突检测逻辑 -----
 		// 统计网络中所有中枢的主控状态
@@ -187,26 +222,71 @@ public class SNCenterBlockEntity extends BlockEntity {
 	// ============================================================
 
 	/**
-	 * 返回本中枢 16 格范围内、按距离由近到远排序的物品储存器位置列表。
-	 * 供物品输入端口等组件查找存储目标使用。
+	 * 返回 BFS 扫描到的物品贮存器位置列表（已按距离由近到远排序）。
+	 * 供物品转运逻辑查找存储目标使用。
 	 */
 	public List<BlockPos> getSortedReservoirs() {
-		List<BlockPos> reservoirs = new ArrayList<>();
-		Level level = getLevel();
-		if (level == null) return reservoirs;
+		return foundReservoirs;
+	}
 
-		for (int dx = -16; dx <= 16; dx++) {
-			for (int dy = -16; dy <= 16; dy++) {
-				for (int dz = -16; dz <= 16; dz++) {
-					BlockPos checkPos = getBlockPos().offset(dx, dy, dz);
-					if (level.getBlockState(checkPos).is(MachineBlocks.SN_ITEM_RESERVOIR.get())) {
-						reservoirs.add(checkPos);
-					}
+	/**
+	 * 返回 BFS 扫描到的物品输入端口位置列表（已按距离由近到远排序）。
+	 */
+	public List<BlockPos> getItemInputPorts() {
+		return foundItemInputPorts;
+	}
+
+	// ============================================================
+	//  物品转运（中枢驱动）
+	// ============================================================
+
+	private void transferItemsFromInputPorts(ServerLevel level) {
+		for (BlockPos portPos : foundItemInputPorts) {
+			BlockState portState = level.getBlockState(portPos);
+			if (portState.getBlock() != MachineBlocks.SN_ITEM_INPUT_PORT.get()) continue;
+
+			// 输入端口朝向的方块即源容器
+			Direction facing = portState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+			BlockEntity sourceBe = level.getBlockEntity(portPos.relative(facing));
+			if (sourceBe == null) continue;
+
+			LazyOptional<IItemHandler> cap = sourceBe.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite());
+			if (!cap.isPresent()) continue;
+
+			IItemHandler sourceHandler = cap.orElse(null);
+			if (sourceHandler == null) continue;
+
+			// 每次只处理一个槽位：模拟抽取 → 依次存入各贮存器 → 实际抽取已存入的数量
+			for (int slot = 0; slot < sourceHandler.getSlots(); slot++) {
+				ItemStack extracted = sourceHandler.extractItem(slot, 64, true);
+				if (extracted.isEmpty()) continue;
+
+				int inserted = 0;
+				ItemStack remaining = extracted.copy();
+				for (BlockPos resPos : foundReservoirs) {
+					BlockEntity resBe = level.getBlockEntity(resPos);
+					if (!(resBe instanceof SNItemReservoirBlockEntity reservoirBe)) continue;
+
+					LazyOptional<IItemHandler> resCap = reservoirBe.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP);
+					if (!resCap.isPresent()) continue;
+
+					IItemHandler resHandler = resCap.orElse(null);
+					if (resHandler == null) continue;
+
+					int before = remaining.getCount();
+					ItemStack leftover = ItemHandlerHelper.insertItem(resHandler, remaining, false);
+					inserted += before - leftover.getCount();
+					remaining = leftover;
+					if (remaining.isEmpty()) break;
 				}
+
+				// 实际从源容器抽取已成功存入的数量
+				if (inserted > 0) {
+					sourceHandler.extractItem(slot, inserted, false);
+				}
+				break;
 			}
 		}
-		reservoirs.sort(Comparator.comparingDouble(pos -> pos.distSqr(getBlockPos())));
-		return reservoirs;
 	}
 
 	private boolean isNetworkComponent(ServerLevel level, BlockPos pos) {
