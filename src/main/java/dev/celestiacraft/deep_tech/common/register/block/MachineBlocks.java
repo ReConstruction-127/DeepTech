@@ -9,6 +9,14 @@ import dev.celestiacraft.deep_tech.common.block.machine.energy_cell.EnergyCellBl
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.ResonanceNodeBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.SNAccessorBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center.SNCenterBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidInputPortBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidOutputPortBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemInputPortBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlock;
 import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 import dev.celestiacraft.deep_tech.tags.DeepTechBlockTags;
 import dev.celestiacraft.deep_tech.tags.DeepTechItemTags;
@@ -20,6 +28,15 @@ public class MachineBlocks {
 	public static final BlockEntry<ResonanceNodeBlock> RESONANCE_NODE;
 	public static final BlockEntry<AlloyFurnaceBlock> ALLOY_FURNACE;
 	public static final BlockEntry<EnergyCellBlock> ENERGY_CELL;
+	public static final BlockEntry<SNCenterBlock> SN_CENTER;
+	public static final BlockEntry<SNItemReservoirBlock> SN_ITEM_RESERVOIR;
+	public static final BlockEntry<SNItemInputPortBlock> SN_ITEM_INPUT_PORT;
+	public static final BlockEntry<SNItemOutputPortBlock> SN_ITEM_OUTPUT_PORT;
+	public static final BlockEntry<SNAccessorBlock> SN_ACCESSOR;
+
+	public static final BlockEntry<SNFluidReservoirBlock> SN_FLUID_RESERVOIR;
+	public static final BlockEntry<SNFluidInputPortBlock> SN_FLUID_INPUT_PORT;
+	public static final BlockEntry<SNFluidOutputPortBlock> SN_FLUID_OUTPUT_PORT;
 
 	static {
 		DTCreativeTabs.getTab("machine");
@@ -77,6 +94,63 @@ public class MachineBlocks {
 				.model(ItemModelGen.withModel("block/machine/energy_cell"))
 				.build()
 				.register();
+		SN_CENTER = DeepTech.REGISTRATE.block("sculk_network_center", SNCenterBlock::new)
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
+				.register();
+		SN_ITEM_RESERVOIR = DeepTech.REGISTRATE.block("sculk_network_item_reservoir", SNItemReservoirBlock::new)
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
+				.register();
+		SN_ITEM_INPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_item_input_port", SNItemInputPortBlock::new)
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
+				.register();
+		SN_ITEM_OUTPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_item_output_port", SNItemOutputPortBlock::new)
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
+				.register();
+		SN_FLUID_RESERVOIR = DeepTech.REGISTRATE.block("sculk_network_fluid_reservoir", SNFluidReservoirBlock::new)
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
+				.register();
+		SN_FLUID_INPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_fluid_input_port", SNFluidInputPortBlock::new)
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
+				.register();
+		SN_FLUID_OUTPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_fluid_output_port", SNFluidOutputPortBlock::new)
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
+				.register();
+		SN_ACCESSOR = DeepTech.REGISTRATE.block("sculk_network_accessor", SNAccessorBlock::new)
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/energy_cell"))
+				.build()
+				.register();
+
 	}
 
 	public static void register() {

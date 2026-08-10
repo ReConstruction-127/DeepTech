@@ -8,6 +8,15 @@ import dev.celestiacraft.deep_tech.common.block.machine.energy_cell.EnergyCellBl
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.ResonanceNodeBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.SNAccessorBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center.SNCenterBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidInputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidOutputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemInputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 
 public class DTBlockEntities {
@@ -17,6 +26,15 @@ public class DTBlockEntities {
 	public static final BlockEntityEntry<ResonanceNodeBlockEntity> RESONANCE_NODE;
 	public static final BlockEntityEntry<AlloyFurnaceBlockEntity> ALLOY_FURNACE;
 	public static final BlockEntityEntry<EnergyCellBlockEntity> ENERGY_CELL;
+
+	public static final BlockEntityEntry<SNCenterBlockEntity> SN_CENTER;
+	public static final BlockEntityEntry<SNItemReservoirBlockEntity> SN_ITEM_RESERVOIR;
+	public static final BlockEntityEntry<SNFluidReservoirBlockEntity> SN_FLUID_RESERVOIR;
+	public static final BlockEntityEntry<SNItemInputPortBlockEntity> SN_ITEM_INPUT_PORT;
+	public static final BlockEntityEntry<SNFluidInputPortBlockEntity> SN_FLUID_INPUT_PORT;
+	public static final BlockEntityEntry<SNItemOutputPortBlockEntity> SN_ITEM_OUTPUT_PORT;
+	public static final BlockEntityEntry<SNFluidOutputPortBlockEntity> SN_FLUID_OUTPUT_PORT;
+	public static final BlockEntityEntry<SNAccessorBlockEntity> SN_ACCESSOR;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
@@ -39,6 +57,31 @@ public class DTBlockEntities {
 				.register();
 		ENERGY_CELL = DeepTech.REGISTRATE.blockEntity("energy_cell", EnergyCellBlockEntity::new)
 				.validBlock(MachineBlocks.ENERGY_CELL)
+				.register();
+
+		SN_ACCESSOR = DeepTech.REGISTRATE.blockEntity("sculk_network_accessor", SNAccessorBlockEntity::new)
+				.validBlock(MachineBlocks.SN_ACCESSOR)
+				.register();
+		SN_CENTER = DeepTech.REGISTRATE.blockEntity("sculk_network_center", SNCenterBlockEntity::new)
+				.validBlock(MachineBlocks.SN_CENTER)
+				.register();
+		SN_ITEM_INPUT_PORT = DeepTech.REGISTRATE.blockEntity("sculk_network_item_input_port", SNItemInputPortBlockEntity::new)
+				.validBlock(MachineBlocks.SN_ITEM_INPUT_PORT)
+				.register();
+		SN_ITEM_OUTPUT_PORT = DeepTech.REGISTRATE.blockEntity("sculk_network_item_output_port", SNItemOutputPortBlockEntity::new)
+				.validBlock(MachineBlocks.SN_ITEM_OUTPUT_PORT)
+				.register();
+		SN_FLUID_INPUT_PORT = DeepTech.REGISTRATE.blockEntity("sculk_network_fluid_input_port", SNFluidInputPortBlockEntity::new)
+				.validBlock(MachineBlocks.SN_FLUID_INPUT_PORT)
+				.register();
+		SN_FLUID_OUTPUT_PORT = DeepTech.REGISTRATE.blockEntity("sculk_network_fluid_output_port", SNFluidOutputPortBlockEntity::new)
+				.validBlock(MachineBlocks.SN_FLUID_OUTPUT_PORT)
+				.register();
+		SN_ITEM_RESERVOIR = DeepTech.REGISTRATE.blockEntity("sculk_network_item_reservoir", SNItemReservoirBlockEntity::new)
+				.validBlock(MachineBlocks.SN_ITEM_RESERVOIR)
+				.register();
+		SN_FLUID_RESERVOIR = DeepTech.REGISTRATE.blockEntity("sculk_network_fluid_reservoir", SNFluidReservoirBlockEntity::new)
+				.validBlock(MachineBlocks.SN_FLUID_RESERVOIR)
 				.register();
 	}
 
