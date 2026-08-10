@@ -22,6 +22,8 @@ import java.util.*;
 
 public class SNCenterBlockEntity extends BlockEntity {
 
+
+
 	// ========== 能量 ==========
 	private int energyStored = 0;
 	private static final int MAX_ENERGY = 10000;
@@ -183,6 +185,29 @@ public class SNCenterBlockEntity extends BlockEntity {
 	// ============================================================
 	//  网络组件判定
 	// ============================================================
+
+	/**
+	 * 返回本中枢 16 格范围内、按距离由近到远排序的物品储存器位置列表。
+	 * 供物品输入端口等组件查找存储目标使用。
+	 */
+	public List<BlockPos> getSortedReservoirs() {
+		List<BlockPos> reservoirs = new ArrayList<>();
+		Level level = getLevel();
+		if (level == null) return reservoirs;
+
+		for (int dx = -16; dx <= 16; dx++) {
+			for (int dy = -16; dy <= 16; dy++) {
+				for (int dz = -16; dz <= 16; dz++) {
+					BlockPos checkPos = getBlockPos().offset(dx, dy, dz);
+					if (level.getBlockState(checkPos).is(MachineBlocks.SN_ITEM_RESERVOIR.get())) {
+						reservoirs.add(checkPos);
+					}
+				}
+			}
+		}
+		reservoirs.sort(Comparator.comparingDouble(pos -> pos.distSqr(getBlockPos())));
+		return reservoirs;
+	}
 
 	private boolean isNetworkComponent(ServerLevel level, BlockPos pos) {
 		BlockState state = level.getBlockState(pos);
