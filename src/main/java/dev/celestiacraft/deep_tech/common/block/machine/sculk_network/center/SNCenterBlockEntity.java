@@ -1,13 +1,299 @@
 package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center;
 
+import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
+import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.energy.IEnergyStorage;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
 
 public class SNCenterBlockEntity extends BlockEntity {
+
+	// ========== 能量 ==========
+	private int energyStored = 0;
+	private static final int MAX_ENERGY = 10000;
+	private static final int SCAN_COST = 1;
+
+	// ========== 主控标签 ==========
+	private boolean isMaster = false;   // 是否带标签
+
+	// ========== 扫描控制 ==========
+	private int scanCooldown = 0;
+	private static final int SCAN_INTERVAL = 20; // 20 tick = 1 秒
+
+	// ========== 扫描结果（用于视觉标记） ==========
+	private Set<BlockPos> currentScanResult = new HashSet<>();
+	private Set<BlockPos> previousScanResult = new HashSet<>();
+
 	public SNCenterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
+	}
+
+	// ============================================================
+	//  Tick 调度
+	// ============================================================
+
+	public static void tick(Level level, BlockPos pos, BlockState state, SNCenterBlockEntity be) {
+		if (level.isClientSide) return;
+
+		// 1. 如果自身已被移除（比如爆炸后），不再执行
+		if (be.isRemoved()) return;
+
+		// 2. 扫描与冲突检测（每秒一次）
+		be.scanCooldown--;
+		if (be.scanCooldown <= 0) {
+			be.scanCooldown = SCAN_INTERVAL;
+			be.performScan((ServerLevel) level, pos);
+		}
+
+		// 3. 更新调试标记（若 BE 还在）
+		if (!be.isRemoved()) {
+			be.cleanupDebugMarkers((ServerLevel) level);
+			be.applyDebugMarkers((ServerLevel) level);
+		}
+	}
+
+	// ============================================================
+	//  核心扫描 (BFS) + 冲突检测
+	// ============================================================
+
+	private void performScan(ServerLevel level, BlockPos center) {
+		// 检查能量
+		if (energyStored < SCAN_COST) {
+			return;
+		}
+		energyStored -= SCAN_COST;
+		setChanged();
+
+		// 保存旧结果
+		previousScanResult = new HashSet<>(currentScanResult);
+		currentScanResult = new HashSet<>();
+
+		// BFS 队列
+		Queue<BlockPos> queue = new ArrayDeque<>();
+		Map<BlockPos, Integer> distanceMap = new HashMap<>();
+
+		queue.add(center);
+		distanceMap.put(center, 0);
+		currentScanResult.add(center);
+
+		// 记录扫描到的中枢（包括自身）
+		List<BlockPos> centersFound = new ArrayList<>();
+
+		while (!queue.isEmpty()) {
+			BlockPos current = queue.poll();
+			int distance = distanceMap.get(current);
+
+			// 检查当前方块是否为中枢（用于后续冲突检测）
+			if (level.getBlockState(current).getBlock() == MachineBlocks.SN_CENTER.get()) {
+				// 只记录有效的中枢（即未被破坏的）
+				BlockEntity be = level.getBlockEntity(current);
+				if (be instanceof SNCenterBlockEntity) {
+					centersFound.add(current);
+				}
+			}
+
+			if (distance >= 16) continue;
+
+			for (Direction dir : Direction.values()) {
+				BlockPos neighbor = current.relative(dir);
+				if (distanceMap.containsKey(neighbor)) continue;
+				if (isNetworkComponent(level, neighbor)) {
+					distanceMap.put(neighbor, distance + 1);
+					queue.add(neighbor);
+					currentScanResult.add(neighbor);
+				}
+			}
+		}
+
+		// ----- 冲突检测逻辑 -----
+		// 统计网络中所有中枢的主控状态
+		List<BlockPos> masterCenters = new ArrayList<>();
+		for (BlockPos pos : centersFound) {
+			BlockEntity be = level.getBlockEntity(pos);
+			if (be instanceof SNCenterBlockEntity) {
+				if (((SNCenterBlockEntity) be).isMaster) {
+					masterCenters.add(pos);
+				}
+			}
+		}
+
+		// 当前中枢是否在 masterCenters 中（可能自身已经是主控）
+		boolean selfIsMaster = masterCenters.contains(center);
+
+		// 情况 1：网络中无主控
+		if (masterCenters.isEmpty()) {
+			// 自动成为主控
+			this.isMaster = true;
+			setChanged();
+			// 发送状态更新（可选）
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+			return;
+		}
+
+		// 情况 2：网络中恰好一个主控
+		if (masterCenters.size() == 1) {
+			// 如果当前中枢不是主控，且网络中有其他主控 → 触发爆炸（后来的中枢）
+			if (!selfIsMaster) {
+				// 这个中枢是“后来的”，爆炸
+				explodeCenter(level, center, "conflict");
+				return; // 爆炸后 BE 被移除，直接返回
+			}
+			// 如果自身是主控，则正常
+			return;
+		}
+
+		// 情况 3：网络中 ≥2 个主控 → 所有带标签的中枢全部爆炸
+		for (BlockPos pos : masterCenters) {
+			explodeCenter(level, pos, "duplicate");
+		}
+		// 爆炸会移除这些中枢，可能包括自身，所以返回
+		// 注意：如果当前中枢在 masterCenters 中，它也会被移除，BE 将失效
+		// 但因为我们已经爆炸，返回即可
+	}
+
+	// ============================================================
+	//  爆炸工具
+	// ============================================================
+
+	private void explodeCenter(ServerLevel level, BlockPos pos, String reason) {
+		// 触发等级 2 爆炸（不破坏地形？可以用原版爆炸，也可只移除方块并产生粒子）
+		// 为了达到“等级2的爆炸”效果，我们使用原版爆炸并保留破坏
+		level.explode(null, pos.getX(), pos.getY(), pos.getZ(),
+				2.0f, Level.ExplosionInteraction.TNT);
+
+		// 注意：爆炸会移除该位置的方块，同时触发事件，BE 会自动失效
+		// 但可能因为爆炸延迟，我们需要额外确保方块被移除
+		// 不过爆炸本身会处理，所以不额外操作
+	}
+
+	// ============================================================
+	//  网络组件判定
+	// ============================================================
+
+	private boolean isNetworkComponent(ServerLevel level, BlockPos pos) {
+		BlockState state = level.getBlockState(pos);
+		var block = state.getBlock();
+
+		// —— 中枢 ——
+		if (block == MachineBlocks.SN_CENTER.get()) return true;
+
+		// —— 脉络（厚 / 薄） ——
+		if (block == BasicBlocks.SCULK_NETWORK_BLOCK.get()) return true;
+		if (block == BasicBlocks.SCULK_NETWORK_VEIN.get()) return true;
+
+		// —— 端口 ——
+		if (block == MachineBlocks.SN_ITEM_INPUT_PORT.get()) return true;
+		if (block == MachineBlocks.SN_ITEM_OUTPUT_PORT.get()) return true;
+		if (block == MachineBlocks.SN_FLUID_INPUT_PORT.get()) return true;
+		if (block == MachineBlocks.SN_FLUID_OUTPUT_PORT.get()) return true;
+
+		// —— 存储 ——
+		if (block == MachineBlocks.SN_ITEM_RESERVOIR.get()) return true;
+		if (block == MachineBlocks.SN_FLUID_RESERVOIR.get()) return true;
+
+		// —— 访问器 ——
+		if (block == MachineBlocks.SN_ACCESSOR.get()) return true;
+
+		return false;
+	}
+
+	// ============================================================
+	//  调试视觉标记
+	// ============================================================
+
+	/**
+	 * 在所有扫描到的组件上方放一块玻璃（临时标记）
+	 */
+	private void applyDebugMarkers(ServerLevel level) {
+		for (BlockPos pos : currentScanResult) {
+			BlockPos markerPos = pos.above();
+			// 只在空位放标记
+			if (level.isEmptyBlock(markerPos)) {
+				level.setBlock(markerPos, Blocks.GLASS.defaultBlockState(), 3);
+			}
+
+			// 粒子效果：在方块中心生成紫色粒子
+			Vec3 center = Vec3.atCenterOf(pos);
+			level.sendParticles(
+					ParticleTypes.END_ROD,
+					center.x, center.y + 0.5, center.z,
+					1,  // 数量
+					0.1, 0.1, 0.1,  // 随机偏移
+					0.0  // 速度
+			);
+		}
+	}
+
+	/**
+	 * 移除上一轮放的玻璃标记
+	 */
+	private void cleanupDebugMarkers(ServerLevel level) {
+		for (BlockPos pos : previousScanResult) {
+			BlockPos markerPos = pos.above();
+			if (level.getBlockState(markerPos).getBlock() == Blocks.GLASS) {
+				level.setBlock(markerPos, Blocks.AIR.defaultBlockState(), 3);
+			}
+		}
+	}
+
+	// ============================================================
+	//  能量 Capability
+	// ============================================================
+
+	public IEnergyStorage getEnergyCapability() {
+		return new IEnergyStorage() {
+			@Override public int receiveEnergy(int maxReceive, boolean simulate) {
+				int received = Math.min(maxReceive, MAX_ENERGY - energyStored);
+				if (!simulate) { energyStored += received; setChanged(); }
+				return received;
+			}
+			@Override public int extractEnergy(int maxExtract, boolean simulate) { return 0; }
+			@Override public int getEnergyStored() { return energyStored; }
+			@Override public int getMaxEnergyStored() { return MAX_ENERGY; }
+			@Override public boolean canExtract() { return false; }
+			@Override public boolean canReceive() { return true; }
+		};
+	}
+
+	@Override
+	public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(
+			net.minecraftforge.common.capabilities.Capability<T> cap,
+			@Nullable Direction side) {
+		if (cap == ForgeCapabilities.ENERGY) {
+			return net.minecraftforge.common.util.LazyOptional.of(this::getEnergyCapability).cast();
+		}
+		return super.getCapability(cap, side);
+	}
+
+	// ============================================================
+	//  NBT 持久化
+	// ============================================================
+
+	@Override
+	protected void saveAdditional(CompoundTag tag) {
+		super.saveAdditional(tag);
+		tag.putInt("Energy", energyStored);
+		tag.putBoolean("IsMaster", isMaster);
+	}
+
+	@Override
+	public void load(CompoundTag tag) {
+		super.load(tag);
+		energyStored = tag.getInt("Energy");
+		isMaster = tag.getBoolean("IsMaster");
 	}
 }

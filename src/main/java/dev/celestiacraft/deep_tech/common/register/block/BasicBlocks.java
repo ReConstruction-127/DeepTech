@@ -19,7 +19,7 @@ public class BasicBlocks {
 				.register();
 	}
 	static {
-		SCULK_NETWORK_VEIN = DeepTech.REGISTRATE.block("sculk_network_block", CarpetBlock::new)
+		SCULK_NETWORK_VEIN = DeepTech.REGISTRATE.block("sculk_network_vein", CarpetBlock::new)
 				.item()
 				.build()
 				.register();
