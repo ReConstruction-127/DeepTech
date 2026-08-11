@@ -2,6 +2,8 @@ package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir
 
 import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
+import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
+import com.lowdragmc.lowdraglib.gui.widget.ButtonWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
@@ -13,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
@@ -34,64 +37,104 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 
 	private final LazyOptional<IItemHandler> inventoryCap = LazyOptional.of(() -> inventory);
 
+	// ============================================================
+	//  LDLib GUI 核心方法
+	// ============================================================
+
+
+
 	@Override
 	public ModularUI createUI(Player player) {
-		WidgetGroup group = new WidgetGroup(0, 0, 176, 222);
+		WidgetGroup main = new WidgetGroup(0, 0, 176, 222);
 
-		// 物品槽位（6 行 × 9 列 = 54 格）
-		SimpleMachineInventory container = new SimpleMachineInventory(inventory);
+		// 背景（可用纯色或纹理）
+		main.addWidget(new ButtonWidget(0, 0, 176, 222, btn -> {}));
+
+		// 储存器槽位（6行×9列）
 		int index = 0;
 		for (int row = 0; row < 6; row++) {
 			for (int col = 0; col < 9; col++) {
 				int x = 8 + col * 18;
 				int y = 18 + row * 18;
-				SlotWidget slot = new SlotWidget(container, index, x, y, true, true);
-				group.addWidget(slot);
+				// SlotWidget 需要 Container 或 IItemTransfer，用 SimpleMachineInventory 包装 ItemStackHandler
+				SlotWidget slot = new SlotWidget(new SimpleMachineInventory(inventory), index, x, y, true, true)
+						.setBackgroundTexture(IGuiTexture.EMPTY);
+				main.addWidget(slot);
 				index++;
 			}
 		}
 
-		// 玩家背包（3 行 × 9 列）
-		addPlayerInventory(group, player);
-
-		ModularUI ui = new ModularUI(176, 222, this, player);
-		ui.widget(group);
-		return ui;
-	}
-
-	protected void addPlayerInventory(WidgetGroup group, Player player) {
-		Container inventory = player.getInventory();
-
+		// 玩家背包（3行）
+		Container playerInv = player.getInventory();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
-				SlotWidget slot = new SlotWidget(inventory, col + row * 9 + 9, 8 + col * 18, 140 + row * 18, true, true);
-				slot.isPlayerContainer = true;
-				group.addWidget(slot);
+				int x = 8 + col * 18;
+				int y = 140 + row * 18;
+				SlotWidget slot = new SlotWidget(playerInv, 9 + row * 9 + col, x, y, true, true)
+						.setBackgroundTexture(IGuiTexture.EMPTY);
+				main.addWidget(slot);
 			}
 		}
 
+		// 快捷栏（1行）
 		for (int col = 0; col < 9; col++) {
-			SlotWidget slot = new SlotWidget(inventory, col, 8 + col * 18, 198, true, true);
-			slot.isPlayerContainer = true;
-			slot.isPlayerHotBar = true;
-			group.addWidget(slot);
+			int x = 8 + col * 18;
+			int y = 198;
+			SlotWidget slot = new SlotWidget(playerInv, col, x, y, true, true)
+					.setBackgroundTexture(IGuiTexture.EMPTY);
+			main.addWidget(slot);
+		}
+
+		return new ModularUI(176, 222, this, player).widget(main);
+	}
+
+	@Override
+	public boolean isInvalid() {
+		return this.isRemoved();
+	}
+
+	@Override
+	public boolean isRemote() {
+		return this.level != null && this.level.isClientSide;
+	}
+
+	@Override
+	public void markAsDirty() {
+		this.setChanged();
+	}
+
+	// ============================================================
+	//  同步方法（LDLib 自动同步）
+	// ============================================================
+
+	private void sync() {
+		if (level != null && !level.isClientSide) {
+			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
 		}
 	}
 
-	// ========== IItemHandler 暴露 ==========
+	// ============================================================
+	//  IItemHandler 暴露
+	// ============================================================
+
 	@Override
-	public <T> LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> cap, @Nullable Direction side) {
+	public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
 		if (cap == ForgeCapabilities.ITEM_HANDLER) {
 			return inventoryCap.cast();
 		}
 		return super.getCapability(cap, side);
 	}
 
-	public ItemStackHandler getInventory() {
-		return inventory;
+	@Override
+	public void invalidateCaps() {
+		super.invalidateCaps();
+		inventoryCap.invalidate();
 	}
 
-	// ========== NBT ==========
+	// ============================================================
+	//  NBT 持久化
+	// ============================================================
+
 	@Override
 	protected void saveAdditional(CompoundTag tag) {
 		super.saveAdditional(tag);

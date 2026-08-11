@@ -1,0 +1,6 @@
+{
+	"parent": "deep_tech:block/sculk_network/port",
+	"textures": {
+		"0": "deep_tech:block/sculk_network/io/item_output"
+	}
+}

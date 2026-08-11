@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center;
 
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
@@ -49,6 +50,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 	// ========== 扫描结果:网络组件列表（按距离由近到远排序） ==========
 	private final List<BlockPos> foundReservoirs = new ArrayList<>();
 	private final List<BlockPos> foundItemInputPorts = new ArrayList<>();
+	private final List<BlockPos> foundItemOutputPorts = new ArrayList<>();  // 新增
 
 	// ========== 物品转运控制 ==========
 	private int tickCounter = 0;
@@ -85,6 +87,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 		be.tickCounter++;
 		if (be.tickCounter % TRANSFER_INTERVAL == 0) {
 			be.transferItemsFromInputPorts((ServerLevel) level);
+			be.transferItemsToOutputPorts((ServerLevel) level);   // 新增
 		}
 	}
 
@@ -138,6 +141,9 @@ public class SNCenterBlockEntity extends BlockEntity {
 			if (blockAt == MachineBlocks.SN_ITEM_INPUT_PORT.get()) {
 				foundItemInputPorts.add(current);
 			}
+			if (blockAt == MachineBlocks.SN_ITEM_OUTPUT_PORT.get()) {   // 新增
+				foundItemOutputPorts.add(current);
+			}
 
 			if (distance >= 16) continue;
 
@@ -155,6 +161,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 		// 组件按到中枢的距离由近到远排序
 		foundReservoirs.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
 		foundItemInputPorts.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
+		foundItemOutputPorts.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
 
 		// ----- 冲突检测逻辑 -----
 		// 统计网络中所有中枢的主控状态
@@ -210,7 +217,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 		// 触发等级 2 爆炸（不破坏地形？可以用原版爆炸，也可只移除方块并产生粒子）
 		// 为了达到“等级2的爆炸”效果，我们使用原版爆炸并保留破坏
 		level.explode(null, pos.getX(), pos.getY(), pos.getZ(),
-				2.0f, Level.ExplosionInteraction.TNT);
+				1.0f, Level.ExplosionInteraction.TNT);
 
 		// 注意：爆炸会移除该位置的方块，同时触发事件，BE 会自动失效
 		// 但可能因为爆炸延迟，我们需要额外确保方块被移除
@@ -285,6 +292,62 @@ public class SNCenterBlockEntity extends BlockEntity {
 					sourceHandler.extractItem(slot, inserted, false);
 				}
 				break;
+			}
+		}
+	}
+
+
+	private void transferItemsToOutputPorts(ServerLevel level) {
+		// 如果没有存储或输出端口，直接返回
+		if (foundReservoirs.isEmpty() || foundItemOutputPorts.isEmpty()) return;
+
+		// 遍历每个输出端口
+		for (BlockPos portPos : foundItemOutputPorts) {
+			BlockState portState = level.getBlockState(portPos);
+			if (portState.getBlock() != MachineBlocks.SN_ITEM_OUTPUT_PORT.get()) continue;
+
+			BlockEntity portBe = level.getBlockEntity(portPos);
+			if (!(portBe instanceof SNItemOutputPortBlockEntity outputPort)) continue;
+
+			// 获取目标容器的 IItemHandler
+			LazyOptional<IItemHandler> targetCap = outputPort.getTargetItemHandler();
+			if (!targetCap.isPresent()) continue;
+			IItemHandler targetHandler = targetCap.orElse(null);
+			if (targetHandler == null) continue;
+
+			// 尝试从最近的存储区块取出物品并插入
+			for (BlockPos resPos : foundReservoirs) {
+				BlockEntity resBe = level.getBlockEntity(resPos);
+				if (!(resBe instanceof SNItemReservoirBlockEntity reservoir)) continue;
+
+				LazyOptional<IItemHandler> resCap = reservoir.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP);
+				if (!resCap.isPresent()) continue;
+				IItemHandler resHandler = resCap.orElse(null);
+				if (resHandler == null) continue;
+
+				// 遍历存储区块的槽位，尝试转移
+				for (int slot = 0; slot < resHandler.getSlots(); slot++) {
+					ItemStack stack = resHandler.getStackInSlot(slot);
+					if (stack.isEmpty()) continue;
+
+					// 尝试插入目标容器（只取一部分，不一次性取完）
+					int maxExtract = Math.min(stack.getCount(), 64);
+					ItemStack extracted = resHandler.extractItem(slot, maxExtract, true);
+					if (extracted.isEmpty()) continue;
+
+					// 模拟插入，看能插入多少
+					int before = extracted.getCount();
+					ItemStack leftover = ItemHandlerHelper.insertItem(targetHandler, extracted, false);
+					int inserted = before - leftover.getCount();
+
+					if (inserted > 0) {
+						// 实际从存储区块提取已插入的数量
+						resHandler.extractItem(slot, inserted, false);
+						reservoir.setChanged();
+						// 一次只处理一组，避免单次 tick 过载
+						return;  // 转移成功一组后结束本次 tick，下次继续
+					}
+				}
 			}
 		}
 	}

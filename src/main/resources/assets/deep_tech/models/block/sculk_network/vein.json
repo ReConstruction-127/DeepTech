@@ -1,0 +1,6 @@
+{
+	"parent": "minecraft:block/carpet",
+	"textures": {
+		"wool": "deep_tech:block/sculk_network/cable_block/vein"
+	}
+}

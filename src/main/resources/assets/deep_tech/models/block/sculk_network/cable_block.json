@@ -1,0 +1,7 @@
+{
+	"parent": "minecraft:block/cube_top",
+	"textures": {
+		"side": "deep_tech:block/sculk_network/cable_block/side",
+		"top": "deep_tech:block/sculk_network/cable_block/top"
+	}
+}

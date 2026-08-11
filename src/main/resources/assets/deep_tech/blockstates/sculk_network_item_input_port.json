@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "deep_tech:block/sculk_network/port_item_input"
+    },
+    "facing=east": {
+      "model": "deep_tech:block/sculk_network/port_item_input",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "deep_tech:block/sculk_network/port_item_input",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "deep_tech:block/sculk_network/port_item_input",
+      "y": 270
+    }
+  }
+}

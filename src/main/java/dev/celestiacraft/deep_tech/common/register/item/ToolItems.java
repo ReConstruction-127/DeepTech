@@ -15,6 +15,7 @@ public class ToolItems {
 
 		WRENCH = DeepTech.REGISTRATE.item("wrench", WrenchItem::new)
 				.model(ItemModelGen.handheld("item/tool/wrench"))
+				.tab(DTCreativeTabs.getTabKey("tool"))
 				.tag(DeepTechItemTags.WRENCH)
 				.register();
 	}

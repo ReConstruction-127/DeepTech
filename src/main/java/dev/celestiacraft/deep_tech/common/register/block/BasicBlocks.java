@@ -15,12 +15,14 @@ public class BasicBlocks {
 	static {
 		SCULK_NETWORK_BLOCK = DeepTech.REGISTRATE.block("sculk_network_block", BasicBlock::new)
 				.item()
+				.tab(DTCreativeTabs.getTabKey("machine"))
 				.build()
 				.register();
 	}
 	static {
 		SCULK_NETWORK_VEIN = DeepTech.REGISTRATE.block("sculk_network_vein", CarpetBlock::new)
 				.item()
+				.tab(DTCreativeTabs.getTabKey("machine"))
 				.build()
 				.register();
 	}

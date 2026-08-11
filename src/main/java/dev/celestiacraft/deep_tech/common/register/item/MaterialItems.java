@@ -18,22 +18,27 @@ public class MaterialItems {
 
 		SCULK_ALLOY = DeepTech.REGISTRATE.item("sculk_alloy", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_alloy"))
+				.tab(DTCreativeTabs.getTabKey("material"))
 				.register();
 
 		SCULK_CHUNK = DeepTech.REGISTRATE.item("sculk_chunk", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_chunk"))
+				.tab(DTCreativeTabs.getTabKey("material"))
 				.register();
 
 		SCULK_BONE = DeepTech.REGISTRATE.item("sculk_bone", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_bone"))
+				.tab(DTCreativeTabs.getTabKey("material"))
 				.register();
 
 		SCULK_BONEMEAL = DeepTech.REGISTRATE.item("sculk_bonemeal", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_bonemeal"))
+				.tab(DTCreativeTabs.getTabKey("material"))
 				.register();
 
 		SCULK_CIRCUIT = DeepTech.REGISTRATE.item("sculk_circuit", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_circuit"))
+				.tab(DTCreativeTabs.getTabKey("material"))
 				.register();
 	}
 
