@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center;
 
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemInputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
@@ -9,7 +10,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -55,6 +59,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 	// ========== 物品转运控制 ==========
 	private int tickCounter = 0;
 	private static final int TRANSFER_INTERVAL = 10; // 每 10 Tick 转运一次
+
 
 	public SNCenterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -252,22 +257,32 @@ public class SNCenterBlockEntity extends BlockEntity {
 			BlockState portState = level.getBlockState(portPos);
 			if (portState.getBlock() != MachineBlocks.SN_ITEM_INPUT_PORT.get()) continue;
 
-			// 输入端口朝向的方块即源容器
-			Direction facing = portState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+			// 获取端口 BE 及过滤
+			BlockEntity portBe = level.getBlockEntity(portPos);
+			if (!(portBe instanceof SNItemInputPortBlockEntity inputPort)) continue;
+			ItemStack filter = inputPort.getFilter();
+
+			// 获取源容器
+			Direction facing = portState.getValue(BlockStateProperties.FACING);
 			BlockEntity sourceBe = level.getBlockEntity(portPos.relative(facing));
 			if (sourceBe == null) continue;
 
 			LazyOptional<IItemHandler> cap = sourceBe.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite());
 			if (!cap.isPresent()) continue;
-
 			IItemHandler sourceHandler = cap.orElse(null);
 			if (sourceHandler == null) continue;
 
-			// 每次只处理一个槽位：模拟抽取 → 依次存入各贮存器 → 实际抽取已存入的数量
+			// 遍历源容器槽位
 			for (int slot = 0; slot < sourceHandler.getSlots(); slot++) {
 				ItemStack extracted = sourceHandler.extractItem(slot, 64, true);
 				if (extracted.isEmpty()) continue;
 
+				// --- 过滤检查 ---
+				if (!filter.isEmpty() && !ItemStack.isSameItemSameTags(extracted, filter)) {
+					continue; // 不匹配，跳过此物品
+				}
+
+				// 尝试存入储存器
 				int inserted = 0;
 				ItemStack remaining = extracted.copy();
 				for (BlockPos resPos : foundReservoirs) {
@@ -276,7 +291,6 @@ public class SNCenterBlockEntity extends BlockEntity {
 
 					LazyOptional<IItemHandler> resCap = reservoirBe.getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP);
 					if (!resCap.isPresent()) continue;
-
 					IItemHandler resHandler = resCap.orElse(null);
 					if (resHandler == null) continue;
 
@@ -287,35 +301,33 @@ public class SNCenterBlockEntity extends BlockEntity {
 					if (remaining.isEmpty()) break;
 				}
 
-				// 实际从源容器抽取已成功存入的数量
 				if (inserted > 0) {
 					sourceHandler.extractItem(slot, inserted, false);
 				}
-				break;
+				break; // 每次只处理一个槽位
 			}
 		}
 	}
 
 
 	private void transferItemsToOutputPorts(ServerLevel level) {
-		// 如果没有存储或输出端口，直接返回
 		if (foundReservoirs.isEmpty() || foundItemOutputPorts.isEmpty()) return;
 
-		// 遍历每个输出端口
 		for (BlockPos portPos : foundItemOutputPorts) {
 			BlockState portState = level.getBlockState(portPos);
 			if (portState.getBlock() != MachineBlocks.SN_ITEM_OUTPUT_PORT.get()) continue;
 
+			// 获取端口 BE 及过滤
 			BlockEntity portBe = level.getBlockEntity(portPos);
 			if (!(portBe instanceof SNItemOutputPortBlockEntity outputPort)) continue;
+			ItemStack filter = outputPort.getFilter();
 
-			// 获取目标容器的 IItemHandler
+			// 获取目标容器
 			LazyOptional<IItemHandler> targetCap = outputPort.getTargetItemHandler();
 			if (!targetCap.isPresent()) continue;
 			IItemHandler targetHandler = targetCap.orElse(null);
 			if (targetHandler == null) continue;
 
-			// 尝试从最近的存储区块取出物品并插入
 			for (BlockPos resPos : foundReservoirs) {
 				BlockEntity resBe = level.getBlockEntity(resPos);
 				if (!(resBe instanceof SNItemReservoirBlockEntity reservoir)) continue;
@@ -325,27 +337,27 @@ public class SNCenterBlockEntity extends BlockEntity {
 				IItemHandler resHandler = resCap.orElse(null);
 				if (resHandler == null) continue;
 
-				// 遍历存储区块的槽位，尝试转移
 				for (int slot = 0; slot < resHandler.getSlots(); slot++) {
 					ItemStack stack = resHandler.getStackInSlot(slot);
 					if (stack.isEmpty()) continue;
 
-					// 尝试插入目标容器（只取一部分，不一次性取完）
+					// --- 过滤检查 ---
+					if (!filter.isEmpty() && !ItemStack.isSameItemSameTags(stack, filter)) {
+						continue;
+					}
+
 					int maxExtract = Math.min(stack.getCount(), 64);
 					ItemStack extracted = resHandler.extractItem(slot, maxExtract, true);
 					if (extracted.isEmpty()) continue;
 
-					// 模拟插入，看能插入多少
 					int before = extracted.getCount();
 					ItemStack leftover = ItemHandlerHelper.insertItem(targetHandler, extracted, false);
 					int inserted = before - leftover.getCount();
 
 					if (inserted > 0) {
-						// 实际从存储区块提取已插入的数量
 						resHandler.extractItem(slot, inserted, false);
 						reservoir.setChanged();
-						// 一次只处理一组，避免单次 tick 过载
-						return;  // 转移成功一组后结束本次 tick，下次继续
+						return; // 每次只转移一组
 					}
 				}
 			}
@@ -464,4 +476,18 @@ public class SNCenterBlockEntity extends BlockEntity {
 		energyStored = tag.getInt("Energy");
 		isMaster = tag.getBoolean("IsMaster");
 	}
+
+
+
+
+	private void sync() {
+		if (level != null && !level.isClientSide) {
+			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+		}
+	}
+
+
+
+
+
 }

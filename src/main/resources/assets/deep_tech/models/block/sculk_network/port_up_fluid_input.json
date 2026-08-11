@@ -1,0 +1,7 @@
+{
+	"parent": "deep_tech:block/sculk_network/port_up",
+	"render_type": "cutout",
+	"textures": {
+		"0": "deep_tech:block/sculk_network/io/fluid_input"
+	}
+}

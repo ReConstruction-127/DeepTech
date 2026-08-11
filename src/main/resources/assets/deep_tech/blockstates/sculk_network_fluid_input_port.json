@@ -1,19 +1,10 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "deep_tech:block/sculk_network/port_fluid_input"
-    },
-    "facing=east": {
-      "model": "deep_tech:block/sculk_network/port_fluid_input",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "deep_tech:block/sculk_network/port_fluid_input",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "deep_tech:block/sculk_network/port_fluid_input",
-      "y": 270
-    }
-  }
+	"variants": {
+		"facing=north": { "model": "deep_tech:block/sculk_network/port_fluid_input" },
+		"facing=east": { "model": "deep_tech:block/sculk_network/port_fluid_input", "y": 90 },
+		"facing=south": { "model": "deep_tech:block/sculk_network/port_fluid_input", "y": 180 },
+		"facing=west": { "model": "deep_tech:block/sculk_network/port_fluid_input", "y": 270 },
+		"facing=up": { "model": "deep_tech:block/sculk_network/port_up_fluid_input" },
+		"facing=down": { "model": "deep_tech:block/sculk_network/port_down_fluid_input" }
+	}
 }

@@ -1,3 +1,4 @@
 {
-  "parent": "deep_tech:block/sculk_network/port_item_output"
+  "parent": "deep_tech:block/sculk_network/port_item_output",
+  "render_type": "cutout"
 }

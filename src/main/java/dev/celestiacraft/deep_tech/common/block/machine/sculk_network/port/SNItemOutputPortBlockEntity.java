@@ -3,6 +3,9 @@ package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,12 +19,13 @@ public class SNItemOutputPortBlockEntity extends BlockEntity {
 	// 目标容器位置（可配置，初版使用方块面向方向）
 	private BlockPos targetPos = null;
 	private Direction facing = Direction.NORTH; // 默认方向，可后期改为从方块状态获取
+	private ItemStack filter = ItemStack.EMPTY;
 
 	public SNItemOutputPortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		// 从方块状态获取朝向（端口方块使用 HORIZONTAL_FACING）
-		if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
-			this.facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+		// 从方块状态获取朝向（端口方块使用 FACING,六面）
+		if (state.hasProperty(BlockStateProperties.FACING)) {
+			this.facing = state.getValue(BlockStateProperties.FACING);
 		}
 	}
 
@@ -32,6 +36,22 @@ public class SNItemOutputPortBlockEntity extends BlockEntity {
 			return worldPosition.relative(facing);
 		}
 		return targetPos;
+	}
+
+	public ItemStack getFilter() {
+		return filter;
+	}
+	public void setFilter(ItemStack filter) {
+		this.filter = filter.copy();
+		this.filter.setCount(1);
+		setChanged();
+		sync();
+	}
+
+	public void clearFilter() {
+		this.filter = ItemStack.EMPTY;
+		setChanged();
+		sync();
 	}
 
 	public void setTargetPos(BlockPos targetPos) {
@@ -56,6 +76,9 @@ public class SNItemOutputPortBlockEntity extends BlockEntity {
 		if (targetPos != null) {
 			tag.putLong("TargetPos", targetPos.asLong());
 		}
+		if (!filter.isEmpty()) {
+			tag.put("Filter", filter.save(new CompoundTag()));
+		}
 		tag.putInt("Facing", facing.get3DDataValue());
 	}
 
@@ -68,9 +91,45 @@ public class SNItemOutputPortBlockEntity extends BlockEntity {
 		if (tag.contains("Facing")) {
 			facing = Direction.from3DDataValue(tag.getInt("Facing"));
 		}
+		if (tag.contains("Filter")) {
+			filter = ItemStack.of(tag.getCompound("Filter"));
+		} else {
+			filter = ItemStack.EMPTY;
+		}
 	}
 
 	// ========== 同步 ==========
+
+	@Override
+	public CompoundTag getUpdateTag() {
+		CompoundTag tag = super.getUpdateTag();
+		// 总是写入 Filter，即使为空也写一个空 CompoundTag
+		tag.put("Filter", filter.save(new CompoundTag()));  // 重点
+		return tag;
+	}
+
+	@Override
+	public void handleUpdateTag(CompoundTag tag) {
+		super.handleUpdateTag(tag);
+		if (tag.contains("Filter")) {
+			filter = ItemStack.of(tag.getCompound("Filter"));
+		} else {
+			filter = ItemStack.EMPTY;
+		}
+	}
+
+	@Nullable
+	@Override
+	public ClientboundBlockEntityDataPacket getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create(this);
+	}
+
+	@Override
+	public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+		if (pkt.getTag() != null) {
+			handleUpdateTag(pkt.getTag());
+		}
+	}
 	private void sync() {
 		if (level != null && !level.isClientSide) {
 			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);

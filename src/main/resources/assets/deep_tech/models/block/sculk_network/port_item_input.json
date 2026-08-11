@@ -1,5 +1,6 @@
 {
 	"parent": "deep_tech:block/sculk_network/port",
+		"render_type": "cutout",
 	"textures": {
 		"0": "deep_tech:block/sculk_network/io/item_input"
 	}

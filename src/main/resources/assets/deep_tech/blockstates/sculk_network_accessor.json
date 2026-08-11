@@ -1,7 +1,10 @@
 {
-  "variants": {
-    "": {
-      "model": "deep_tech:block/sculk_network/accessor"
-    }
-  }
+	"variants": {
+		"facing=north": { "model": "deep_tech:block/sculk_network/accessor" },
+		"facing=east": { "model": "deep_tech:block/sculk_network/accessor" },
+		"facing=south": { "model": "deep_tech:block/sculk_network/accessor" },
+		"facing=west": { "model": "deep_tech:block/sculk_network/accessor" },
+		"facing=up": { "model": "deep_tech:block/sculk_network/accessor" },
+		"facing=down": { "model": "deep_tech:block/sculk_network/accessor" }
+	}
 }

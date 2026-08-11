@@ -5,10 +5,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-// ✅ 正确：接受 Properties 参数并传递给父类
+// 正确：接 Properties 参数并传递给父类
 public class SNFluidOutputPortBlock extends SNPortBlock {
 	public SNFluidOutputPortBlock(Properties properties) {
-		super(properties);
+		super(properties.noOcclusion());
 	}
 
 	@Override
