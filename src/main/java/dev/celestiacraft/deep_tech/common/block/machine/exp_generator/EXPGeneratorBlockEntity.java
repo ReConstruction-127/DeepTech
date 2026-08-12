@@ -8,9 +8,10 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
+import dev.celestiacraft.deep_tech.api.fluid.SingleTankFluidTransfer;
 import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
-import dev.celestiacraft.deep_tech.api.gui.widget.FluidTankWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.ProportionalTankWidget;
 import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -72,10 +72,8 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 
 	@Override
 	public boolean canFillFluid(int tank, FluidStack stack) {
-		Fluid fluid = stack.getFluid();
-
-		return super.canFillFluid(tank, stack)
-				|| fluid.is(DeepTechFluidTags.EXPERIENCE);
+		// 只接受经验类流体,其他流体一律拒绝填充
+		return isFluidInputTank(tank) && stack.getFluid().is(DeepTechFluidTags.EXPERIENCE);
 	}
 
 	@Override
@@ -131,7 +129,9 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 			int mbPerTick = EXPGeneratorConfig.MB_PER_TICK.get();
 			FluidStack drainStack = entity.getFluidHandler().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.SIMULATE, false);
 
-			if (!drainStack.isEmpty() && drainStack.getAmount() >= mbPerTick) {
+			if (!drainStack.isEmpty()
+					&& drainStack.getAmount() >= mbPerTick
+					&& drainStack.getFluid().is(DeepTechFluidTags.EXPERIENCE)) {
 				entity.getFluidHandler().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.EXECUTE, false);
 				int fePerMb = EXPGeneratorConfig.FE_PER_MB.get();
 				int generated = fePerMb * mbPerTick;
@@ -194,16 +194,17 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				getMachineMaxEnergy()
 		));
 
-		group.addWidget(new FluidTankWidget(
+		// 经验槽:比例填充式流体槽,支持拿着桶点击槽位灌入/抽取
+		group.addWidget(new ProportionalTankWidget(
+				new SingleTankFluidTransfer(getFluidHandler().getTankHandler(getExperienceTank())),
+				0,
 				42,
 				26,
 				16,
 				40,
-				this::getFluidAmount,
-				getFluidCapacity(),
-				() -> getFluidHandler().getFluidInTank(getExperienceTank()),
-				new ResourceTexture(DeepTech.loadGui("elements/tank_back"))
-		));
+				true,
+				true
+		).setBackground(new ResourceTexture(DeepTech.loadGui("elements/tank_back"))));
 
 		// 根据配置动态生成物品槽位: 输入/输出槽数量为 0 时不会创建任何 widget
 		MachineItemSlots.add(

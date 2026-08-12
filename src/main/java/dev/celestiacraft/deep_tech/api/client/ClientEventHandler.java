@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.api.client;
 
+import dev.celestiacraft.deep_tech.api.client.renderer.SNFluidPortRenderer;
 import dev.celestiacraft.deep_tech.api.client.renderer.SNItemPortRenderer;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,6 +23,16 @@ public class ClientEventHandler {
 		event.registerBlockEntityRenderer(
 				DTBlockEntities.SN_ITEM_OUTPUT_PORT.get(),
 				SNItemPortRenderer::new
+		);
+		// 注册流体输入端口渲染器
+		event.registerBlockEntityRenderer(
+				DTBlockEntities.SN_FLUID_INPUT_PORT.get(),
+				SNFluidPortRenderer::new
+		);
+		// 注册流体输出端口渲染器
+		event.registerBlockEntityRenderer(
+				DTBlockEntities.SN_FLUID_OUTPUT_PORT.get(),
+				SNFluidPortRenderer::new
 		);
 	}
 }

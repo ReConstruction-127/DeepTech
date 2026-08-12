@@ -124,6 +124,54 @@ public class MachineFluidHandler implements IFluidHandler, INBTSerializable<Comp
 		return drained;
 	}
 
+	/**
+	 * 返回只暴露指定单个储罐的 IFluidHandler 视图(共享同一份存储)。
+	 * 用于 UI 槽位绑定:让 LDLib TankWidget 的桶点击精确作用于该罐,
+	 * 而不是按聚合 handler 的顺序填到最早的空罐/从最后罐抽取。
+	 */
+	public IFluidHandler getTankHandler(int tank) {
+		return new IFluidHandler() {
+			@Override
+			public int getTanks() {
+				return 1;
+			}
+
+			@Override
+			public @NotNull FluidStack getFluidInTank(int t) {
+				return MachineFluidHandler.this.getFluidInTank(tank);
+			}
+
+			@Override
+			public int getTankCapacity(int t) {
+				return MachineFluidHandler.this.getTankCapacity(tank);
+			}
+
+			@Override
+			public boolean isFluidValid(int t, @NotNull FluidStack stack) {
+				return MachineFluidHandler.this.isFluidValid(tank, stack);
+			}
+
+			@Override
+			public int fill(FluidStack resource, FluidAction action) {
+				return fillTank(tank, resource, action, true);
+			}
+
+			@Override
+			public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
+				FluidStack stored = fluids[tank];
+				if (stored.isEmpty() || !stored.isFluidEqual(resource)) {
+					return FluidStack.EMPTY;
+				}
+				return drainTank(tank, resource.getAmount(), action, true);
+			}
+
+			@Override
+			public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+				return drainTank(tank, maxDrain, action, true);
+			}
+		};
+	}
+
 	public int fillTank(int tank, FluidStack resource, FluidAction action, boolean checkFillPolicy) {
 		if (!isTankValid(tank) || resource.isEmpty()) {
 			return 0;

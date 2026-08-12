@@ -2,11 +2,14 @@ package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir
 
 import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
-import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
-import com.lowdragmc.lowdraglib.gui.widget.ButtonWidget;
+import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
+import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
+import com.lowdragmc.lowdraglib.utils.Position;
+import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -45,10 +48,13 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 
 	@Override
 	public ModularUI createUI(Player player) {
+		ModularUI ui = new ModularUI(176, 222, this, player);
 		WidgetGroup main = new WidgetGroup(0, 0, 176, 222);
+		main.setBackground(new ResourceTexture(DeepTech.loadGui("item_reservoir")));
 
-		// 背景（可用纯色或纹理）
-		main.addWidget(new ButtonWidget(0, 0, 176, 222, btn -> {}));
+		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.SN_ITEM_RESERVOIR.get().getName());
+		title.setColor(0xFF5D5F60);
+		main.addWidget(title);
 
 		// 储存器槽位（6行×9列）
 		int index = 0;
@@ -56,10 +62,8 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 			for (int col = 0; col < 9; col++) {
 				int x = 8 + col * 18;
 				int y = 18 + row * 18;
-				// SlotWidget 需要 Container 或 IItemTransfer，用 SimpleMachineInventory 包装 ItemStackHandler
-				SlotWidget slot = new SlotWidget(new SimpleMachineInventory(inventory), index, x, y, true, true)
-						.setBackgroundTexture(IGuiTexture.EMPTY);
-				main.addWidget(slot);
+				// 与机器槽位一致:new + setContainerSlot(SimpleMachineInventory 包装 ItemStackHandler)
+				addMachineSlot(main, new SimpleMachineInventory(inventory), index, x, y);
 				index++;
 			}
 		}
@@ -70,9 +74,7 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 			for (int col = 0; col < 9; col++) {
 				int x = 8 + col * 18;
 				int y = 140 + row * 18;
-				SlotWidget slot = new SlotWidget(playerInv, 9 + row * 9 + col, x, y, true, true)
-						.setBackgroundTexture(IGuiTexture.EMPTY);
-				main.addWidget(slot);
+				addPlayerSlot(main, playerInv, 9 + row * 9 + col, x, y);
 			}
 		}
 
@@ -80,12 +82,33 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 		for (int col = 0; col < 9; col++) {
 			int x = 8 + col * 18;
 			int y = 198;
-			SlotWidget slot = new SlotWidget(playerInv, col, x, y, true, true)
-					.setBackgroundTexture(IGuiTexture.EMPTY);
-			main.addWidget(slot);
+			addPlayerSlot(main, playerInv, col, x, y);
 		}
 
-		return new ModularUI(176, 222, this, player).widget(main);
+		return ui.widget(main);
+	}
+
+	// 机器槽位（与 MachineItemSlots.createSlot 一致,isPlayerContainer 默认为 false）
+	private void addMachineSlot(WidgetGroup group, Container container, int slotIndex, int x, int y) {
+		SlotWidget slot = new SlotWidget();
+		slot.setContainerSlot(container, slotIndex);
+		slot.setSelfPosition(new Position(x, y));
+		slot.setBackground((ResourceTexture) null);
+		slot.setCanTakeItems(true);
+		slot.setCanPutItems(true);
+		group.addWidget(slot);
+	}
+
+	// 玩家槽位（与 MachineBlockEntity.addPlayerInventory 一致,isPlayerContainer 必须为 true,
+	// shift-click 时 LDLib 才把这里当作玩家背包目标槽）
+	private void addPlayerSlot(WidgetGroup group, Container container, int slotIndex, int x, int y) {
+		SlotWidget slot = new SlotWidget();
+		slot.initTemplate();
+		slot.setContainerSlot(container, slotIndex);
+		slot.isPlayerContainer = true;
+		slot.setSelfPosition(new Position(x, y));
+		slot.setBackground((ResourceTexture) null);
+		group.addWidget(slot);
 	}
 
 	@Override

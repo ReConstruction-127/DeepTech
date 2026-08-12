@@ -1,7 +1,10 @@
 package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center;
 
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidInputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidOutputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemInputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
@@ -25,6 +28,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
@@ -55,6 +60,9 @@ public class SNCenterBlockEntity extends BlockEntity {
 	private final List<BlockPos> foundReservoirs = new ArrayList<>();
 	private final List<BlockPos> foundItemInputPorts = new ArrayList<>();
 	private final List<BlockPos> foundItemOutputPorts = new ArrayList<>();  // 新增
+	private final List<BlockPos> foundFluidReservoirs = new ArrayList<>();
+	private final List<BlockPos> foundFluidInputPorts = new ArrayList<>();
+	private final List<BlockPos> foundFluidOutputPorts = new ArrayList<>();
 
 	// ========== 物品转运控制 ==========
 	private int tickCounter = 0;
@@ -93,6 +101,8 @@ public class SNCenterBlockEntity extends BlockEntity {
 		if (be.tickCounter % TRANSFER_INTERVAL == 0) {
 			be.transferItemsFromInputPorts((ServerLevel) level);
 			be.transferItemsToOutputPorts((ServerLevel) level);   // 新增
+			be.transferFluidsFromInputPorts((ServerLevel) level);   // 新增
+			be.transferFluidsToOutputPorts((ServerLevel) level);     // 新增
 		}
 	}
 
@@ -149,6 +159,15 @@ public class SNCenterBlockEntity extends BlockEntity {
 			if (blockAt == MachineBlocks.SN_ITEM_OUTPUT_PORT.get()) {   // 新增
 				foundItemOutputPorts.add(current);
 			}
+			if (blockAt == MachineBlocks.SN_FLUID_RESERVOIR.get()) {
+				foundFluidReservoirs.add(current);
+			}
+			if (blockAt == MachineBlocks.SN_FLUID_INPUT_PORT.get()) {
+				foundFluidInputPorts.add(current);
+			}
+			if (blockAt == MachineBlocks.SN_FLUID_OUTPUT_PORT.get()) {
+				foundFluidOutputPorts.add(current);
+			}
 
 			if (distance >= 16) continue;
 
@@ -167,6 +186,9 @@ public class SNCenterBlockEntity extends BlockEntity {
 		foundReservoirs.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
 		foundItemInputPorts.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
 		foundItemOutputPorts.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
+		foundFluidReservoirs.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
+		foundFluidInputPorts.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
+		foundFluidOutputPorts.sort(Comparator.comparingDouble(pos -> pos.distSqr(center)));
 
 		// ----- 冲突检测逻辑 -----
 		// 统计网络中所有中枢的主控状态
@@ -357,7 +379,97 @@ public class SNCenterBlockEntity extends BlockEntity {
 					if (inserted > 0) {
 						resHandler.extractItem(slot, inserted, false);
 						reservoir.setChanged();
-						return; // 每次只转移一组
+						break; // 每次只转移一组
+					}
+				}
+			}
+		}
+	}
+
+
+	private static final int FLUID_TRANSFER_RATE = 50; // 每 tick 传输 50 mB = 1000 mB/s
+
+	private void transferFluidsFromInputPorts(ServerLevel level) {
+		for (BlockPos portPos : foundFluidInputPorts) {
+			BlockState portState = level.getBlockState(portPos);
+			if (portState.getBlock() != MachineBlocks.SN_FLUID_INPUT_PORT.get()) continue;
+
+			BlockEntity portBe = level.getBlockEntity(portPos);
+			if (!(portBe instanceof SNFluidInputPortBlockEntity inputPort)) continue;
+			FluidStack filter = inputPort.getFilter();
+
+			LazyOptional<IFluidHandler> targetCap = inputPort.getTargetFluidHandler();
+			if (!targetCap.isPresent()) continue;
+			IFluidHandler targetHandler = targetCap.orElse(null);
+			if (targetHandler == null) continue;
+
+			// 尝试从目标容器抽取流体
+			FluidStack drained = targetHandler.drain(FLUID_TRANSFER_RATE, IFluidHandler.FluidAction.SIMULATE);
+			if (drained.isEmpty()) continue;
+
+			// 过滤检查
+			if (!filter.isEmpty() && !drained.isFluidEqual(filter)) continue;
+
+			// 尝试存入最近的储存器
+			FluidStack toInsert = drained.copy();
+			for (BlockPos resPos : foundFluidReservoirs) {
+				BlockEntity resBe = level.getBlockEntity(resPos);
+				if (!(resBe instanceof SNFluidReservoirBlockEntity reservoir)) continue;
+				IFluidHandler resHandler = reservoir.getTank();
+
+				int filled = resHandler.fill(toInsert, IFluidHandler.FluidAction.SIMULATE);
+				if (filled > 0) {
+					// 先从源容器真正抽取
+					FluidStack actualDrained = targetHandler.drain(filled, IFluidHandler.FluidAction.EXECUTE);
+					if (!actualDrained.isEmpty()) {
+						resHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
+						reservoir.setChanged();
+						break; // 一次只处理一个端口
+					}
+				}
+			}
+		}
+	}
+
+	private void transferFluidsToOutputPorts(ServerLevel level) {
+		if (foundFluidReservoirs.isEmpty() || foundFluidOutputPorts.isEmpty()) return;
+
+		for (BlockPos portPos : foundFluidOutputPorts) {
+			BlockState portState = level.getBlockState(portPos);
+			if (portState.getBlock() != MachineBlocks.SN_FLUID_OUTPUT_PORT.get()) continue;
+
+			BlockEntity portBe = level.getBlockEntity(portPos);
+			if (!(portBe instanceof SNFluidOutputPortBlockEntity outputPort)) continue;
+			FluidStack filter = outputPort.getFilter();
+
+			// 获取目标容器
+			LazyOptional<IFluidHandler> targetCap = outputPort.getTargetFluidHandler();
+			if (!targetCap.isPresent()) continue;
+			IFluidHandler targetHandler = targetCap.orElse(null);
+			if (targetHandler == null) continue;
+
+			// 从最近的流体储存器抽取
+			for (BlockPos resPos : foundFluidReservoirs) {
+				BlockEntity resBe = level.getBlockEntity(resPos);
+				if (!(resBe instanceof SNFluidReservoirBlockEntity reservoir)) continue;
+				IFluidHandler resHandler = reservoir.getTank();
+
+				// 模拟抽取
+				FluidStack drained = resHandler.drain(FLUID_TRANSFER_RATE, IFluidHandler.FluidAction.SIMULATE);
+				if (drained.isEmpty()) continue;
+
+				// 过滤检查
+				if (!filter.isEmpty() && !drained.isFluidEqual(filter)) continue;
+
+				// 尝试推入目标容器
+				int filled = targetHandler.fill(drained, IFluidHandler.FluidAction.SIMULATE);
+				if (filled > 0) {
+					// 真正抽取
+					FluidStack actualDrained = resHandler.drain(filled, IFluidHandler.FluidAction.EXECUTE);
+					if (!actualDrained.isEmpty()) {
+						targetHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
+						reservoir.setChanged();
+						return; // 每次只处理一组
 					}
 				}
 			}

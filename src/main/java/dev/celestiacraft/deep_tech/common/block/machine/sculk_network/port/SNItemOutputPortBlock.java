@@ -33,7 +33,7 @@ public class SNItemOutputPortBlock extends SNPortBlock {
 		}
 
 		if (player.isShiftKeyDown()) {
-			player.displayClientMessage(Component.literal("Hold shift to prevent accidental change"), true);
+			// 按住Shift防误触，可以不加提示，直接返回
 			return InteractionResult.SUCCESS;
 		}
 
