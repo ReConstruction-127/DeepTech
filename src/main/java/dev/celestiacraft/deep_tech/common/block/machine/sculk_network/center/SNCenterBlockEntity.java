@@ -6,17 +6,15 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNIte
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
-import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
+import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -25,6 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -32,11 +31,20 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import javax.annotation.Nullable;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
-public class SNCenterBlockEntity extends BlockEntity {
+public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBlockEntity<SNCenterBlockEntity> {
 
 
 
@@ -68,41 +76,42 @@ public class SNCenterBlockEntity extends BlockEntity {
 	private int tickCounter = 0;
 	private static final int TRANSFER_INTERVAL = 10; // 每 10 Tick 转运一次
 
+	private final LazyOptional<IEnergyStorage> energyCap = LazyOptional.of(this::getEnergyCapability);
+
 
 	public SNCenterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
 
 	// ============================================================
-	//  Tick 调度
+	//  Tick 调度（由 IEntityBlock 默认 ticker 驱动,仅服务端）
 	// ============================================================
 
-	public static void tick(Level level, BlockPos pos, BlockState state, SNCenterBlockEntity be) {
-		if (level.isClientSide) return;
-
+	@Override
+	public void serverTick(Level level, BlockPos pos, BlockState state, SNCenterBlockEntity entity) {
 		// 1. 如果自身已被移除（比如爆炸后），不再执行
-		if (be.isRemoved()) return;
+		if (isRemoved()) return;
 
 		// 2. 扫描与冲突检测（每秒一次）
-		be.scanCooldown--;
-		if (be.scanCooldown <= 0) {
-			be.scanCooldown = SCAN_INTERVAL;
-			be.performScan((ServerLevel) level, pos);
+		scanCooldown--;
+		if (scanCooldown <= 0) {
+			scanCooldown = SCAN_INTERVAL;
+			performScan((ServerLevel) level, pos);
 		}
 
 		// 3. 更新调试标记（若 BE 还在）
-		if (!be.isRemoved()) {
-			be.cleanupDebugMarkers((ServerLevel) level);
-			be.applyDebugMarkers((ServerLevel) level);
+		if (!isRemoved()) {
+			cleanupDebugMarkers((ServerLevel) level);
+			applyDebugMarkers((ServerLevel) level);
 		}
 
 		// 4. 物品转运：从网络中的输入端口抽取物品存入最近的贮存器
-		be.tickCounter++;
-		if (be.tickCounter % TRANSFER_INTERVAL == 0) {
-			be.transferItemsFromInputPorts((ServerLevel) level);
-			be.transferItemsToOutputPorts((ServerLevel) level);   // 新增
-			be.transferFluidsFromInputPorts((ServerLevel) level);   // 新增
-			be.transferFluidsToOutputPorts((ServerLevel) level);     // 新增
+		tickCounter++;
+		if (tickCounter % TRANSFER_INTERVAL == 0) {
+			transferItemsFromInputPorts((ServerLevel) level);
+			transferItemsToOutputPorts((ServerLevel) level);   // 新增
+			transferFluidsFromInputPorts((ServerLevel) level);   // 新增
+			transferFluidsToOutputPorts((ServerLevel) level);     // 新增
 		}
 	}
 
@@ -116,13 +125,17 @@ public class SNCenterBlockEntity extends BlockEntity {
 			return;
 		}
 		energyStored -= SCAN_COST;
-		setChanged();
+		markDirty();
 
 		// 保存旧结果
 		previousScanResult = new HashSet<>(currentScanResult);
 		currentScanResult = new HashSet<>();
 		foundReservoirs.clear();
 		foundItemInputPorts.clear();
+		foundItemOutputPorts.clear();
+		foundFluidReservoirs.clear();
+		foundFluidInputPorts.clear();
+		foundFluidOutputPorts.clear();
 
 		// BFS 队列
 		Queue<BlockPos> queue = new ArrayDeque<>();
@@ -209,9 +222,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 		if (masterCenters.isEmpty()) {
 			// 自动成为主控
 			this.isMaster = true;
-			setChanged();
-			// 发送状态更新（可选）
-			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+			markDirtyAndUpdate();
 			return;
 		}
 
@@ -378,7 +389,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 
 					if (inserted > 0) {
 						resHandler.extractItem(slot, inserted, false);
-						reservoir.setChanged();
+						reservoir.markAsDirty();
 						break; // 每次只转移一组
 					}
 				}
@@ -423,7 +434,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 					FluidStack actualDrained = targetHandler.drain(filled, IFluidHandler.FluidAction.EXECUTE);
 					if (!actualDrained.isEmpty()) {
 						resHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
-						reservoir.setChanged();
+						reservoir.markAsDirty();
 						break; // 一次只处理一个端口
 					}
 				}
@@ -468,7 +479,7 @@ public class SNCenterBlockEntity extends BlockEntity {
 					FluidStack actualDrained = resHandler.drain(filled, IFluidHandler.FluidAction.EXECUTE);
 					if (!actualDrained.isEmpty()) {
 						targetHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
-						reservoir.setChanged();
+						reservoir.markAsDirty();
 						return; // 每次只处理一组
 					}
 				}
@@ -546,11 +557,11 @@ public class SNCenterBlockEntity extends BlockEntity {
 	//  能量 Capability
 	// ============================================================
 
-	public IEnergyStorage getEnergyCapability() {
+	private IEnergyStorage getEnergyCapability() {
 		return new IEnergyStorage() {
 			@Override public int receiveEnergy(int maxReceive, boolean simulate) {
 				int received = Math.min(maxReceive, MAX_ENERGY - energyStored);
-				if (!simulate) { energyStored += received; setChanged(); }
+				if (!simulate) { energyStored += received; markDirty(); }
 				return received;
 			}
 			@Override public int extractEnergy(int maxExtract, boolean simulate) { return 0; }
@@ -562,13 +573,17 @@ public class SNCenterBlockEntity extends BlockEntity {
 	}
 
 	@Override
-	public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(
-			net.minecraftforge.common.capabilities.Capability<T> cap,
-			@Nullable Direction side) {
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
 		if (cap == ForgeCapabilities.ENERGY) {
-			return net.minecraftforge.common.util.LazyOptional.of(this::getEnergyCapability).cast();
+			return energyCap.cast();
 		}
 		return super.getCapability(cap, side);
+	}
+
+	@Override
+	protected void onCapsInvalidated() {
+		super.onCapsInvalidated();
+		energyCap.invalidate();
 	}
 
 	// ============================================================
@@ -576,30 +591,14 @@ public class SNCenterBlockEntity extends BlockEntity {
 	// ============================================================
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	protected void write(CompoundTag tag) {
 		tag.putInt("Energy", energyStored);
 		tag.putBoolean("IsMaster", isMaster);
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void read(CompoundTag tag) {
 		energyStored = tag.getInt("Energy");
 		isMaster = tag.getBoolean("IsMaster");
 	}
-
-
-
-
-	private void sync() {
-		if (level != null && !level.isClientSide) {
-			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-		}
-	}
-
-
-
-
-
 }

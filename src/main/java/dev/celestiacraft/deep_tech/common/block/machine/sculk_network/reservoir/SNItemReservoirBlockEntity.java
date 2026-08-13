@@ -10,12 +10,12 @@ import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -23,9 +23,10 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder.BlockEntityUI {
+public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIHolder.BlockEntityUI {
 	public SNItemReservoirBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
@@ -34,7 +35,7 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 	private final ItemStackHandler inventory = new ItemStackHandler(54) {
 		@Override
 		protected void onContentsChanged(int slot) {
-			setChanged();
+			markDirty();
 		}
 	};
 
@@ -118,22 +119,12 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 
 	@Override
 	public boolean isRemote() {
-		return this.level != null && this.level.isClientSide;
+		return isClient();
 	}
 
 	@Override
 	public void markAsDirty() {
-		this.setChanged();
-	}
-
-	// ============================================================
-	//  同步方法（LDLib 自动同步）
-	// ============================================================
-
-	private void sync() {
-		if (level != null && !level.isClientSide) {
-			level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-		}
+		this.markDirty();
 	}
 
 	// ============================================================
@@ -141,7 +132,7 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 	// ============================================================
 
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+	public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
 		if (cap == ForgeCapabilities.ITEM_HANDLER) {
 			return inventoryCap.cast();
 		}
@@ -149,8 +140,8 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 	}
 
 	@Override
-	public void invalidateCaps() {
-		super.invalidateCaps();
+	protected void onCapsInvalidated() {
+		super.onCapsInvalidated();
 		inventoryCap.invalidate();
 	}
 
@@ -159,14 +150,12 @@ public class SNItemReservoirBlockEntity extends BlockEntity implements IUIHolder
 	// ============================================================
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	protected void write(CompoundTag tag) {
 		tag.put("Inventory", inventory.serializeNBT());
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void read(CompoundTag tag) {
 		inventory.deserializeNBT(tag.getCompound("Inventory"));
 	}
 }

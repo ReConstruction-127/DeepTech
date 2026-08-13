@@ -11,11 +11,12 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNHel
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
+import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -39,7 +40,7 @@ import java.util.Set;
  * 网络发现方式与中枢一致:BFS 沿网络组件扩展(半径 16 格),
  * 不过度依赖中枢的扫描结果,访问器自身即可定位储存器。
  */
-public class SNAccessorBlockEntity extends BlockEntity implements IUIHolder.BlockEntityUI {
+public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder.BlockEntityUI, ITickableBlockEntity<SNAccessorBlockEntity> {
 
 	public record ItemEntry(ItemStack stack, long count) {
 	}
@@ -60,14 +61,12 @@ public class SNAccessorBlockEntity extends BlockEntity implements IUIHolder.Bloc
 	}
 
 	// ============================================================
-	//  Tick(驱动汇总缓存刷新)
+	//  Tick(驱动汇总缓存刷新,由 IEntityBlock 默认 ticker 驱动)
 	// ============================================================
 
-	public static void tick(Level level, BlockPos pos, BlockState state, SNAccessorBlockEntity be) {
-		if (level.isClientSide) {
-			return;
-		}
-		be.refreshIfNeeded();
+	@Override
+	public void serverTick(Level level, BlockPos pos, BlockState state, SNAccessorBlockEntity entity) {
+		refreshIfNeeded();
 	}
 
 	/**

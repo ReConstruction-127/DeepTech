@@ -11,12 +11,12 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.fluid.SingleTankFluidTransfer;
 import dev.celestiacraft.deep_tech.api.gui.widget.ProportionalTankWidget;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -28,7 +28,7 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class SNFluidReservoirBlockEntity extends BlockEntity implements IUIHolder.BlockEntityUI {
+public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUIHolder.BlockEntityUI {
 	// 9 个 8B 储罐 (8 * 1000 = 8000 mB),总容量 72B = 72000 mB
 	public static final int TANK_COUNT = 9;
 	public static final int TANK_CAPACITY = 8 * 1000;
@@ -147,8 +147,7 @@ public class SNFluidReservoirBlockEntity extends BlockEntity implements IUIHolde
 			tanks[i] = new FluidTank(TANK_CAPACITY) {
 				@Override
 				protected void onContentsChanged() {
-					setChanged();
-					sync();
+					markDirtyAndUpdate();
 				}
 			};
 		}
@@ -181,7 +180,7 @@ public class SNFluidReservoirBlockEntity extends BlockEntity implements IUIHolde
 
 	// ========== Capability ==========
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
+	public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
 		if (cap == ForgeCapabilities.FLUID_HANDLER) {
 			return tankCap.cast();
 		}
@@ -189,32 +188,23 @@ public class SNFluidReservoirBlockEntity extends BlockEntity implements IUIHolde
 	}
 
 	@Override
-	public void invalidateCaps() {
-		super.invalidateCaps();
+	protected void onCapsInvalidated() {
+		super.onCapsInvalidated();
 		tankCap.invalidate();
 	}
 
 	// ========== NBT ==========
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
-		super.saveAdditional(tag);
+	protected void write(CompoundTag tag) {
 		for (int i = 0; i < TANK_COUNT; i++) {
 			tag.put("Tank" + i, tanks[i].writeToNBT(new CompoundTag()));
 		}
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
-		super.load(tag);
+	protected void read(CompoundTag tag) {
 		for (int i = 0; i < TANK_COUNT; i++) {
 			tanks[i].readFromNBT(tag.getCompound("Tank" + i));
-		}
-	}
-
-	// ========== 同步 ==========
-	private void sync() {
-		if (level != null && !level.isClientSide) {
-			level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
 		}
 	}
 
@@ -282,11 +272,11 @@ public class SNFluidReservoirBlockEntity extends BlockEntity implements IUIHolde
 
 	@Override
 	public boolean isRemote() {
-		return this.level != null && this.level.isClientSide;
+		return isClient();
 	}
 
 	@Override
 	public void markAsDirty() {
-		this.setChanged();
+		this.markDirty();
 	}
 }

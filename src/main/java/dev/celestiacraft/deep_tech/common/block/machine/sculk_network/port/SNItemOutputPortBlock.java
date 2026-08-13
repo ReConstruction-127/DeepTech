@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port;
 
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
+import dev.celestiacraft.libs.api.register.block.IEntityBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -8,18 +9,23 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class SNItemOutputPortBlock extends SNPortBlock {
+public class SNItemOutputPortBlock extends SNPortBlock implements IEntityBlock<SNItemOutputPortBlockEntity> {
 	public SNItemOutputPortBlock(Properties properties) {
 		super(properties.noOcclusion());
 	}
 
 	@Override
-	public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new SNItemOutputPortBlockEntity(DTBlockEntities.SN_ITEM_OUTPUT_PORT.get(), pos, state);
+	public BlockEntityType<SNItemOutputPortBlockEntity> getBlockEntityType() {
+		return DTBlockEntities.SN_ITEM_OUTPUT_PORT.get();
+	}
+
+	@Override
+	public Class<SNItemOutputPortBlockEntity> getBlockEntityClass() {
+		return SNItemOutputPortBlockEntity.class;
 	}
 
 	@Override
@@ -27,8 +33,7 @@ public class SNItemOutputPortBlock extends SNPortBlock {
 	                             Player player, InteractionHand hand, BlockHitResult hit) {
 		if (level.isClientSide) return InteractionResult.SUCCESS;
 
-		BlockEntity be = level.getBlockEntity(pos);
-		if (!(be instanceof SNItemOutputPortBlockEntity portBe)) {
+		if (!(level.getBlockEntity(pos) instanceof SNItemOutputPortBlockEntity portBe)) {
 			return InteractionResult.PASS;
 		}
 
