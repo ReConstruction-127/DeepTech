@@ -9,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
 
 // 正确：接 Properties 参数并传递给父类
 public class SNFluidInputPortBlock extends SNPortBlock<SNFluidInputPortBlockEntity> {
@@ -47,8 +46,8 @@ public class SNFluidInputPortBlock extends SNPortBlock<SNFluidInputPortBlockEnti
 			port.clearFilter();
 			player.displayClientMessage(Component.literal("Fluid filter cleared"), true);
 		} else {
-			// 尝试从物品中提取流体（桶、瓶等）
-			FluidStack fluidStack = FluidUtil.getFluidContained(held).orElse(FluidStack.EMPTY);
+			// 尝试从物品中提取流体(原版桶/模组容器)
+			FluidStack fluidStack = getContainedFluid(held);
 			if (!fluidStack.isEmpty()) {
 				port.setFilter(fluidStack);
 				player.displayClientMessage(Component.literal("Filter set: " + fluidStack.getDisplayName()), true);

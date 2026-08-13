@@ -3,15 +3,21 @@ package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port;
 import dev.celestiacraft.libs.api.register.block.BasicEntityBlock;
 import dev.celestiacraft.libs.api.register.block.BlockFacing;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 
 /**
  * 端口基类:继承 {@link BasicEntityBlock},BE 由 IEntityBlock 默认实现创建与 tick,
@@ -49,5 +55,23 @@ public abstract class SNPortBlock<T extends BlockEntity> extends BasicEntityBloc
 	@Override
 	public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
 		return Shapes.empty();
+	}
+
+	/**
+	 * 提取手持物品所含的流体(用于设置端口过滤)。
+	 * <p>
+	 * Forge 1.20.1 的 {@link FluidUtil#getFluidContained} 依赖物品注册
+	 * {@code FLUID_HANDLER_ITEM} capability,而原版 {@link BucketItem} 并未注册,
+	 * 对水桶/熔岩桶会漏识别(返回空)。因此先走 {@link BucketItem#getFluid()} 直取,
+	 * 再兜底 capability 路线(模组容器、瓶等)。
+	 */
+	protected static FluidStack getContainedFluid(ItemStack stack) {
+		if (stack.getItem() instanceof BucketItem bucket) {
+			Fluid fluid = bucket.getFluid();
+			if (fluid != Fluids.EMPTY) {
+				return new FluidStack(fluid, 1000);
+			}
+		}
+		return FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
 	}
 }
