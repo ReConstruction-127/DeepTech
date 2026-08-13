@@ -4,8 +4,10 @@ import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
+import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
+import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNHelper;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
@@ -14,11 +16,15 @@ import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -114,7 +120,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 			if (pos.distSqr(worldPosition) >= 16 * 16) {
 				continue;
 			}
-			for (var dir : net.minecraft.core.Direction.values()) {
+			for (var dir : Direction.values()) {
 				BlockPos neighbor = pos.relative(dir);
 				if (!visited.contains(neighbor) && SNHelper.isNetworkComponent(level, neighbor)) {
 					visited.add(neighbor);
@@ -124,8 +130,8 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		}
 
 		// 聚合物品:按物品 ID 合并数量,图标取首个遇到的堆
-		Map<net.minecraft.world.item.Item, long[]> itemCounts = new HashMap<>();
-		Map<net.minecraft.world.item.Item, ItemStack> itemIcons = new HashMap<>();
+		Map<Item, long[]> itemCounts = new HashMap<>();
+		Map<Item, ItemStack> itemIcons = new HashMap<>();
 		for (SNItemReservoirBlockEntity reservoir : itemReservoirs) {
 			IItemHandler handler = reservoir.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
 			if (handler == null) {
@@ -149,8 +155,8 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		}
 
 		// 聚合流体:按流体 ID 合并数量
-		Map<net.minecraft.world.level.material.Fluid, long[]> fluidCounts = new HashMap<>();
-		Map<net.minecraft.world.level.material.Fluid, FluidStack> fluidIcons = new HashMap<>();
+		Map<Fluid, long[]> fluidCounts = new HashMap<>();
+		Map<Fluid, FluidStack> fluidIcons = new HashMap<>();
 		for (SNFluidReservoirBlockEntity reservoir : fluidReservoirs) {
 			IFluidHandler handler = reservoir.getTank();
 			if (handler == null) {
@@ -212,7 +218,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		group.addWidget(fluidList);
 
 		// 玩家背包(3 行)+ 快捷栏(1 行)
-		net.minecraft.world.Container inventory = player.getInventory();
+		Container inventory = player.getInventory();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
 				addPlayerSlot(group, inventory, row * 9 + col + 9, 7 + col * 18, 128 + row * 18);
@@ -225,13 +231,13 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		return group;
 	}
 
-	private void addPlayerSlot(WidgetGroup group, net.minecraft.world.Container container, int slotIndex, int x, int y) {
-		com.lowdragmc.lowdraglib.gui.widget.SlotWidget slot = new com.lowdragmc.lowdraglib.gui.widget.SlotWidget();
+	private void addPlayerSlot(WidgetGroup group, Container container, int slotIndex, int x, int y) {
+		SlotWidget slot = new SlotWidget();
 		slot.initTemplate();
 		slot.setContainerSlot(container, slotIndex);
 		slot.isPlayerContainer = true;
-		slot.setSelfPosition(new com.lowdragmc.lowdraglib.utils.Position(x, y));
-		slot.setBackground((com.lowdragmc.lowdraglib.gui.texture.ResourceTexture) null);
+		slot.setSelfPosition(new Position(x, y));
+		slot.setBackground((ResourceTexture) null);
 		group.addWidget(slot);
 	}
 

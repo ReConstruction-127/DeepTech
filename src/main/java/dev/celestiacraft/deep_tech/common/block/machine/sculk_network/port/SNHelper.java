@@ -41,10 +41,8 @@ public class SNHelper {
 				}
 			}
 
-			// 只沿网络组件扩展（超过 16 格停止，但此处用距离检查？由于BFS天然按层扩展，我们可以在入队前检查距离）
-			// 但为避免无限扩展，我们在入队时检查距离（起始点距离）
-			int distance = (int) Math.sqrt(pos.distSqr(start)); // 粗略距离
-			if (distance >= 16) continue;
+			// 只沿网络组件扩展（起点 16 格半径内,入队前用距离平方检查,避免开方）
+			if (pos.distSqr(start) >= 16 * 16) continue;
 
 			for (Direction dir : Direction.values()) {
 				BlockPos neighbor = pos.relative(dir);

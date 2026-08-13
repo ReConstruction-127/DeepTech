@@ -16,22 +16,20 @@ import net.minecraftforge.items.IItemHandler;
 public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 	// 目标容器位置（可配置，初版使用方块面向方向）
 	private BlockPos targetPos = null;
-	private Direction facing = Direction.NORTH; // 默认方向，可后期改为从方块状态获取
 	private ItemStack filter = ItemStack.EMPTY;
 
 	public SNItemOutputPortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-		// 从方块状态获取朝向（端口方块使用 FACING,六面）
-		if (state.hasProperty(BlockStateProperties.FACING)) {
-			this.facing = state.getValue(BlockStateProperties.FACING);
-		}
 	}
 
-	// 获取目标容器位置（根据朝向自动计算）
+	// 获取目标容器位置（根据朝向自动计算,朝向实时读取自方块状态）
 	public BlockPos getTargetPos() {
 		if (targetPos == null && level != null) {
-			// 默认朝方块面向方向偏移一格
-			return worldPosition.relative(facing);
+			BlockState state = getState();
+			if (state.hasProperty(BlockStateProperties.FACING)) {
+				return worldPosition.relative(state.getValue(BlockStateProperties.FACING));
+			}
+			return null;
 		}
 		return targetPos;
 	}
@@ -62,10 +60,13 @@ public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 		if (pos == null) return LazyOptional.empty();
 		BlockEntity be = level.getBlockEntity(pos);
 		if (be == null) return LazyOptional.empty();
-		return be.getCapability(ForgeCapabilities.ITEM_HANDLER, facing.getOpposite());
+		BlockState state = getState();
+		if (!state.hasProperty(BlockStateProperties.FACING)) return LazyOptional.empty();
+		Direction side = state.getValue(BlockStateProperties.FACING).getOpposite();
+		return be.getCapability(ForgeCapabilities.ITEM_HANDLER, side);
 	}
 
-	// ========== NBT(持久化) ==========
+	// ========== NBT(持久化,朝向由方块状态持有,无需存储) ==========
 	@Override
 	protected void write(CompoundTag tag) {
 		if (targetPos != null) {
@@ -74,13 +75,11 @@ public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 		if (!filter.isEmpty()) {
 			tag.put("Filter", filter.save(new CompoundTag()));
 		}
-		tag.putInt("Facing", facing.get3DDataValue());
 	}
 
 	@Override
 	protected void read(CompoundTag tag) {
 		targetPos = tag.contains("TargetPos") ? BlockPos.of(tag.getLong("TargetPos")) : null;
-		facing = tag.contains("Facing") ? Direction.from3DDataValue(tag.getInt("Facing")) : Direction.NORTH;
 		filter = tag.contains("Filter") ? ItemStack.of(tag.getCompound("Filter")) : ItemStack.EMPTY;
 	}
 
@@ -88,12 +87,10 @@ public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 	@Override
 	protected void writeSync(CompoundTag tag) {
 		tag.put("Filter", filter.save(new CompoundTag()));
-		tag.putInt("Facing", facing.get3DDataValue());
 	}
 
 	@Override
 	protected void readSync(CompoundTag tag) {
 		filter = tag.contains("Filter") ? ItemStack.of(tag.getCompound("Filter")) : ItemStack.EMPTY;
-		facing = tag.contains("Facing") ? Direction.from3DDataValue(tag.getInt("Facing")) : Direction.NORTH;
 	}
 }

@@ -2,11 +2,11 @@ package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center;
 
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidInputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidOutputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNHelper;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemInputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
-import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
@@ -488,30 +488,7 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBl
 	}
 
 	private boolean isNetworkComponent(ServerLevel level, BlockPos pos) {
-		BlockState state = level.getBlockState(pos);
-		var block = state.getBlock();
-
-		// —— 中枢 ——
-		if (block == MachineBlocks.SN_CENTER.get()) return true;
-
-		// —— 脉络（厚 / 薄） ——
-		if (block == BasicBlocks.SCULK_NETWORK_BLOCK.get()) return true;
-		if (block == BasicBlocks.SCULK_NETWORK_VEIN.get()) return true;
-
-		// —— 端口 ——
-		if (block == MachineBlocks.SN_ITEM_INPUT_PORT.get()) return true;
-		if (block == MachineBlocks.SN_ITEM_OUTPUT_PORT.get()) return true;
-		if (block == MachineBlocks.SN_FLUID_INPUT_PORT.get()) return true;
-		if (block == MachineBlocks.SN_FLUID_OUTPUT_PORT.get()) return true;
-
-		// —— 存储 ——
-		if (block == MachineBlocks.SN_ITEM_RESERVOIR.get()) return true;
-		if (block == MachineBlocks.SN_FLUID_RESERVOIR.get()) return true;
-
-		// —— 访问器 ——
-		if (block == MachineBlocks.SN_ACCESSOR.get()) return true;
-
-		return false;
+		return SNHelper.isNetworkComponent(level, pos);
 	}
 
 	// ============================================================
