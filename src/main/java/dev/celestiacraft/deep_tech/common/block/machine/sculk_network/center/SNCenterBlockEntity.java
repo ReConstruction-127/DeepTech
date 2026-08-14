@@ -696,13 +696,13 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		group.setBackground(new ResourceTexture(DeepTech.loadGui("center")));
 
 		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.SN_CENTER.get().getName());
-		title.setColor(0xFF5D5F60);
+		title.setColor(0xFF97CCD6);
 		group.addWidget(title);
 
 		SNCenterStatsWidget stats = new SNCenterStatsWidget(this);
 		group.addWidget(stats);
 
-		group.addWidget(new EnergyBarWidget(7, 32, stats::getSyncedEnergy, getMaxEnergyStored()));
+		group.addWidget(new EnergyBarWidget(20, 30, stats::getSyncedEnergy, getMaxEnergyStored()));
 
 		return group;
 	}
@@ -724,7 +724,7 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 
 	// ============================================================
 	//  NBT 持久化
-	// ============================================================
+	// ============================================================ 
 
 	@Override
 	protected void write(CompoundTag tag) {

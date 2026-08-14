@@ -26,11 +26,11 @@ public class SNCenterStatsWidget extends Widget {
 
 	private static final int UPDATE_ID = 0;
 	private static final int CELL_SIZE = 18;
-	private static final int COLS = 8;
-	private static final int VISIBLE_ROWS = 1;
+	private static final int COLS = 4;
+	private static final int VISIBLE_ROWS = 2;
 
 	/** 部件网格左上角(相对控件原点) */
-	private static final int GRID_X = 30;
+	private static final int GRID_X = 60;
 	private static final int GRID_Y = 32;
 
 	private final SNCenterBlockEntity center;
@@ -141,7 +141,7 @@ public class SNCenterStatsWidget extends Widget {
 		int y = getPosition().y;
 		var font = Minecraft.getInstance().font;
 
-		// ---- 部件网格(单行 8 格) ----
+		// ---- 部件网格(2 行 4 格) ----
 		int hoverIndex = isMouseOverElement(mouseX, mouseY) ? cellIndexAt(mouseX, mouseY) : -1;
 		for (int row = 0; row < VISIBLE_ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
@@ -183,9 +183,9 @@ public class SNCenterStatsWidget extends Widget {
 		for (ComponentCount cc : components) {
 			total += cc.count();
 		}
-		graphics.drawString(font, Component.translatable("gui.deep_tech.center_component_total", total), x + 7, y + 92, 0xFF5D5F60, false);
+		graphics.drawString(font, Component.translatable("gui.deep_tech.center_component_total", total), x + 7, y + 92, 0xFF97CCD6, true);
 		graphics.drawString(font, Component.translatable("gui.deep_tech.center_master",
-				Component.translatable(master ? "gui.deep_tech.center_yes" : "gui.deep_tech.center_no")), x + 7, y + 104, 0xFF5D5F60, false);
+				Component.translatable(master ? "gui.deep_tech.center_yes" : "gui.deep_tech.center_no")), x + 7, y + 104, 0xFF97CCD6, true);
 	}
 
 	@Override
