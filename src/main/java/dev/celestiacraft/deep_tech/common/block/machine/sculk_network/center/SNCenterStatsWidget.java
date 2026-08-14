@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 中枢状态控件:网络部件统计(单行 6 格:部件图标 + 数量角标,悬停提示),
+ * 中枢状态控件:网络部件统计(单行 8 格:部件图标 + 数量角标,悬停提示),
  * 能量由 {@link dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget} 单独渲染。
  * <p>
  * 数据由服务端 detectAndSendChanges 推送(与访问器列表控件同一套 writeUpdateInfo / readUpdateInfo 机制),
@@ -26,11 +26,11 @@ public class SNCenterStatsWidget extends Widget {
 
 	private static final int UPDATE_ID = 0;
 	private static final int CELL_SIZE = 18;
-	private static final int COLS = 6;
+	private static final int COLS = 8;
 	private static final int VISIBLE_ROWS = 1;
 
 	/** 部件网格左上角(相对控件原点) */
-	private static final int GRID_X = 58;
+	private static final int GRID_X = 30;
 	private static final int GRID_Y = 32;
 
 	private final SNCenterBlockEntity center;
@@ -141,7 +141,7 @@ public class SNCenterStatsWidget extends Widget {
 		int y = getPosition().y;
 		var font = Minecraft.getInstance().font;
 
-		// ---- 部件网格(单行 6 格) ----
+		// ---- 部件网格(单行 8 格) ----
 		int hoverIndex = isMouseOverElement(mouseX, mouseY) ? cellIndexAt(mouseX, mouseY) : -1;
 		for (int row = 0; row < VISIBLE_ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {

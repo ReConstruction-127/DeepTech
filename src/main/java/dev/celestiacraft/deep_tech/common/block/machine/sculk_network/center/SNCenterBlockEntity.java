@@ -14,6 +14,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNIte
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
+import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
@@ -81,6 +82,8 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 	private final List<BlockPos> foundFluidReservoirs = new ArrayList<>();
 	private final List<BlockPos> foundFluidInputPorts = new ArrayList<>();
 	private final List<BlockPos> foundFluidOutputPorts = new ArrayList<>();
+	private final List<BlockPos> foundCableBlocks = new ArrayList<>();
+	private final List<BlockPos> foundCableVeins = new ArrayList<>();
 
 	// ========== 物品转运控制 ==========
 	private int tickCounter = 0;
@@ -148,6 +151,8 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		foundFluidReservoirs.clear();
 		foundFluidInputPorts.clear();
 		foundFluidOutputPorts.clear();
+		foundCableBlocks.clear();
+		foundCableVeins.clear();
 
 		// BFS 队列
 		Queue<BlockPos> queue = new ArrayDeque<>();
@@ -192,6 +197,12 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 			}
 			if (blockAt == MachineBlocks.SN_FLUID_OUTPUT_PORT.get()) {
 				foundFluidOutputPorts.add(current);
+			}
+			if (blockAt == BasicBlocks.SCULK_NETWORK_BLOCK.get()) {
+				foundCableBlocks.add(current);
+			}
+			if (blockAt == BasicBlocks.SCULK_NETWORK_VEIN.get()) {
+				foundCableVeins.add(current);
 			}
 
 			if (distance >= 16) continue;
@@ -612,6 +623,8 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		counts.add(new ComponentCount(MachineBlocks.SN_ITEM_OUTPUT_PORT.get(), foundItemOutputPorts.size()));
 		counts.add(new ComponentCount(MachineBlocks.SN_FLUID_INPUT_PORT.get(), foundFluidInputPorts.size()));
 		counts.add(new ComponentCount(MachineBlocks.SN_FLUID_OUTPUT_PORT.get(), foundFluidOutputPorts.size()));
+		counts.add(new ComponentCount(BasicBlocks.SCULK_NETWORK_BLOCK.get(), foundCableBlocks.size()));
+		counts.add(new ComponentCount(BasicBlocks.SCULK_NETWORK_VEIN.get(), foundCableVeins.size()));
 		return counts;
 	}
 
