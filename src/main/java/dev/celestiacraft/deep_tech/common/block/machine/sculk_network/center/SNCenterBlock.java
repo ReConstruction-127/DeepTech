@@ -4,10 +4,8 @@ import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.libs.api.register.block.BasicEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class SNCenterBlock extends BasicEntityBlock<SNCenterBlockEntity> {
-
 	public SNCenterBlock(BlockBehaviour.Properties properties) {
 		super(properties);
 	}

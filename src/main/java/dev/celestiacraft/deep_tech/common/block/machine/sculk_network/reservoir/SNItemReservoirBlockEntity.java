@@ -114,7 +114,7 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 
 	@Override
 	public boolean isInvalid() {
-		return this.isRemoved();
+		return isRemoved();
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 
 	@Override
 	public void markAsDirty() {
-		this.markDirty();
+		markDirty();
 	}
 
 	// ============================================================
@@ -132,7 +132,7 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 	// ============================================================
 
 	@Override
-	public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
 		if (cap == ForgeCapabilities.ITEM_HANDLER) {
 			return inventoryCap.cast();
 		}

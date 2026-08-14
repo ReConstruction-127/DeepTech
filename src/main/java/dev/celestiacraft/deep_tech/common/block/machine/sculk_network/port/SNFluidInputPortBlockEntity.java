@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port;
 
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -13,15 +14,12 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
+@Getter
 public class SNFluidInputPortBlockEntity extends BasicBlockEntity {
 	private FluidStack filter = FluidStack.EMPTY;   // 过滤流体
 
 	public SNFluidInputPortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
-	}
-
-	public FluidStack getFilter() {
-		return filter;
 	}
 
 	public void setFilter(FluidStack filter) {
@@ -31,7 +29,7 @@ public class SNFluidInputPortBlockEntity extends BasicBlockEntity {
 	}
 
 	public void clearFilter() {
-		this.filter = FluidStack.EMPTY;
+		filter = FluidStack.EMPTY;
 		markDirtyAndUpdate();
 	}
 

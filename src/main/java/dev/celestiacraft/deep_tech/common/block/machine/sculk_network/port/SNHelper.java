@@ -42,7 +42,7 @@ public class SNHelper {
 			}
 
 			// 只沿网络组件扩展（起点 16 格半径内,入队前用距离平方检查,避免开方）
-			if (pos.distSqr(start) >= 16 * 16) continue;
+			if (pos.distSqr(start) >= 16 << 4) continue;
 
 			for (Direction dir : Direction.values()) {
 				BlockPos neighbor = pos.relative(dir);

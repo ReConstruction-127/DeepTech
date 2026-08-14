@@ -48,12 +48,12 @@ public class SNFluidInputPortBlock extends SNPortBlock<SNFluidInputPortBlockEnti
 		} else {
 			// 尝试从物品中提取流体(原版桶/模组容器)
 			FluidStack fluidStack = getContainedFluid(held);
-			if (!fluidStack.isEmpty()) {
-				port.setFilter(fluidStack);
-				player.displayClientMessage(Component.literal("Filter set: " + fluidStack.getDisplayName()), true);
-			} else {
+			if (fluidStack.isEmpty()) {
 				player.displayClientMessage(Component.literal("Item contains no fluid!"), true);
 				return InteractionResult.PASS;
+			} else {
+				port.setFilter(fluidStack);
+				player.displayClientMessage(Component.literal("Filter set: " + fluidStack.getDisplayName()), true);
 			}
 		}
 		return InteractionResult.SUCCESS;

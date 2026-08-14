@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -162,7 +163,7 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBl
 			}
 
 			// 收集网络组件（物品贮存器 / 物品输入端口）
-			var blockAt = level.getBlockState(current).getBlock();
+			Block blockAt = level.getBlockState(current).getBlock();
 			if (blockAt == MachineBlocks.SN_ITEM_RESERVOIR.get()) {
 				foundReservoirs.add(current);
 			}
@@ -221,7 +222,7 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBl
 		// 情况 1：网络中无主控
 		if (masterCenters.isEmpty()) {
 			// 自动成为主控
-			this.isMaster = true;
+			isMaster = true;
 			markDirtyAndUpdate();
 			return;
 		}

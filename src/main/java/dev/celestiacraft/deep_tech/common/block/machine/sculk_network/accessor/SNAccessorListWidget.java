@@ -3,15 +3,15 @@ package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor;
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.side.fluid.forge.FluidHelperImpl;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.SNAccessorBlockEntity.FluidEntry;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.SNAccessorBlockEntity.ItemEntry;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +24,6 @@ import java.util.Locale;
  * 本地按名称排序 + 搜索过滤 + 滚轮滚动,全部在客户端完成。
  */
 public class SNAccessorListWidget extends Widget {
-
 	public enum Kind {
 		ITEMS,
 		FLUIDS
@@ -34,7 +33,7 @@ public class SNAccessorListWidget extends Widget {
 	private static final int UPDATE_ID = 0;
 
 	/** 单行显示数据(图标 + 名称 + 总数) */
-	private static final class Row {
+	private static class Row {
 		private final ItemStack item;
 		private final com.lowdragmc.lowdraglib.side.fluid.FluidStack fluid;
 		private final String name;
@@ -49,13 +48,15 @@ public class SNAccessorListWidget extends Widget {
 	}
 
 	private final SNAccessorBlockEntity accessor;
+	@Getter
 	private final Kind kind;
 
 	// 客户端数据(由服务端同步的全量条目)
-	private final List<ItemEntry> allItems = new ArrayList<>();
-	private final List<FluidEntry> allFluids = new ArrayList<>();
+	private final List<SNAccessorBlockEntity.ItemEntry> allItems = new ArrayList<>();
+	private final List<SNAccessorBlockEntity.FluidEntry> allFluids = new ArrayList<>();
 	private final List<Row> rows = new ArrayList<>();
 
+	@Getter
 	private String filter = "";
 	private int scrollOffset = 0;
 
@@ -68,16 +69,8 @@ public class SNAccessorListWidget extends Widget {
 		this.kind = kind;
 	}
 
-	public Kind getKind() {
-		return kind;
-	}
-
-	public String getFilter() {
-		return filter;
-	}
-
 	public void setFilter(String text) {
-		this.filter = text == null ? "" : text.trim().toLowerCase(Locale.ROOT);
+		filter = text == null ? "" : text.trim().toLowerCase(Locale.ROOT);
 		applyFilterAndSort();
 	}
 
@@ -104,14 +97,14 @@ public class SNAccessorListWidget extends Widget {
 		net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
 		net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
 		if (kind == Kind.ITEMS) {
-			for (ItemEntry entry : accessor.getItemEntries()) {
+			for (SNAccessorBlockEntity.ItemEntry entry : accessor.getItemEntries()) {
 				net.minecraft.nbt.CompoundTag c = new net.minecraft.nbt.CompoundTag();
 				c.put("Stack", entry.stack().save(new net.minecraft.nbt.CompoundTag()));
 				c.putLong("Count", entry.count());
 				list.add(c);
 			}
 		} else {
-			for (FluidEntry entry : accessor.getFluidEntries()) {
+			for (SNAccessorBlockEntity.FluidEntry entry : accessor.getFluidEntries()) {
 				net.minecraft.nbt.CompoundTag c = new net.minecraft.nbt.CompoundTag();
 				c.put("Stack", entry.stack().writeToNBT(new net.minecraft.nbt.CompoundTag()));
 				c.putLong("Amount", entry.amount());
@@ -143,7 +136,7 @@ public class SNAccessorListWidget extends Widget {
 				if (stack.isEmpty()) {
 					continue;
 				}
-				allItems.add(new ItemEntry(stack, cc.getLong("Count")));
+				allItems.add(new SNAccessorBlockEntity.ItemEntry(stack, cc.getLong("Count")));
 			}
 			applyFilterAndSort();
 		} else {
@@ -154,7 +147,7 @@ public class SNAccessorListWidget extends Widget {
 				if (forge.isEmpty()) {
 					continue;
 				}
-				allFluids.add(new FluidEntry(forge, cc.getLong("Amount")));
+				allFluids.add(new SNAccessorBlockEntity.FluidEntry(forge, cc.getLong("Amount")));
 			}
 			applyFilterAndSort();
 		}
@@ -166,14 +159,14 @@ public class SNAccessorListWidget extends Widget {
 	private void applyFilterAndSort() {
 		rows.clear();
 		if (kind == Kind.ITEMS) {
-			for (ItemEntry entry : allItems) {
+			for (SNAccessorBlockEntity.ItemEntry entry : allItems) {
 				String name = entry.stack().getHoverName().getString();
 				if (matchesFilter(name)) {
 					rows.add(new Row(entry.stack(), null, name, entry.count()));
 				}
 			}
 		} else {
-			for (FluidEntry entry : allFluids) {
+			for (SNAccessorBlockEntity.FluidEntry entry : allFluids) {
 				com.lowdragmc.lowdraglib.side.fluid.FluidStack ld = FluidHelperImpl.toFluidStack(entry.stack());
 				String name = FluidHelperImpl.getDisplayName(ld).getString();
 				if (matchesFilter(name)) {
@@ -196,7 +189,7 @@ public class SNAccessorListWidget extends Widget {
 	// ============================================================
 
 	@Override
-	public void drawInBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+	public void drawInBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
 		if (rows.isEmpty()) {
 			return;
 		}
@@ -207,7 +200,7 @@ public class SNAccessorListWidget extends Widget {
 
 		int startRow = scrollOffset / ROW_HEIGHT;
 		int pixelOffset = scrollOffset % ROW_HEIGHT;
-		var font = Minecraft.getInstance().font;
+		Font font = Minecraft.getInstance().font;
 
 		for (int i = startRow; ; i++) {
 			int rowY = y + i * ROW_HEIGHT - pixelOffset;

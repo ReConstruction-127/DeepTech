@@ -15,6 +15,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
@@ -47,28 +48,24 @@ import java.util.Set;
  * 不过度依赖中枢的扫描结果,访问器自身即可定位储存器。
  */
 public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder.BlockEntityUI, ITickableBlockEntity<SNAccessorBlockEntity> {
-
 	public record ItemEntry(ItemStack stack, long count) {
 	}
 
 	public record FluidEntry(FluidStack stack, long amount) {
 	}
 
-	/** 汇总刷新间隔(tick) */
 	private static final int REFRESH_INTERVAL = 20;
 
 	// ========== 汇总结果(服务端维护) ==========
+	@Getter
 	private final List<ItemEntry> itemEntries = new ArrayList<>();
+	@Getter
 	private final List<FluidEntry> fluidEntries = new ArrayList<>();
 	private long nextRefreshTime = Long.MIN_VALUE;
 
 	public SNAccessorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
-
-	// ============================================================
-	//  Tick(驱动汇总缓存刷新,由 IEntityBlock 默认 ticker 驱动)
-	// ============================================================
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, SNAccessorBlockEntity entity) {
@@ -117,11 +114,11 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 				}
 			}
 
-			if (pos.distSqr(worldPosition) >= 16 * 16) {
+			if (pos.distSqr(worldPosition) >= 16 << 4) {
 				continue;
 			}
-			for (var dir : Direction.values()) {
-				BlockPos neighbor = pos.relative(dir);
+			for (Direction direction : Direction.values()) {
+				BlockPos neighbor = pos.relative(direction);
 				if (!visited.contains(neighbor) && SNHelper.isNetworkComponent(level, neighbor)) {
 					visited.add(neighbor);
 					queue.add(neighbor);
@@ -146,7 +143,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 				itemIcons.putIfAbsent(stack.getItem(), stack.copy());
 			}
 		}
-		for (var entry : itemCounts.entrySet()) {
+		for (Map.Entry<Item, long[]> entry : itemCounts.entrySet()) {
 			ItemStack icon = itemIcons.get(entry.getKey());
 			if (icon == null) {
 				continue;
@@ -178,14 +175,6 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 			}
 			fluidEntries.add(new FluidEntry(icon, entry.getValue()[0]));
 		}
-	}
-
-	public List<ItemEntry> getItemEntries() {
-		return itemEntries;
-	}
-
-	public List<FluidEntry> getFluidEntries() {
-		return fluidEntries;
 	}
 
 	// ============================================================
@@ -243,16 +232,16 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 
 	@Override
 	public boolean isInvalid() {
-		return this.isRemoved();
+		return isRemoved();
 	}
 
 	@Override
 	public boolean isRemote() {
-		return this.level != null && this.level.isClientSide;
+		return level != null && level.isClientSide;
 	}
 
 	@Override
 	public void markAsDirty() {
-		this.setChanged();
+		setChanged();
 	}
 }

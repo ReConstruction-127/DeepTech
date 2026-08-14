@@ -18,6 +18,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 端口基类:继承 {@link BasicEntityBlock},BE 由 IEntityBlock 默认实现创建与 tick,
@@ -39,21 +40,21 @@ public abstract class SNPortBlock<T extends BlockEntity> extends BasicEntityBloc
 	// 放置模式参考 ResonanceNode:朝向 = 点击面的反方向(接头指向被点击的方块)
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return this.defaultBlockState().setValue(BlockStateProperties.FACING, context.getClickedFace().getOpposite());
+		return defaultBlockState().setValue(BlockStateProperties.FACING, context.getClickedFace().getOpposite());
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public @NotNull VoxelShape getShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
 		return PORT_SHAPE;
 	}
 
 	@Override
-	public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+	public @NotNull VoxelShape getCollisionShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos, @NotNull CollisionContext context) {
 		return PORT_SHAPE;
 	}
 
 	@Override
-	public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+	public @NotNull VoxelShape getOcclusionShape(@NotNull BlockState state, @NotNull BlockGetter level, @NotNull BlockPos pos) {
 		return Shapes.empty();
 	}
 

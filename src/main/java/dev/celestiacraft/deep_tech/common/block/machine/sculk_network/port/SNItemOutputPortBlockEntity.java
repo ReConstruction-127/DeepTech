@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port;
 
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -12,10 +13,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
 
 public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 	// 目标容器位置（可配置，初版使用方块面向方向）
-	private BlockPos targetPos = null;
+	private @Nullable BlockPos targetPos = null;
+	@Getter
 	private ItemStack filter = ItemStack.EMPTY;
 
 	public SNItemOutputPortBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -34,9 +37,6 @@ public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 		return targetPos;
 	}
 
-	public ItemStack getFilter() {
-		return filter;
-	}
 	public void setFilter(ItemStack filter) {
 		this.filter = filter.copy();
 		this.filter.setCount(1);
@@ -44,7 +44,7 @@ public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 	}
 
 	public void clearFilter() {
-		this.filter = ItemStack.EMPTY;
+		filter = ItemStack.EMPTY;
 		markDirtyAndUpdate();
 	}
 

@@ -180,7 +180,7 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 
 	// ========== Capability ==========
 	@Override
-	public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
 		if (cap == ForgeCapabilities.FLUID_HANDLER) {
 			return tankCap.cast();
 		}
@@ -267,7 +267,7 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 
 	@Override
 	public boolean isInvalid() {
-		return this.isRemoved();
+		return isRemoved();
 	}
 
 	@Override
@@ -277,6 +277,6 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 
 	@Override
 	public void markAsDirty() {
-		this.markDirty();
+		markDirty();
 	}
 }
