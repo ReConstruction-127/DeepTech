@@ -9,6 +9,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.common.Tags;
 
 import java.util.function.Consumer;
 
@@ -21,7 +22,7 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 	public static void register(Consumer<FinishedRecipe> consumer) {
 		// 压板: 左键
 		InteractionRecipeBuilder.builder()
-				.trigger(Items.IRON_INGOT)
+				.trigger(Tags.Items.INGOTS_IRON)
 				.target(Blocks.REINFORCED_DEEPSLATE)
 				.result(Items.IRON_NUGGET, 8, 0.25)
 				.result(DTMaterials.IRON.getDust().get(), 0.25)
@@ -32,7 +33,7 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.save(consumer, save("interaction/iron_plate_craft"));
 
 		InteractionRecipeBuilder.builder()
-				.trigger(Items.COPPER_INGOT)
+				.trigger(Tags.Items.INGOTS_COPPER)
 				.target(Blocks.REINFORCED_DEEPSLATE)
 				.result(DTMaterials.COPPER.getNugget().get(), 8, 0.25)
 				.result(DTMaterials.COPPER.getDust().get(), 0.25)
@@ -43,7 +44,7 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.save(consumer, save("interaction/copper_plate_craft"));
 
 		InteractionRecipeBuilder.builder()
-				.trigger(Items.GOLD_INGOT)
+				.trigger(Tags.Items.INGOTS_GOLD)
 				.target(Blocks.REINFORCED_DEEPSLATE)
 				.result(Items.GOLD_NUGGET, 8, 0.25)
 				.result(DTMaterials.GOLD.getDust().get(), 0.25)
