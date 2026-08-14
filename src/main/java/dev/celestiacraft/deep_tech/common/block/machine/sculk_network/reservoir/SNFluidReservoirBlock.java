@@ -5,14 +5,13 @@ import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class SNFluidReservoirBlock extends MachineBlock<SNFluidReservoirBlockEntity> {
-
 	public SNFluidReservoirBlock(Properties properties) {
 		super(properties.noOcclusion());
 	}
 
 	@Override
 	public BlockEntityType<SNFluidReservoirBlockEntity> getBlockEntityType() {
-		return DTBlockEntities.SN_FLUID_RESERVOIR.get();  // 确保注册名正确
+		return DTBlockEntities.SN_FLUID_RESERVOIR.get();
 	}
 
 	@Override

@@ -9,11 +9,11 @@ import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import net.minecraftforge.items.ItemStackHandler;
 
 /**
- * 根据机器的物品槽位配置(IMachineItemConfig)动态生成物品槽位 widget。
+ * 根据机器的物品槽位配置(IMachineItemConfig)动态生成物品槽位 widget. 
  * <p>
- * 输入槽从 {@code inputStart} 开始、输出槽从 {@code outputStart} 开始, 按固定间距向右排列;
+ * 输入槽从 {@code inputStart} 开始, 输出槽从 {@code outputStart} 开始, 按固定间距向右排列;
  * 槽位数量为 0 时自动跳过, 不会创建任何 widget, 因此不会出现
- * {@code Slot 0 not in valid range - [0,0)} 这类越界崩溃。
+ * {@code Slot 0 not in valid range - [0,0)} 这类越界崩溃. 
  * <p>
  * 使用示例:
  * <pre>{@code
@@ -37,7 +37,7 @@ public class MachineItemSlots {
 	}
 
 	/**
-	 * 按配置生成所有物品槽位 widget。
+	 * 按配置生成所有物品槽位 widget. 
 	 *
 	 * @param group       槽位要加入的容器 widget
 	 * @param config      机器物品槽位配置(数量与下标转换)

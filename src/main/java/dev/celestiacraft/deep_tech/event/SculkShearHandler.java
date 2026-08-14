@@ -66,7 +66,7 @@ public class SculkShearHandler {
 			spawnItem(level, pos, new ItemStack(Blocks.SCULK_VEIN));
 		}
 
-		// 6. 消耗剪刀耐久（1点）
+		// 6. 消耗剪刀耐久(1点)
 		mainHand.hurtAndBreak(1, player, (entity) -> {
 			entity.broadcastBreakEvent(player.getUsedItemHand());
 		});

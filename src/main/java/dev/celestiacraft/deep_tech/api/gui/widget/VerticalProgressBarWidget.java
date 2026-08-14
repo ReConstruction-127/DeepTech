@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Supplier;
 
 /**
- * 垂直进度条（从下往上填充）
+ * 垂直进度条(从下往上填充)
  */
 public class VerticalProgressBarWidget extends Widget {
 	private final Supplier<Integer> progressGetter;

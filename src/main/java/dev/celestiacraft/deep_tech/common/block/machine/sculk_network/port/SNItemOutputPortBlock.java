@@ -28,10 +28,14 @@ public class SNItemOutputPortBlock extends SNPortBlock<SNItemOutputPortBlockEnti
 	public InteractionResult useOn(UseContext context) {
 		// 桶/流体交互优先(未启用时默认直接 PASS)
 		InteractionResult fluid = tryFluidInteraction(context.getPlayer(), context.getHand(), context.getLevel(), context.getPos(), context.getResult());
-		if (fluid.consumesAction()) return fluid;
+		if (fluid.consumesAction()) {
+			return fluid;
+		}
 
 		Level level = context.getLevel();
-		if (level.isClientSide) return InteractionResult.SUCCESS;
+		if (level.isClientSide()) {
+			return InteractionResult.SUCCESS;
+		}
 
 		if (!(level.getBlockEntity(context.getPos()) instanceof SNItemOutputPortBlockEntity portBe)) {
 			return InteractionResult.PASS;
@@ -40,7 +44,7 @@ public class SNItemOutputPortBlock extends SNPortBlock<SNItemOutputPortBlockEnti
 		Player player = context.getPlayer();
 
 		if (player.isShiftKeyDown()) {
-			// 按住Shift防误触，可以不加提示，直接返回
+			// 按住Shift防误触, 可以不加提示, 直接返回
 			return InteractionResult.SUCCESS;
 		}
 

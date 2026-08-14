@@ -20,6 +20,6 @@ public class SNItemReservoirBlock extends MachineBlock<SNItemReservoirBlockEntit
 		return SNItemReservoirBlockEntity.class;
 	}
 
-	// 可选：重写光照等（如不需要留空）
-	// 注意：UI 打开由基类 MachineBlock 自动处理，无需重写 use()
+	// 可选: 重写光照等(如不需要留空)
+	// 注意: UI 打开由基类 MachineBlock 自动处理, 无需重写 use()
 }

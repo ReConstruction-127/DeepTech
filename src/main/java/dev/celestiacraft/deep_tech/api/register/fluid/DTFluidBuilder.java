@@ -114,7 +114,7 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 
 	/**
 	 * 给流体注册 tick 回调, 源液体和流动液体都会生效
-	 * 使用该方法时不要再传自定义流体工厂, 直接用 {@link #of(String)}。
+	 * 使用该方法时不要再传自定义流体工厂, 直接用 {@link #of(String)}. 
 	 */
 	public DTFluidBuilder<T> tick(FluidTickHandler handler) {
 		checkMutable();

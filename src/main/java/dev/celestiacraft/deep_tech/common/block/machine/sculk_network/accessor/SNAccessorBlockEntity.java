@@ -42,13 +42,12 @@ import java.util.Set;
 
 /**
  * 幽匿网络访问器:汇总所在网络中所有储存器(物品/流体)的内容,
- * 供 UI 端的列表控件读取并同步给客户端展示。
+ * 供 UI 端的列表控件读取并同步给客户端展示.
  * <p>
  * 网络发现方式与中枢一致:BFS 沿网络组件扩展(半径 16 格),
- * 不过度依赖中枢的扫描结果,访问器自身即可定位储存器。
+ * 不过度依赖中枢的扫描结果,访问器自身即可定位储存器.
  */
 public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder.BlockEntityUI, ITickableBlockEntity<SNAccessorBlockEntity> {
-
 	public record ItemEntry(ItemStack stack, long count) {
 	}
 
@@ -57,8 +56,6 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 
 	/** 汇总刷新间隔(tick) */
 	private static final int REFRESH_INTERVAL = 20;
-
-	// ========== 汇总结果(服务端维护) ==========
 	@Getter
 	private final List<ItemEntry> itemEntries = new ArrayList<>();
 	@Getter
@@ -71,20 +68,16 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		super(type, pos, state);
 	}
 
-	// ============================================================
-	//  Tick(驱动汇总缓存刷新,由 IEntityBlock 默认 ticker 驱动)
-	// ============================================================
-
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, SNAccessorBlockEntity entity) {
 		refreshIfNeeded();
 	}
 
 	/**
-	 * 间隔刷新网络汇总数据。UI 列表控件也会主动调用,保证打开界面时数据新鲜。
+	 * 间隔刷新网络汇总数据. UI 列表控件也会主动调用,保证打开界面时数据新鲜.
 	 */
 	public void refreshIfNeeded() {
-		if (level == null || level.isClientSide) {
+		if (level == null || level.isClientSide()) {
 			return;
 		}
 		if (level.getGameTime() >= nextRefreshTime) {
@@ -124,8 +117,8 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 			if (pos.distSqr(worldPosition) >= 16 << 4) {
 				continue;
 			}
-			for (var dir : Direction.values()) {
-				BlockPos neighbor = pos.relative(dir);
+			for (Direction direction : Direction.values()) {
+				BlockPos neighbor = pos.relative(direction);
 				if (!visited.contains(neighbor) && SNHelper.isNetworkComponent(level, neighbor)) {
 					visited.add(neighbor);
 					queue.add(neighbor);
@@ -146,11 +139,11 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 				if (stack.isEmpty()) {
 					continue;
 				}
-				itemCounts.computeIfAbsent(stack.getItem(), k -> new long[]{0})[0] += stack.getCount();
+				itemCounts.computeIfAbsent(stack.getItem(), k -> new long[] {0})[0] += stack.getCount();
 				itemIcons.putIfAbsent(stack.getItem(), stack.copy());
 			}
 		}
-		for (var entry : itemCounts.entrySet()) {
+		for (Map.Entry<Item, long[]> entry : itemCounts.entrySet()) {
 			ItemStack icon = itemIcons.get(entry.getKey());
 			if (icon == null) {
 				continue;
@@ -161,6 +154,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		// 聚合流体:按流体 ID 合并数量
 		Map<Fluid, long[]> fluidCounts = new HashMap<>();
 		Map<Fluid, FluidStack> fluidIcons = new HashMap<>();
+
 		for (SNFluidReservoirBlockEntity reservoir : fluidReservoirs) {
 			IFluidHandler handler = reservoir.getTank();
 			if (handler == null) {
@@ -171,11 +165,13 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 				if (stack.isEmpty()) {
 					continue;
 				}
-				fluidCounts.computeIfAbsent(stack.getFluid(), k -> new long[]{0})[0] += stack.getAmount();
+				fluidCounts.computeIfAbsent(stack.getFluid(), (fluid) -> {
+					return new long[] {0};
+				})[0] += stack.getAmount();
 				fluidIcons.putIfAbsent(stack.getFluid(), stack.copy());
 			}
 		}
-		for (var entry : fluidCounts.entrySet()) {
+		for (Map.Entry<Fluid, long[]> entry : fluidCounts.entrySet()) {
 			FluidStack icon = fluidIcons.get(entry.getKey());
 			if (icon == null) {
 				continue;
@@ -193,12 +189,8 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		setChanged();
 	}
 
-	// ============================================================
-	//  网络存取(终端语义:物品/流体均可存入与取出)
-	// ============================================================
-
 	/**
-	 * 把物品存入网络(依次塞入各物品储库)。返回实际存入数量。
+	 * 把物品存入网络(依次塞入各物品储库). 返回实际存入数量.
 	 */
 	public int insertItem(ItemStack stack, boolean simulate) {
 		if (stack.isEmpty() || level == null || level.isClientSide) {
@@ -226,7 +218,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 	}
 
 	/**
-	 * 从网络取出指定物品(按物品 ID+NBT 匹配,遍历各储库)。返回实际抽出的堆。
+	 * 从网络取出指定物品(按物品 ID+NBT 匹配,遍历各储库). 返回实际抽出的堆.
 	 */
 	public ItemStack extractItem(ItemStack filter, int amount, boolean simulate) {
 		if (filter.isEmpty() || amount <= 0 || level == null || level.isClientSide) {
@@ -270,7 +262,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 	}
 
 	/**
-	 * 把流体存入网络(依次填入各流体储库)。返回实际存入量(mB)。
+	 * 把流体存入网络(依次填入各流体储库). 返回实际存入量(mB).
 	 */
 	public int fill(FluidStack stack, IFluidHandler.FluidAction action) {
 		if (stack.isEmpty() || level == null || level.isClientSide) {
@@ -297,7 +289,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 	}
 
 	/**
-	 * 从网络抽取流体(按流体类型匹配)。返回实际抽出的流体堆。
+	 * 从网络抽取流体(按流体类型匹配). 返回实际抽出的流体堆.
 	 */
 	public FluidStack drain(FluidStack resource, IFluidHandler.FluidAction action) {
 		if (resource.isEmpty() || level == null || level.isClientSide) {
@@ -330,10 +322,6 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		}
 		return result;
 	}
-
-	// ============================================================
-	//  LDLib GUI
-	// ============================================================
 
 	@Override
 	public ModularUI createUI(Player player) {

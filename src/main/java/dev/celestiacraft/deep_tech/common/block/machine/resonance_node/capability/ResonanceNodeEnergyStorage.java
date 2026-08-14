@@ -96,7 +96,7 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 
 	@Override
 	public int getMaxEnergyStored() {
-		// 返回足够大的值，让机器觉得能存储无限能量
+		// 返回足够大的值, 让机器觉得能存储无限能量
 		return Integer.MAX_VALUE;
 	}
 
@@ -111,10 +111,10 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 	}
 
 	/**
-	 * 获取某个节点“基座面”所紧贴方块的能量存储。
+	 * 获取某个节点“基座面”所紧贴方块的能量存储. 
 	 * <p>
-	 * 基座面是节点自身朝向（FACING，紫水晶指向）的反方向，
-	 * 而不是世界坐标下的底面（below）。
+	 * 基座面是节点自身朝向(FACING, 紫水晶指向)的反方向, 
+	 * 而不是世界坐标下的底面(below). 
 	 */
 	@Nullable
 	private IEnergyStorage getBaseEnergyStorage(BlockPos nodePos) {
@@ -132,7 +132,7 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 		BlockPos basePos = nodePos.relative(baseDir);
 
 		BlockEntity baseBe = level.getBlockEntity(basePos);
-		// 基座紧贴的方块不能是另一个节点，避免节点之间互相查询造成递归
+		// 基座紧贴的方块不能是另一个节点, 避免节点之间互相查询造成递归
 		if (baseBe == null || baseBe instanceof ResonanceNodeBlockEntity) {
 			return null;
 		}

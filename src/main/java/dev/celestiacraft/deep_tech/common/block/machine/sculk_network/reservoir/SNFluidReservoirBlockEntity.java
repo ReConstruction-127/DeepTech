@@ -10,6 +10,8 @@ import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.fluid.SingleTankFluidTransfer;
 import dev.celestiacraft.deep_tech.api.gui.widget.ProportionalTankWidget;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.capability.SNFluidReservoirTank;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.capability.SNFluidReservoirTankHandler;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import net.minecraft.core.BlockPos;
@@ -35,127 +37,25 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 
 	private final FluidTank[] tanks = new FluidTank[TANK_COUNT];
 
-	// 聚合所有储罐的 IFluidHandler(填装时按顺序,抽取时从后往前)
-	private final IFluidHandler tankHandler = new IFluidHandler() {
-		@Override
-		public int getTanks() {
-			return TANK_COUNT;
-		}
-
-		@Override
-		public @NotNull FluidStack getFluidInTank(int tank) {
-			if (tank < 0 || tank >= TANK_COUNT) {
-				return FluidStack.EMPTY;
-			}
-			return tanks[tank].getFluid();
-		}
-
-		@Override
-		public int getTankCapacity(int tank) {
-			if (tank < 0 || tank >= TANK_COUNT) {
-				return 0;
-			}
-			return tanks[tank].getCapacity();
-		}
-
-		@Override
-		public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-			return tank >= 0 && tank < TANK_COUNT && tanks[tank].isFluidValid(stack);
-		}
-
-		@Override
-		public int fill(FluidStack resource, FluidAction action) {
-			if (resource.isEmpty()) {
-				return 0;
-			}
-			int filledTotal = 0;
-			FluidStack remaining = resource.copy();
-			for (FluidTank tank : tanks) {
-				if (remaining.isEmpty()) {
-					break;
-				}
-				int filled = tank.fill(remaining, action);
-				filledTotal += filled;
-				if (filled > 0) {
-					remaining.shrink(filled);
-				}
-			}
-			return filledTotal;
-		}
-
-		@Override
-		public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
-			if (resource.isEmpty()) {
-				return FluidStack.EMPTY;
-			}
-			FluidStack drainedTotal = FluidStack.EMPTY;
-			for (int i = TANK_COUNT - 1; i >= 0; i--) {
-				if (drainedTotal.getAmount() >= resource.getAmount()) {
-					break;
-				}
-				FluidStack tankFluid = tanks[i].getFluid();
-				if (tankFluid.isEmpty() || !tankFluid.isFluidEqual(resource)) {
-					continue;
-				}
-				FluidStack drained = tanks[i].drain(resource.getAmount() - drainedTotal.getAmount(), action);
-				if (drained.isEmpty()) {
-					continue;
-				}
-				if (drainedTotal.isEmpty()) {
-					drainedTotal = drained.copy();
-				} else {
-					drainedTotal.grow(drained.getAmount());
-				}
-			}
-			return drainedTotal;
-		}
-
-		@Override
-		public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-			if (maxDrain <= 0) {
-				return FluidStack.EMPTY;
-			}
-			int drainedTotal = 0;
-			FluidStack result = FluidStack.EMPTY;
-			for (int i = TANK_COUNT - 1; i >= 0; i--) {
-				if (drainedTotal >= maxDrain) {
-					break;
-				}
-				if (tanks[i].getFluid().isEmpty()) {
-					continue;
-				}
-				FluidStack drained = tanks[i].drain(maxDrain - drainedTotal, action);
-				if (drained.isEmpty()) {
-					continue;
-				}
-				drainedTotal += drained.getAmount();
-				if (result.isEmpty()) {
-					result = drained.copy();
-				} else {
-					result.grow(drained.getAmount());
-				}
-			}
-			return result;
-		}
-	};
-
+	private final IFluidHandler tankHandler = new SNFluidReservoirTankHandler(tanks);
 	private final LazyOptional<IFluidHandler> tankCap = LazyOptional.of(() -> tankHandler);
 
 	public SNFluidReservoirBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		for (int i = 0; i < TANK_COUNT; i++) {
-			tanks[i] = new FluidTank(TANK_CAPACITY) {
-				@Override
-				protected void onContentsChanged() {
-					markDirtyAndUpdate();
-				}
-			};
+			tanks[i] = new SNFluidReservoirTank(TANK_CAPACITY, this);
 		}
 	}
 
-	// ========== 储罐访问(供中枢传输与 UI 使用) ==========
 	public IFluidHandler getTank() {
 		return tankHandler;
+	}
+
+	/**
+	 * 储罐内容变化回调:由 SNFluidReservoirTank 调用, 标记脏数据并同步客户端
+	 */
+	public void onTankContentChanged() {
+		markDirtyAndUpdate();
 	}
 
 	public int getTankCount() {
@@ -178,13 +78,12 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 		return tanks[index].getCapacity();
 	}
 
-	// ========== Capability ==========
 	@Override
-	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-		if (cap == ForgeCapabilities.FLUID_HANDLER) {
+	public <T> @NotNull LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction direction) {
+		if (capability == ForgeCapabilities.FLUID_HANDLER) {
 			return tankCap.cast();
 		}
-		return super.getCapability(cap, side);
+		return super.getCapability(capability, direction);
 	}
 
 	@Override
@@ -193,7 +92,6 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 		tankCap.invalidate();
 	}
 
-	// ========== NBT ==========
 	@Override
 	protected void write(CompoundTag tag) {
 		for (int i = 0; i < TANK_COUNT; i++) {
@@ -207,10 +105,6 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 			tanks[i].readFromNBT(tag.getCompound("Tank" + i));
 		}
 	}
-
-	// ============================================================
-	//  LDLib GUI(仿照其他机器 UI 样式)
-	// ============================================================
 
 	@Override
 	public ModularUI createUI(Player player) {
@@ -227,12 +121,20 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 		title.setColor(0xFF5D5F60);
 		group.addWidget(title);
 
-		// 9 个 8B 储罐:比例填充式流体槽,支持拿着桶点击槽位灌入/抽取。
+		// 9 个 8B 储罐:比例填充式流体槽,支持拿着桶点击槽位灌入/抽取. 
 		// LDLib TankWidget 的桶点击是对整个 IFluidTransfer 做 fill/drain(不区分罐索引),
-		// 因此每个槽位必须绑定一个只暴露该罐的 SingleTankFluidTransfer,点击才精确命中对应罐。
+		// 因此每个槽位必须绑定一个只暴露该罐的 SingleTankFluidTransfer,点击才精确命中对应罐. 
 		for (int i = 0; i < TANK_COUNT; i++) {
-			group.addWidget(new ProportionalTankWidget(new SingleTankFluidTransfer(tanks[i]), 0, 8 + i * 18, 26, 16, 40, true, true)
-					.setBackground(new ResourceTexture(DeepTech.loadGui("elements/tank_back"))));
+			group.addWidget(new ProportionalTankWidget(new SingleTankFluidTransfer(
+					tanks[i]),
+					0,
+					8 + i * 18,
+					26,
+					16,
+					40,
+					true,
+					true
+			).setBackground(new ResourceTexture(DeepTech.loadGui("elements/tank_back"))));
 		}
 
 		addPlayerInventory(group, player);

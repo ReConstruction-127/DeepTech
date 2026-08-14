@@ -10,7 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.fluids.FluidStack;
 
-// 正确：接 Properties 参数并传递给父类
+// 正确: 接 Properties 参数并传递给父类
 public class SNFluidOutputPortBlock extends SNPortBlock<SNFluidOutputPortBlockEntity> {
 	public SNFluidOutputPortBlock(Properties properties) {
 		super(properties.noOcclusion());

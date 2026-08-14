@@ -8,11 +8,11 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 /**
  * 把一个"只含单个储罐"的 Forge {@link IFluidHandler}(如 {@link FluidTank}
- * 或 {@code MachineFluidHandler} 的单罐视图)包装成 LDLib 的 {@link IFluidTransfer}(只有 1 个 tank)。
+ * 或 {@code MachineFluidHandler} 的单罐视图)包装成 LDLib 的 {@link IFluidTransfer}(只有 1 个 tank). 
  * <p>
  * LDLib TankWidget 的桶点击是对整个 IFluidTransfer 做 fill/drain(不区分 tank 索引),
  * 因此每个 UI 槽位必须各自绑定一个"只暴露该罐"的 transfer,点击才精确作用于对应罐,
- * 而不是命中聚合 handler 的固定顺序(第一罐优先)。
+ * 而不是命中聚合 handler 的固定顺序(第一罐优先). 
  */
 public class SingleTankFluidTransfer implements IFluidTransfer {
 	private final IFluidHandler tank;

@@ -7,12 +7,12 @@ import com.lowdragmc.lowdraglib.side.fluid.IFluidTransfer;
 import net.minecraft.client.gui.GuiGraphics;
 
 /**
- * 比例填充式流体槽:TankWidget 的桶点击互动 + 传统"按流体量填充高度"的渲染。
- * 取代 LDLib 默认的全格填充 + 数字显示。
+ * 比例填充式流体槽:TankWidget 的桶点击互动 + 传统"按流体量填充高度"的渲染. 
+ * 取代 LDLib 默认的全格填充 + 数字显示. 
  * <p>
  * 渲染数据来自父类自带的同步缓存 lastFluidInTank/lastTankCapacity
  * (服务端 detectAndSendChanges -> writeUpdateInfo,客户端 readUpdateInfo 恢复),
- * 不要直接读客户端 BE,BE 数据不经过该同步链路,会是空值。
+ * 不要直接读客户端 BE,BE 数据不经过该同步链路,会是空值. 
  */
 public class ProportionalTankWidget extends TankWidget {
 

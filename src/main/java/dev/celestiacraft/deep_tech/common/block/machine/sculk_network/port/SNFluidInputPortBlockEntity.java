@@ -24,7 +24,7 @@ public class SNFluidInputPortBlockEntity extends BasicBlockEntity {
 
 	public void setFilter(FluidStack filter) {
 		this.filter = filter.copy();
-		this.filter.setAmount(1000); // 只存类型，不存数量
+		this.filter.setAmount(1000); // 只存类型, 不存数量
 		markDirtyAndUpdate();
 	}
 
@@ -57,7 +57,7 @@ public class SNFluidInputPortBlockEntity extends BasicBlockEntity {
 		filter = tag.contains("Filter") ? FluidStack.loadFluidStackFromNBT(tag.getCompound("Filter")) : FluidStack.EMPTY;
 	}
 
-	// 获取目标容器的 IFluidHandler（输入端口专用）
+	// 获取目标容器的 IFluidHandler(输入端口专用)
 	public LazyOptional<IFluidHandler> getTargetFluidHandler() {
 		if (level == null) return LazyOptional.empty();
 		BlockState state = getBlockState();

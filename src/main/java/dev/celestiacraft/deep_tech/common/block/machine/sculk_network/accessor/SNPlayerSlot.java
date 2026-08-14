@@ -7,17 +7,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * 玩家背包槽位:Shift+单击(左键)= 该格物品整组存入网络(箱子语义)。
- * 普通单击/拖拽/双击仍走原版槽位逻辑。
+ * 玩家背包槽位:Shift+单击(左键)= 该格物品整组存入网络(箱子语义).
+ * 普通单击/拖拽/双击仍走原版槽位逻辑.
  */
 public class SNPlayerSlot extends SlotWidget {
 	private static final int CLICK_ID = 1;
 
-	private final SNAccessorBlockEntity accessor;
+	private final SNAccessorBlockEntity entity;
 	private final int invIndex;
 
-	public SNPlayerSlot(SNAccessorBlockEntity accessor, int invIndex) {
-		this.accessor = accessor;
+	public SNPlayerSlot(SNAccessorBlockEntity entity, int invIndex) {
+		this.entity = entity;
 		this.invIndex = invIndex;
 	}
 
@@ -31,7 +31,7 @@ public class SNPlayerSlot extends SlotWidget {
 	}
 
 	@Override
-	public void handleClientAction(int id, FriendlyByteBuf buffer) {
+	public void handleClientAction(int id, FriendlyByteBuf buf) {
 		if (id != CLICK_ID) {
 			return;
 		}
@@ -39,12 +39,12 @@ public class SNPlayerSlot extends SlotWidget {
 		if (player == null || player.level().isClientSide) {
 			return;
 		}
-		int index = buffer.readVarInt();
+		int index = buf.readVarInt();
 		ItemStack stack = player.getInventory().getItem(index);
 		if (stack.isEmpty()) {
 			return;
 		}
-		int inserted = accessor.insertItem(stack.copy(), false);
+		int inserted = entity.insertItem(stack.copy(), false);
 		if (inserted <= 0) {
 			return;
 		}

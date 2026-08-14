@@ -7,6 +7,8 @@ import dev.celestiacraft.libs.api.register.block.BasicEntityBlock;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
@@ -27,16 +29,19 @@ public class SNAccessorBlock extends BasicEntityBlock<SNAccessorBlockEntity> {
 
 	@Override
 	public InteractionResult useOn(UseContext context) {
-		if (context.getLevel().isClientSide()) {
+		Level level = context.getLevel();
+		ItemStack stack = context.getStack();
+
+		if (level.isClientSide()) {
 			return InteractionResult.SUCCESS;
 		}
 
 		// 桶点击时交给默认逻辑,避免吞掉流体交互
-		if (context.getStack().getItem() instanceof BucketItem) {
+		if (stack.getItem() instanceof BucketItem) {
 			return super.useOn(context);
 		}
 
-		if (context.getLevel().getBlockEntity(context.getPos()) instanceof SNAccessorBlockEntity accessor && context.getPlayer() instanceof ServerPlayer serverPlayer) {
+		if (level.getBlockEntity(context.getPos()) instanceof SNAccessorBlockEntity accessor && context.getPlayer() instanceof ServerPlayer serverPlayer) {
 			return BlockEntityUIFactory.INSTANCE.openUI(accessor, serverPlayer)
 					? InteractionResult.CONSUME
 					: InteractionResult.PASS;

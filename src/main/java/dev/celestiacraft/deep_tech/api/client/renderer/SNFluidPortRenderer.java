@@ -27,7 +27,7 @@ public class SNFluidPortRenderer<T extends BlockEntity> implements BlockEntityRe
 	public void render(T be, float partialTick, PoseStack poseStack,
 	                   MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
 
-		// ----- 1. 获取过滤流体，并转换成物品（桶）用于渲染 -----
+		// ----- 1. 获取过滤流体, 并转换成物品(桶)用于渲染 -----
 		FluidStack filterFluid = FluidStack.EMPTY;
 		if (be instanceof SNFluidInputPortBlockEntity input) {
 			filterFluid = input.getFilter();
@@ -36,12 +36,12 @@ public class SNFluidPortRenderer<T extends BlockEntity> implements BlockEntityRe
 		}
 		if (filterFluid.isEmpty()) return;
 
-		// 将流体转换成物品（桶），用于渲染
+		// 将流体转换成物品(桶), 用于渲染
 		ItemStack filterItem = FluidUtil.getFilledBucket(filterFluid);
-		// 注意：如果流体没有桶装形态，getFilledBucket 可能返回空，此时需要回退方案。
-		// 可以使用 FluidHelper 或直接渲染流体材质，但为了简化，我们先假设流体有桶。
+		// 注意: 如果流体没有桶装形态, getFilledBucket 可能返回空, 此时需要回退方案. 
+		// 可以使用 FluidHelper 或直接渲染流体材质, 但为了简化, 我们先假设流体有桶. 
 		if (filterItem.isEmpty()) {
-			// 如果拿不到桶，可以尝试用 FluidStack 的渲染，但比较复杂，这里简单跳过
+			// 如果拿不到桶, 可以尝试用 FluidStack 的渲染, 但比较复杂, 这里简单跳过
 			return;
 		}
 
@@ -81,7 +81,7 @@ public class SNFluidPortRenderer<T extends BlockEntity> implements BlockEntityRe
 		float scale = 0.25f;
 		poseStack.scale(scale, scale, scale);
 
-		// ----- 6. 渲染桶（包含流体纹理） -----
+		// ----- 6. 渲染桶(包含流体纹理) -----
 		Minecraft.getInstance().getItemRenderer().renderStatic(
 				filterItem,
 				ItemDisplayContext.FIXED,

@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * 端口基类:继承 {@link BasicEntityBlock},BE 由 IEntityBlock 默认实现创建与 tick,
- * FACING 六面朝向属性由 {@link BasicEntityBlock#useFacingType()} 自动注册与管理。
+ * FACING 六面朝向属性由 {@link BasicEntityBlock#useFacingType()} 自动注册与管理. 
  */
 public abstract class SNPortBlock<T extends BlockEntity> extends BasicEntityBlock<T> {
 	// 碰撞箱与地毯一致:16x16 底板上 1 格高
@@ -59,12 +59,12 @@ public abstract class SNPortBlock<T extends BlockEntity> extends BasicEntityBloc
 	}
 
 	/**
-	 * 提取手持物品所含的流体(用于设置端口过滤)。
+	 * 提取手持物品所含的流体(用于设置端口过滤). 
 	 * <p>
 	 * Forge 1.20.1 的 {@link FluidUtil#getFluidContained} 依赖物品注册
 	 * {@code FLUID_HANDLER_ITEM} capability,而原版 {@link BucketItem} 并未注册,
-	 * 对水桶/熔岩桶会漏识别(返回空)。因此先走 {@link BucketItem#getFluid()} 直取,
-	 * 再兜底 capability 路线(模组容器、瓶等)。
+	 * 对水桶/熔岩桶会漏识别(返回空). 因此先走 {@link BucketItem#getFluid()} 直取,
+	 * 再兜底 capability 路线(模组容器, 瓶等). 
 	 */
 	protected static FluidStack getContainedFluid(ItemStack stack) {
 		if (stack.getItem() instanceof BucketItem bucket) {
