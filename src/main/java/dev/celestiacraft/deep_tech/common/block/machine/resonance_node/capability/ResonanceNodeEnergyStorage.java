@@ -178,7 +178,7 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 
 		// 限制节点数量防止性能问题
 		if (cachedNodes.size() > 100) {
-			cachedNodes = cachedNodes.subList(0, 100);
+			cachedNodes = new ArrayList<>(cachedNodes.subList(0, 100));
 		}
 	}
 }

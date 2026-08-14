@@ -134,7 +134,7 @@ public class ResonanceNodeClientHelper {
 		}
 
 		if (cachedNodes.size() > 100) {
-			cachedNodes = cachedNodes.subList(0, 100);
+			cachedNodes = new ArrayList<>(cachedNodes.subList(0, 100));
 		}
 	}
 
