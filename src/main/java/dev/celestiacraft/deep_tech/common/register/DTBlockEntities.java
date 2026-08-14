@@ -15,7 +15,6 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFlu
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemInputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 
@@ -44,6 +43,7 @@ public class DTBlockEntities {
 		SCULK_FURNACE = DeepTech.REGISTRATE.blockEntity("furnace", SculkFurnaceBlockEntity::new)
 				.validBlock(MachineBlocks.SCULK_FURNACE)
 				.register();
+
 		EXP_GENERATOR = DeepTech.REGISTRATE.blockEntity("exp_generator", EXPGeneratorBlockEntity::new)
 				.validBlock(MachineBlocks.EXP_GENERATOR)
 				.register();
@@ -55,6 +55,7 @@ public class DTBlockEntities {
 		ALLOY_FURNACE = DeepTech.REGISTRATE.blockEntity("alloy_furnace", AlloyFurnaceBlockEntity::new)
 				.validBlock(MachineBlocks.ALLOY_FURNACE)
 				.register();
+
 		ENERGY_CELL = DeepTech.REGISTRATE.blockEntity("energy_cell", EnergyCellBlockEntity::new)
 				.validBlock(MachineBlocks.ENERGY_CELL)
 				.register();
@@ -62,24 +63,31 @@ public class DTBlockEntities {
 		SN_ACCESSOR = DeepTech.REGISTRATE.blockEntity("sculk_network_accessor", SNAccessorBlockEntity::new)
 				.validBlock(MachineBlocks.SN_ACCESSOR)
 				.register();
+
 		SN_CENTER = DeepTech.REGISTRATE.blockEntity("sculk_network_center", SNCenterBlockEntity::new)
 				.validBlock(MachineBlocks.SN_CENTER)
 				.register();
+
 		SN_ITEM_INPUT_PORT = DeepTech.REGISTRATE.blockEntity("sculk_network_item_input_port", SNItemInputPortBlockEntity::new)
 				.validBlock(MachineBlocks.SN_ITEM_INPUT_PORT)
 				.register();
+
 		SN_ITEM_OUTPUT_PORT = DeepTech.REGISTRATE.blockEntity("sculk_network_item_output_port", SNItemOutputPortBlockEntity::new)
 				.validBlock(MachineBlocks.SN_ITEM_OUTPUT_PORT)
 				.register();
+
 		SN_FLUID_INPUT_PORT = DeepTech.REGISTRATE.blockEntity("sculk_network_fluid_input_port", SNFluidInputPortBlockEntity::new)
 				.validBlock(MachineBlocks.SN_FLUID_INPUT_PORT)
 				.register();
+
 		SN_FLUID_OUTPUT_PORT = DeepTech.REGISTRATE.blockEntity("sculk_network_fluid_output_port", SNFluidOutputPortBlockEntity::new)
 				.validBlock(MachineBlocks.SN_FLUID_OUTPUT_PORT)
 				.register();
+
 		SN_ITEM_RESERVOIR = DeepTech.REGISTRATE.blockEntity("sculk_network_item_reservoir", SNItemReservoirBlockEntity::new)
 				.validBlock(MachineBlocks.SN_ITEM_RESERVOIR)
 				.register();
+
 		SN_FLUID_RESERVOIR = DeepTech.REGISTRATE.blockEntity("sculk_network_fluid_reservoir", SNFluidReservoirBlockEntity::new)
 				.validBlock(MachineBlocks.SN_FLUID_RESERVOIR)
 				.register();
