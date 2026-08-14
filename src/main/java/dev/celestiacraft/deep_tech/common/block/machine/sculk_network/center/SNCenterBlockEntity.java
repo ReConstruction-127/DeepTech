@@ -29,6 +29,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
@@ -105,14 +106,16 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBl
 			applyDebugMarkers((ServerLevel) level);
 		}
 
-		// 4. 物品转运：从网络中的输入端口抽取物品存入最近的贮存器
+		// 4. 物品转运：从网络中的输入端口抽取物品存入最近的贮存器(每 10 tick 一次)
 		tickCounter++;
 		if (tickCounter % TRANSFER_INTERVAL == 0) {
 			transferItemsFromInputPorts((ServerLevel) level);
-			transferItemsToOutputPorts((ServerLevel) level);   // 新增
-			transferFluidsFromInputPorts((ServerLevel) level);   // 新增
-			transferFluidsToOutputPorts((ServerLevel) level);     // 新增
+			transferItemsToOutputPorts((ServerLevel) level);
 		}
+
+		// 5. 流体转运:每 tick 执行,50 mB/tick = 1000 mB/s
+		transferFluidsFromInputPorts((ServerLevel) level);
+		transferFluidsToOutputPorts((ServerLevel) level);
 	}
 
 	// ============================================================
@@ -398,7 +401,7 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBl
 	}
 
 
-	private static final int FLUID_TRANSFER_RATE = 50; // 每 tick 传输 50 mB = 1000 mB/s
+	private static final int FLUID_TRANSFER_RATE = 50; // 每 tick 50 mB = 1000 mB/s(传输每 tick 执行)
 
 	private void transferFluidsFromInputPorts(ServerLevel level) {
 		for (BlockPos portPos : foundFluidInputPorts) {
@@ -414,28 +417,39 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBl
 			IFluidHandler targetHandler = targetCap.orElse(null);
 			if (targetHandler == null) continue;
 
-			// 尝试从目标容器抽取流体
-			FluidStack drained = targetHandler.drain(FLUID_TRANSFER_RATE, IFluidHandler.FluidAction.SIMULATE);
-			if (drained.isEmpty()) continue;
+			// 按罐遍历(从后往前),逐罐匹配过滤后抽取。
+			// 不能用无类型 drain(max) 一次抽:聚合容器只会返回最后一个非空罐的流体,
+			// 过滤判断会错位(例如最后罐是牛奶、前面罐是水,过滤=水将永远抽不出)。
+			for (int tank = targetHandler.getTanks() - 1; tank >= 0; tank--) {
+				FluidStack tankFluid = targetHandler.getFluidInTank(tank);
+				if (tankFluid.isEmpty()) continue;
 
-			// 过滤检查
-			if (!filter.isEmpty() && !drained.isFluidEqual(filter)) continue;
+				// 过滤检查
+				if (!filter.isEmpty() && !tankFluid.isFluidEqual(filter)) continue;
 
-			// 尝试存入最近的储存器
-			FluidStack toInsert = drained.copy();
-			for (BlockPos resPos : foundFluidReservoirs) {
-				BlockEntity resBe = level.getBlockEntity(resPos);
-				if (!(resBe instanceof SNFluidReservoirBlockEntity reservoir)) continue;
-				IFluidHandler resHandler = reservoir.getTank();
+				int maxExtract = Math.min(FLUID_TRANSFER_RATE, tankFluid.getAmount());
+				if (maxExtract <= 0) continue;
 
-				int filled = resHandler.fill(toInsert, IFluidHandler.FluidAction.SIMULATE);
-				if (filled > 0) {
-					// 先从源容器真正抽取
-					FluidStack actualDrained = targetHandler.drain(filled, IFluidHandler.FluidAction.EXECUTE);
-					if (!actualDrained.isEmpty()) {
-						resHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
-						reservoir.markAsDirty();
-						break; // 一次只处理一个端口
+				// 从该罐模拟抽取
+				FluidStack request = new FluidStack(tankFluid.getFluid(), maxExtract, tankFluid.getTag());
+				FluidStack drained = targetHandler.drain(request, IFluidHandler.FluidAction.SIMULATE);
+				if (drained.isEmpty()) continue;
+
+				// 尝试存入最近的储存器
+				for (BlockPos resPos : foundFluidReservoirs) {
+					BlockEntity resBe = level.getBlockEntity(resPos);
+					if (!(resBe instanceof SNFluidReservoirBlockEntity reservoir)) continue;
+					IFluidHandler resHandler = reservoir.getTank();
+
+					int filled = resHandler.fill(drained, IFluidHandler.FluidAction.SIMULATE);
+					if (filled > 0) {
+						// 先从源容器真正抽取
+						FluidStack actualDrained = targetHandler.drain(request, IFluidHandler.FluidAction.EXECUTE);
+						if (!actualDrained.isEmpty()) {
+							resHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
+							reservoir.markAsDirty();
+							break; // 一次只处理一个罐
+						}
 					}
 				}
 			}
@@ -459,28 +473,38 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBl
 			IFluidHandler targetHandler = targetCap.orElse(null);
 			if (targetHandler == null) continue;
 
-			// 从最近的流体储存器抽取
+			// 从最近的流体储存器抽取:按罐(从后往前)逐罐匹配过滤。
+			// 不能用聚合 drain(max) 一次抽:它只返回最后一个非空罐的流体,
+			// 过滤判断会错位(例如最后罐是牛奶、前面罐是水,过滤=水将永远抽不出)。
 			for (BlockPos resPos : foundFluidReservoirs) {
 				BlockEntity resBe = level.getBlockEntity(resPos);
 				if (!(resBe instanceof SNFluidReservoirBlockEntity reservoir)) continue;
-				IFluidHandler resHandler = reservoir.getTank();
 
-				// 模拟抽取
-				FluidStack drained = resHandler.drain(FLUID_TRANSFER_RATE, IFluidHandler.FluidAction.SIMULATE);
-				if (drained.isEmpty()) continue;
+				for (int tank = reservoir.getTankCount() - 1; tank >= 0; tank--) {
+					FluidTank fluidTank = reservoir.getFluidTank(tank);
+					FluidStack tankFluid = fluidTank.getFluid();
+					if (tankFluid.isEmpty()) continue;
 
-				// 过滤检查
-				if (!filter.isEmpty() && !drained.isFluidEqual(filter)) continue;
+					// 过滤检查
+					if (!filter.isEmpty() && !tankFluid.isFluidEqual(filter)) continue;
 
-				// 尝试推入目标容器
-				int filled = targetHandler.fill(drained, IFluidHandler.FluidAction.SIMULATE);
-				if (filled > 0) {
-					// 真正抽取
-					FluidStack actualDrained = resHandler.drain(filled, IFluidHandler.FluidAction.EXECUTE);
-					if (!actualDrained.isEmpty()) {
-						targetHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
-						reservoir.markAsDirty();
-						return; // 每次只处理一组
+					int maxExtract = Math.min(FLUID_TRANSFER_RATE, tankFluid.getAmount());
+					if (maxExtract <= 0) continue;
+
+					// 模拟抽取
+					FluidStack drained = fluidTank.drain(maxExtract, IFluidHandler.FluidAction.SIMULATE);
+					if (drained.isEmpty()) continue;
+
+					// 尝试推入目标容器
+					int filled = targetHandler.fill(drained, IFluidHandler.FluidAction.SIMULATE);
+					if (filled > 0) {
+						// 真正抽取
+						FluidStack actualDrained = fluidTank.drain(filled, IFluidHandler.FluidAction.EXECUTE);
+						if (!actualDrained.isEmpty()) {
+							targetHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
+							reservoir.markAsDirty();
+							return; // 每次只处理一组
+						}
 					}
 				}
 			}
