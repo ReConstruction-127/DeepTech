@@ -67,7 +67,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 			}
 			if (entity.getProgress() > 0) {
 				entity.setProgress(0);
-				entity.setChanged(); // 状态变化，保存一次
+				entity.setChanged(); // 状态变化, 保存一次
 				entity.sync();       // 通知客户端进度归零
 				entity.setSyncCounter(0);
 			}
@@ -75,7 +75,7 @@ public class SculkFurnaceBlockEntity extends MachineBlockEntity<SculkFurnaceBloc
 			return;
 		}
 
-		// 固定参数：处理时间 100 tick（5 秒），能量消耗 20 FE/tick
+		// 固定参数: 处理时间 100 tick(5 秒), 能量消耗 20 FE/tick
 		int processingTime = 100;
 		int energyCost = 20;
 		entity.setMaxProgress(processingTime);

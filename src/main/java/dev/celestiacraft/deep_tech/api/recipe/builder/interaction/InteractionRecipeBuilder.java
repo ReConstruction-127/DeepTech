@@ -108,7 +108,7 @@ public class InteractionRecipeBuilder implements RecipeBuilder {
 		return this;
 	}
 
-	// 新增：设置交互类型
+	// 新增: 设置交互类型
 	public InteractionRecipeBuilder type(InteractionType type) {
 		interactionType = type;
 		return this;

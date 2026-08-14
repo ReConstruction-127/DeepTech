@@ -16,7 +16,7 @@ import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
-	// 目标容器位置（可配置，初版使用方块面向方向）
+	// 目标容器位置(可配置, 初版使用方块面向方向)
 	private @Nullable BlockPos targetPos = null;
 	@Getter
 	private ItemStack filter = ItemStack.EMPTY;
@@ -25,7 +25,7 @@ public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 		super(type, pos, state);
 	}
 
-	// 获取目标容器位置（根据朝向自动计算,朝向实时读取自方块状态）
+	// 获取目标容器位置(根据朝向自动计算,朝向实时读取自方块状态)
 	public BlockPos getTargetPos() {
 		if (targetPos == null && level != null) {
 			BlockState state = getState();
@@ -53,7 +53,7 @@ public class SNItemOutputPortBlockEntity extends BasicBlockEntity {
 		markDirty();
 	}
 
-	// 获取目标容器的 IItemHandler（用于输出）
+	// 获取目标容器的 IItemHandler(用于输出)
 	public LazyOptional<IItemHandler> getTargetItemHandler() {
 		if (level == null) return LazyOptional.empty();
 		BlockPos pos = getTargetPos();

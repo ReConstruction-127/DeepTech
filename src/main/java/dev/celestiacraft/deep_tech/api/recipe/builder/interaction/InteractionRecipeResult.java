@@ -41,7 +41,7 @@ public class InteractionRecipeResult implements FinishedRecipe {
 			JsonObject obj = new JsonObject();
 			obj.addProperty("item", ForgeRegistries.ITEMS.getKey(wr.stack.getItem()).toString());
 			if (wr.stack.getCount() != 1) obj.addProperty("count", wr.stack.getCount());
-// ✅ 写入 chance（不再写入 weight）
+// ✅ 写入 chance(不再写入 weight)
 			obj.addProperty("chance", wr.chance);
 			resultsArray.add(obj);
 		}
@@ -70,7 +70,7 @@ public class InteractionRecipeResult implements FinishedRecipe {
 			json.addProperty("consume_trigger", true);
 		}
 
-		// 写入交互类型（如果非 ANY）
+		// 写入交互类型(如果非 ANY)
 		if (interactionType != InteractionType.ANY) {
 			json.addProperty("interaction_type", interactionType.name().toLowerCase());
 		}

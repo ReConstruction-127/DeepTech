@@ -34,7 +34,7 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 		for (var elem : resultsArray) {
 			JsonObject obj = elem.getAsJsonObject();
 			ItemStack stack = RecipeResultUtil.itemStackFromJson(obj);
-			// ✅ 读取 chance，默认 1.0（100%）
+			// ✅ 读取 chance, 默认 1.0(100%)
 			double chance = GsonHelper.getAsDouble(obj, "chance", 1.0);
 			results.add(new ChanceResult(stack, chance));
 		}
@@ -61,7 +61,7 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 
 		boolean consume = GsonHelper.getAsBoolean(json, "consume_trigger", false);
 
-		// 解析交互类型（默认为 ANY）
+		// 解析交互类型(默认为 ANY)
 		InteractionType type = InteractionType.ANY;
 		if (json.has("interaction_type")) {
 			String typeStr = GsonHelper.getAsString(json, "interaction_type");

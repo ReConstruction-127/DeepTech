@@ -19,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
 public class SNItemPortRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
 
 	public SNItemPortRenderer(BlockEntityRendererProvider.Context context) {
-		// 可以在这里获取一些渲染资源，但本例不需要
+		// 可以在这里获取一些渲染资源, 但本例不需要
 	}
 
 	@Override

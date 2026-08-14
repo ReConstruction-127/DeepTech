@@ -125,9 +125,9 @@ public class MachineFluidHandler implements IFluidHandler, INBTSerializable<Comp
 	}
 
 	/**
-	 * 返回只暴露指定单个储罐的 IFluidHandler 视图(共享同一份存储)。
+	 * 返回只暴露指定单个储罐的 IFluidHandler 视图(共享同一份存储). 
 	 * 用于 UI 槽位绑定:让 LDLib TankWidget 的桶点击精确作用于该罐,
-	 * 而不是按聚合 handler 的顺序填到最早的空罐/从最后罐抽取。
+	 * 而不是按聚合 handler 的顺序填到最早的空罐/从最后罐抽取. 
 	 */
 	public IFluidHandler getTankHandler(int tank) {
 		return new IFluidHandler() {

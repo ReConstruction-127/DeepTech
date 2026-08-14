@@ -17,9 +17,9 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	// 静态注册方法（与 CrushingRecipeGen 保持一致）
+	// 静态注册方法(与 CrushingRecipeGen 保持一致)
 	public static void register(Consumer<FinishedRecipe> consumer) {
-		// 压板：左键
+		// 压板: 左键
 		InteractionRecipeBuilder.builder()
 				.trigger(Items.IRON_INGOT)
 				.target(Blocks.REINFORCED_DEEPSLATE)
@@ -53,7 +53,7 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.type(InteractionType.LEFT_CLICK)
 				.save(consumer, save("interaction/gold_plate_craft"));
 
-		// 强化深板岩修复：右键
+		// 强化深板岩修复: 右键
 		InteractionRecipeBuilder.builder()
 				.trigger(MaterialItems.SCULK_BONE)
 				.target(Blocks.DEEPSLATE)
@@ -62,7 +62,7 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 				.type(InteractionType.RIGHT_CLICK)
 				.save(consumer, save("interaction/sculk_bone_repair"));
 
-		// 幽匿骨粉复原：左键
+		// 幽匿骨粉复原: 左键
 		InteractionRecipeBuilder.builder()
 				.trigger(MaterialItems.SCULK_BONEMEAL)
 				.target(Blocks.SCULK)

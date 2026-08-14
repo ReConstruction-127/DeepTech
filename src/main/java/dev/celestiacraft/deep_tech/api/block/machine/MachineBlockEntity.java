@@ -43,7 +43,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	private int energy = 0;
 	// 用于控制 sync 频率的计数器
 	private int syncCounter = 0;
-	// 复用 inventoryWrapper，避免每 tick 创建
+	// 复用 inventoryWrapper, 避免每 tick 创建
 	private final SimpleMachineInventory inventory;
 
 	public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -89,7 +89,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	public void sync() {
 		if (level != null && !level.isClientSide) {
 			setChanged();
-			// 强制发送 BlockEntity 数据包，不依赖 BlockState 变化
+			// 强制发送 BlockEntity 数据包, 不依赖 BlockState 变化
 			if (level instanceof ServerLevel serverLevel) {
 				serverLevel.getChunkSource().blockChanged(worldPosition);
 			}
@@ -214,7 +214,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 		return getMachineMaxEnergy();
 	}
 
-	protected void addPlayerInventory(WidgetGroup group, Player player) {
+	public void addPlayerInventory(WidgetGroup group, Player player) {
 		Container inventory = player.getInventory();
 
 		for (int row = 0; row < 3; row++) {

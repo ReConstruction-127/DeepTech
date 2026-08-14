@@ -30,7 +30,7 @@ public interface IMachineItemConfig {
 	 * <p>
 	 * 输出槽会紧接在输入槽之后连续排列
 	 * <p>
-	 * 例如输入槽数量为 1、输出槽数量为 1 时, slot 1 是输出槽
+	 * 例如输入槽数量为 1, 输出槽数量为 1 时, slot 1 是输出槽
 	 *
 	 * @return 输出槽数量
 	 */

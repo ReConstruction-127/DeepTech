@@ -24,7 +24,7 @@ public class RecipeResultUtil {
 	 *
 	 * @param result 配方的 result JSON 对象
 	 * @return 解析得到的输出物品
-	 * @throws JsonSyntaxException 当 item 缺失、ID 非法、物品不存在或 count 小于 1 时抛出
+	 * @throws JsonSyntaxException 当 item 缺失, ID 非法, 物品不存在或 count 小于 1 时抛出
 	 */
 	public static ItemStack itemStackFromJson(JsonObject result) {
 		String itemName = GsonHelper.getAsString(result, "item");

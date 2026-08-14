@@ -8,6 +8,7 @@ import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.capability.SNItemReservoirInventory;
 import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
@@ -31,21 +32,9 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 		super(type, pos, state);
 	}
 
-	// ========== 54 格物品栏 ==========
-	private final ItemStackHandler inventory = new ItemStackHandler(54) {
-		@Override
-		protected void onContentsChanged(int slot) {
-			markDirty();
-		}
-	};
+	private final ItemStackHandler inventory = new SNItemReservoirInventory(this);
 
 	private final LazyOptional<IItemHandler> inventoryCap = LazyOptional.of(() -> inventory);
-
-	// ============================================================
-	//  LDLib GUI 核心方法
-	// ============================================================
-
-
 
 	@Override
 	public ModularUI createUI(Player player) {
@@ -57,7 +46,7 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 		title.setColor(0xFF5D5F60);
 		main.addWidget(title);
 
-		// 储存器槽位（6行×9列）
+		// 储存器槽位(6行×9列)
 		int index = 0;
 		for (int row = 0; row < 6; row++) {
 			for (int col = 0; col < 9; col++) {
@@ -69,7 +58,7 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 			}
 		}
 
-		// 玩家背包（3行）
+		// 玩家背包(3行)
 		Container playerInv = player.getInventory();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
@@ -79,7 +68,7 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 			}
 		}
 
-		// 快捷栏（1行）
+		// 快捷栏(1行)
 		for (int col = 0; col < 9; col++) {
 			int x = 8 + col * 18;
 			int y = 198;
@@ -89,7 +78,7 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 		return ui.widget(main);
 	}
 
-	// 机器槽位（与 MachineItemSlots.createSlot 一致,isPlayerContainer 默认为 false）
+	// 机器槽位(与 MachineItemSlots.createSlot 一致,isPlayerContainer 默认为 false)
 	private void addMachineSlot(WidgetGroup group, Container container, int slotIndex, int x, int y) {
 		SlotWidget slot = new SlotWidget();
 		slot.setContainerSlot(container, slotIndex);
@@ -100,8 +89,8 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 		group.addWidget(slot);
 	}
 
-	// 玩家槽位（与 MachineBlockEntity.addPlayerInventory 一致,isPlayerContainer 必须为 true,
-	// shift-click 时 LDLib 才把这里当作玩家背包目标槽）
+	// 玩家槽位(与 MachineBlockEntity.addPlayerInventory 一致,isPlayerContainer 必须为 true,
+	// shift-click 时 LDLib 才把这里当作玩家背包目标槽)
 	private void addPlayerSlot(WidgetGroup group, Container container, int slotIndex, int x, int y) {
 		SlotWidget slot = new SlotWidget();
 		slot.initTemplate();

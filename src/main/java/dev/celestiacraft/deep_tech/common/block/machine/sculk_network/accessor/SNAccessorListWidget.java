@@ -4,19 +4,24 @@ import com.lowdragmc.lowdraglib.gui.modular.ModularUIContainer;
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.side.fluid.forge.FluidHelperImpl;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.SNAccessorBlockEntity.FluidEntry;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.SNAccessorBlockEntity.ItemEntry;
+import com.mojang.blaze3d.vertex.PoseStack;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.capability.FixedFluidSource;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.capability.NetworkFluidSink;
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidActionResult;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -30,10 +35,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * 访问器网格控件:物品 / 流体列表共用。
+ * 访问器网格控件:物品 / 流体列表共用.
  * <p>
  * 网格式展示(9 列 × 可见区高度行,可滚动 + 搜索过滤),数据由服务端
- * detectAndSendChanges 推送,客户端本地过滤排序渲染。
+ * detectAndSendChanges 推送,客户端本地过滤排序渲染.
  * <p>
  * 交互(经 writeClientAction 通知服务端执行,物品/流体语义不同):
  * <ul>
@@ -43,7 +48,6 @@ import java.util.Locale;
  * </ul>
  */
 public class SNAccessorListWidget extends Widget {
-
 	public enum Kind {
 		ITEMS,
 		FLUIDS
@@ -54,7 +58,7 @@ public class SNAccessorListWidget extends Widget {
 	private static final int CLICK_ID = 1;
 
 	/** 单行显示数据(图标 + 名称 + 总数) */
-	private static final class Row {
+	private static class Row {
 		private final ItemStack item;
 		private final FluidStack fluid;
 		private final String name;
@@ -69,14 +73,16 @@ public class SNAccessorListWidget extends Widget {
 	}
 
 	private final SNAccessorBlockEntity accessor;
+	@Getter
 	private final Kind kind;
 	private final int cols;
 
 	// 客户端数据(由服务端同步的全量条目)
-	private final List<ItemEntry> allItems = new ArrayList<>();
-	private final List<FluidEntry> allFluids = new ArrayList<>();
+	private final List<SNAccessorBlockEntity.ItemEntry> allItems = new ArrayList<>();
+	private final List<SNAccessorBlockEntity.FluidEntry> allFluids = new ArrayList<>();
 	private final List<Row> rows = new ArrayList<>();
 
+	@Getter
 	private String filter = "";
 	private int rowOffset = 0;
 
@@ -90,22 +96,10 @@ public class SNAccessorListWidget extends Widget {
 		this.cols = Math.max(1, cols);
 	}
 
-	public Kind getKind() {
-		return kind;
-	}
-
-	public String getFilter() {
-		return filter;
-	}
-
 	public void setFilter(String text) {
-		this.filter = text == null ? "" : text;
+		filter = text == null ? "" : text;
 		applyFilterAndSort();
 	}
-
-	// ============================================================
-	//  服务端:变更检测与推送
-	// ============================================================
 
 	@Override
 	public void detectAndSendChanges() {
@@ -114,7 +108,7 @@ public class SNAccessorListWidget extends Widget {
 		}
 		accessor.refreshIfNeeded();
 
-		net.minecraft.nbt.CompoundTag tag = buildTag();
+		CompoundTag tag = buildTag();
 		String key = tag.toString();
 		if (!key.equals(lastSent)) {
 			lastSent = key;
@@ -122,20 +116,22 @@ public class SNAccessorListWidget extends Widget {
 		}
 	}
 
-	private net.minecraft.nbt.CompoundTag buildTag() {
-		net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-		net.minecraft.nbt.ListTag list = new net.minecraft.nbt.ListTag();
+	private CompoundTag buildTag() {
+		CompoundTag tag = new CompoundTag();
+		ListTag list = new ListTag();
+
 		if (kind == Kind.ITEMS) {
-			for (ItemEntry entry : accessor.getItemEntries()) {
-				net.minecraft.nbt.CompoundTag c = new net.minecraft.nbt.CompoundTag();
-				c.put("Stack", entry.stack().save(new net.minecraft.nbt.CompoundTag()));
-				c.putLong("Count", entry.count());
-				list.add(c);
+			for (SNAccessorBlockEntity.ItemEntry entry : accessor.getItemEntries()) {
+				CompoundTag nbt = new CompoundTag();
+
+				nbt.put("Stack", entry.stack().save(new CompoundTag()));
+				nbt.putLong("Count", entry.count());
+				list.add(nbt);
 			}
 		} else {
-			for (FluidEntry entry : accessor.getFluidEntries()) {
-				net.minecraft.nbt.CompoundTag c = new net.minecraft.nbt.CompoundTag();
-				c.put("Stack", entry.stack().writeToNBT(new net.minecraft.nbt.CompoundTag()));
+			for (SNAccessorBlockEntity.FluidEntry entry : accessor.getFluidEntries()) {
+				CompoundTag c = new CompoundTag();
+				c.put("Stack", entry.stack().writeToNBT(new CompoundTag()));
 				c.putLong("Amount", entry.amount());
 				list.add(c);
 			}
@@ -144,58 +140,55 @@ public class SNAccessorListWidget extends Widget {
 		return tag;
 	}
 
-	// ============================================================
-	//  客户端:接收数据并重建显示列表
-	// ============================================================
-
 	@Override
-	public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
+	public void readUpdateInfo(int id, FriendlyByteBuf buf) {
 		if (id != UPDATE_ID) {
 			return;
 		}
-		net.minecraft.nbt.CompoundTag tag = buffer.readNbt();
+		CompoundTag tag = buf.readNbt();
 		if (tag == null) {
 			return;
 		}
 		if (kind == Kind.ITEMS) {
 			allItems.clear();
-			for (var c : tag.getList("List", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
-				net.minecraft.nbt.CompoundTag cc = (net.minecraft.nbt.CompoundTag) c;
+			for (Tag nbt : tag.getList("List", Tag.TAG_COMPOUND)) {
+				CompoundTag cc = (CompoundTag) nbt;
+
 				ItemStack stack = ItemStack.of(cc.getCompound("Stack"));
 				if (stack.isEmpty()) {
 					continue;
 				}
-				allItems.add(new ItemEntry(stack, cc.getLong("Count")));
+				allItems.add(new SNAccessorBlockEntity.ItemEntry(stack, cc.getLong("Count")));
 			}
 			applyFilterAndSort();
 		} else {
 			allFluids.clear();
-			for (var c : tag.getList("List", net.minecraft.nbt.Tag.TAG_COMPOUND)) {
-				net.minecraft.nbt.CompoundTag cc = (net.minecraft.nbt.CompoundTag) c;
+			for (Tag c : tag.getList("List", Tag.TAG_COMPOUND)) {
+				CompoundTag cc = (CompoundTag) c;
 				net.minecraftforge.fluids.FluidStack forge = net.minecraftforge.fluids.FluidStack.loadFluidStackFromNBT(cc.getCompound("Stack"));
 				if (forge.isEmpty()) {
 					continue;
 				}
-				allFluids.add(new FluidEntry(forge, cc.getLong("Amount")));
+				allFluids.add(new SNAccessorBlockEntity.FluidEntry(forge, cc.getLong("Amount")));
 			}
 			applyFilterAndSort();
 		}
 	}
 
 	/**
-	 * 应用搜索过滤并按显示名称排序(客户端,实时语言环境)。
+	 * 应用搜索过滤并按显示名称排序(客户端,实时语言环境).
 	 */
 	private void applyFilterAndSort() {
 		rows.clear();
 		if (kind == Kind.ITEMS) {
-			for (ItemEntry entry : allItems) {
+			for (SNAccessorBlockEntity.ItemEntry entry : allItems) {
 				String name = entry.stack().getHoverName().getString();
 				if (matchesFilter(name, entry.stack().getItem().getDescriptionId(), idOf(entry.stack()))) {
 					rows.add(new Row(entry.stack(), null, name, entry.count()));
 				}
 			}
 		} else {
-			for (FluidEntry entry : allFluids) {
+			for (SNAccessorBlockEntity.FluidEntry entry : allFluids) {
 				FluidStack forge = entry.stack();
 				String name = FluidHelperImpl.getDisplayName(FluidHelperImpl.toFluidStack(forge)).getString();
 				if (matchesFilter(name, "", "")) {
@@ -253,13 +246,13 @@ public class SNAccessorListWidget extends Widget {
 	// ============================================================
 
 	@Override
-	public void drawInBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+	public void drawInBackground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
 		int x = getPosition().x;
 		int y = getPosition().y;
 		int offsetX = getOffsetX();
 		int offsetY = getOffsetY();
 		int visibleRows = getVisibleRows();
-		var font = Minecraft.getInstance().font;
+		Font font = Minecraft.getInstance().font;
 
 		// 鼠标悬停的格子
 		int hoverCellIndex = -1;
@@ -306,11 +299,18 @@ public class SNAccessorListWidget extends Widget {
 				// 数量角标(右上角,半倍字)
 				if (entry.amount > 0) {
 					String countText = entry.amount > 99999 ? "∞" : String.valueOf(entry.amount);
-					var pose = graphics.pose();
+					PoseStack pose = graphics.pose();
 					pose.pushPose();
 					pose.translate(cellX, cellY, 0);
 					pose.scale(0.5f, 0.5f, 1.0f);
-					graphics.drawString(font, countText, (CELL_SIZE - 3) * 2 - font.width(countText), (CELL_SIZE - 9) * 2, 0xFFFFFFFF, true);
+					graphics.drawString(
+							font,
+							countText,
+							((CELL_SIZE - 3) << 1) - font.width(countText),
+							(CELL_SIZE - 9) << 1,
+							0xFFFFFFFF,
+							true
+					);
 					pose.popPose();
 				}
 			}
@@ -322,17 +322,13 @@ public class SNAccessorListWidget extends Widget {
 		if (!isMouseOverElement(mouseX, mouseY)) {
 			return false;
 		}
-		rowOffset -= (int) wheelDelta * 2;
+		rowOffset -= (int) wheelDelta << 1;
 		rowOffset = Math.max(0, Math.min(rowOffset, getMaxRowOffset()));
 		return true;
 	}
 
-	// ============================================================
-	//  交互(客户端发起,服务端执行)
-	// ============================================================
-
 	@Override
-	public void drawInForeground(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+	public void drawInForeground(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
 		if (!isMouseOverElement(mouseX, mouseY)) {
 			return;
 		}
@@ -366,7 +362,6 @@ public class SNAccessorListWidget extends Widget {
 		}
 		int cellIndex = (rowOffset + row) * cols + col;
 
-		// 条目身份(空格子为空 NBT → 服务端得到 EMPTY)
 		CompoundTag identity;
 		if (cellIndex < rows.size()) {
 			Row target = rows.get(cellIndex);
@@ -381,7 +376,7 @@ public class SNAccessorListWidget extends Widget {
 		}
 
 		int actionFlags = flags;
-		writeClientAction(CLICK_ID, buf -> {
+		writeClientAction(CLICK_ID, (buf) -> {
 			buf.writeNbt(identity);
 			buf.writeVarInt(actionFlags);
 		});
@@ -468,7 +463,7 @@ public class SNAccessorListWidget extends Widget {
 	 * <ul>
 	 *   <li>光标是空容器(且仅 1 个)且格子有流体:从网络灌满该容器,留在光标</li>
 	 *   <li>光标是有流体的容器(且仅 1 个):把容器流体全部倒入网络,空容器留在光标</li>
-	 *   <li>光标是其他物品、或容器成组(>1 个):无操作</li>
+	 *   <li>光标是其他物品, 或容器成组(>1 个):无操作</li>
 	 * </ul>
 	 */
 	private void handleFluidClick(Player player, FluidStack key, int flags) {
@@ -488,8 +483,8 @@ public class SNAccessorListWidget extends Widget {
 			if (!drained.isEmpty()) {
 				FixedFluidSource source = new FixedFluidSource(drained);
 				FluidActionResult filled = FluidUtil.tryFillContainer(carried, source, Integer.MAX_VALUE, player, true);
-				if (!source.fluid.isEmpty()) {
-					accessor.fill(source.fluid, IFluidHandler.FluidAction.EXECUTE);
+				if (!source.getFluid().isEmpty()) {
+					accessor.fill(source.getFluid(), IFluidHandler.FluidAction.EXECUTE);
 				}
 				if (filled.isSuccess()) {
 					container.setCarried(filled.getResult());
@@ -499,106 +494,9 @@ public class SNAccessorListWidget extends Widget {
 		}
 
 		// 2) 灌不进去(容器已满/非容器):光标上若有流体则全部倒入网络
-		FluidActionResult emptied = FluidUtil.tryEmptyContainer(carried, new NetworkFluidSink(), Integer.MAX_VALUE, player, true);
+		FluidActionResult emptied = FluidUtil.tryEmptyContainer(carried, new NetworkFluidSink(accessor), Integer.MAX_VALUE, player, true);
 		if (emptied.isSuccess()) {
 			container.setCarried(emptied.getResult());
-		}
-	}
-
-	/**
-	 * 已从网络抽出的流体的固定来源:供 tryFillContainer 模拟/实际灌入。
-	 * 灌完剩余的仍可通过 {@link #fluid} 读回,由调用方归还网络。
-	 */
-	private static final class FixedFluidSource implements IFluidHandler {
-		private FluidStack fluid;
-
-		private FixedFluidSource(FluidStack fluid) {
-			this.fluid = fluid;
-		}
-
-		@Override
-		public int getTanks() {
-			return 1;
-		}
-
-		@Override
-		public @NotNull FluidStack getFluidInTank(int tank) {
-			return fluid;
-		}
-
-		@Override
-		public int getTankCapacity(int tank) {
-			return fluid.getAmount();
-		}
-
-		@Override
-		public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-			return true;
-		}
-
-		@Override
-		public int fill(FluidStack resource, FluidAction action) {
-			return 0;
-		}
-
-		@Override
-		public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
-			if (resource.isEmpty() || !resource.isFluidEqual(fluid)) {
-				return FluidStack.EMPTY;
-			}
-			return drain(resource.getAmount(), action);
-		}
-
-		@Override
-		public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-			if (fluid.isEmpty() || maxDrain <= 0) {
-				return FluidStack.EMPTY;
-			}
-			FluidStack out = fluid.copy();
-			out.setAmount(Math.min(maxDrain, fluid.getAmount()));
-			if (action.execute()) {
-				fluid.shrink(out.getAmount());
-			}
-			return out;
-		}
-	}
-
-	/** 网络流体接收端:直接把灌入的流体写进网络储库 */
-	private final class NetworkFluidSink implements IFluidHandler {
-
-		@Override
-		public int getTanks() {
-			return 1;
-		}
-
-		@Override
-		public @NotNull FluidStack getFluidInTank(int tank) {
-			return FluidStack.EMPTY;
-		}
-
-		@Override
-		public int getTankCapacity(int tank) {
-			return Integer.MAX_VALUE;
-		}
-
-		@Override
-		public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-			return true;
-		}
-
-		@Override
-		public int fill(FluidStack resource, FluidAction action) {
-			return accessor.fill(resource, action);
-		}
-
-		@Override
-		public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
-			return FluidStack.EMPTY;
-		}
-
-		@Override
-		public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-			return FluidStack.EMPTY;
 		}
 	}
 }
