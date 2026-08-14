@@ -484,7 +484,8 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 					int filled = resHandler.fill(drained, IFluidHandler.FluidAction.SIMULATE);
 					if (filled > 0) {
 						// 先从源容器真正抽取
-						FluidStack actualDrained = targetHandler.drain(request, IFluidHandler.FluidAction.EXECUTE);
+						FluidStack toDrain = new FluidStack(drained.getFluid(), filled, drained.getTag());
+						FluidStack actualDrained = targetHandler.drain(toDrain, IFluidHandler.FluidAction.EXECUTE);
 						if (!actualDrained.isEmpty()) {
 							resHandler.fill(actualDrained, IFluidHandler.FluidAction.EXECUTE);
 							reservoir.markAsDirty();
