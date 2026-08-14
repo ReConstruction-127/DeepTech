@@ -11,7 +11,6 @@ import net.minecraft.world.item.ItemStack;
  * 普通单击/拖拽/双击仍走原版槽位逻辑。
  */
 public class SNPlayerSlot extends SlotWidget {
-
 	private static final int CLICK_ID = 1;
 
 	private final SNAccessorBlockEntity accessor;

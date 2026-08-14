@@ -4,7 +4,6 @@ import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
@@ -15,6 +14,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
@@ -59,7 +59,9 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 	private static final int REFRESH_INTERVAL = 20;
 
 	// ========== 汇总结果(服务端维护) ==========
+	@Getter
 	private final List<ItemEntry> itemEntries = new ArrayList<>();
+	@Getter
 	private final List<FluidEntry> fluidEntries = new ArrayList<>();
 	private final List<SNItemReservoirBlockEntity> itemReservoirs = new ArrayList<>();
 	private final List<SNFluidReservoirBlockEntity> fluidReservoirs = new ArrayList<>();
@@ -119,7 +121,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 				}
 			}
 
-			if (pos.distSqr(worldPosition) >= 16 * 16) {
+			if (pos.distSqr(worldPosition) >= 16 << 4) {
 				continue;
 			}
 			for (var dir : Direction.values()) {
@@ -182,21 +184,13 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		}
 	}
 
-	public List<ItemEntry> getItemEntries() {
-		return itemEntries;
-	}
-
-	public List<FluidEntry> getFluidEntries() {
-		return fluidEntries;
-	}
-
 	/** 让汇总缓存下次 tick 立即刷新(存取操作后调用) */
 	private void forceRefreshSoon() {
 		if (level == null || level.isClientSide) {
 			return;
 		}
 		nextRefreshTime = level.getGameTime();
-		this.setChanged();
+		setChanged();
 	}
 
 	// ============================================================
@@ -358,7 +352,14 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 
 		// 物品列表(9×3,可滚动 + 搜索过滤)
 		SNAccessorListWidget itemList = new SNAccessorListWidget(this, SNAccessorListWidget.Kind.ITEMS, 9, 7, 34, 162, 54);
-		group.addWidget(new TextFieldWidget(7, 20, 162, 12, itemList::getFilter, itemList::setFilter).setClientSideWidget().setBordered(true));
+		group.addWidget(new TextFieldWidget(
+				7,
+				20,
+				162,
+				12,
+				itemList::getFilter,
+				itemList::setFilter
+		).setClientSideWidget().setBordered(true));
 		group.addWidget(itemList);
 
 		// 流体列表(9×2,紧邻物品区下方,无搜索栏)
@@ -391,16 +392,16 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 
 	@Override
 	public boolean isInvalid() {
-		return this.isRemoved();
+		return isRemoved();
 	}
 
 	@Override
 	public boolean isRemote() {
-		return this.level != null && this.level.isClientSide;
+		return level != null && level.isClientSide;
 	}
 
 	@Override
 	public void markAsDirty() {
-		this.setChanged();
+		setChanged();
 	}
 }

@@ -2,8 +2,6 @@ package dev.celestiacraft.deep_tech.common.register.block;
 
 import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.block.FrameBlock;
-import dev.celestiacraft.deep_tech.api.block.properties.MiningLevel;
 import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
 import net.minecraft.world.level.block.CarpetBlock;
@@ -18,8 +16,7 @@ public class BasicBlocks {
 				.tab(DTCreativeTabs.getTabKey("machine"))
 				.build()
 				.register();
-	}
-	static {
+
 		SCULK_NETWORK_VEIN = DeepTech.REGISTRATE.block("sculk_network_vein", CarpetBlock::new)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))
