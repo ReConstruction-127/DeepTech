@@ -15,7 +15,6 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
-import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
@@ -30,6 +29,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -48,24 +48,30 @@ import java.util.Set;
  * 不过度依赖中枢的扫描结果,访问器自身即可定位储存器。
  */
 public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder.BlockEntityUI, ITickableBlockEntity<SNAccessorBlockEntity> {
+
 	public record ItemEntry(ItemStack stack, long count) {
 	}
 
 	public record FluidEntry(FluidStack stack, long amount) {
 	}
 
+	/** 汇总刷新间隔(tick) */
 	private static final int REFRESH_INTERVAL = 20;
 
 	// ========== 汇总结果(服务端维护) ==========
-	@Getter
 	private final List<ItemEntry> itemEntries = new ArrayList<>();
-	@Getter
 	private final List<FluidEntry> fluidEntries = new ArrayList<>();
+	private final List<SNItemReservoirBlockEntity> itemReservoirs = new ArrayList<>();
+	private final List<SNFluidReservoirBlockEntity> fluidReservoirs = new ArrayList<>();
 	private long nextRefreshTime = Long.MIN_VALUE;
 
 	public SNAccessorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
+
+	// ============================================================
+	//  Tick(驱动汇总缓存刷新,由 IEntityBlock 默认 ticker 驱动)
+	// ============================================================
 
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, SNAccessorBlockEntity entity) {
@@ -88,15 +94,14 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		nextRefreshTime = level.getGameTime() + REFRESH_INTERVAL;
 		itemEntries.clear();
 		fluidEntries.clear();
+		itemReservoirs.clear();
+		fluidReservoirs.clear();
 
 		// BFS 收集网络中的储存器
 		Queue<BlockPos> queue = new ArrayDeque<>();
 		Set<BlockPos> visited = new HashSet<>();
 		queue.add(worldPosition);
 		visited.add(worldPosition);
-
-		List<SNItemReservoirBlockEntity> itemReservoirs = new ArrayList<>();
-		List<SNFluidReservoirBlockEntity> fluidReservoirs = new ArrayList<>();
 
 		while (!queue.isEmpty()) {
 			BlockPos pos = queue.poll();
@@ -114,11 +119,11 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 				}
 			}
 
-			if (pos.distSqr(worldPosition) >= 16 << 4) {
+			if (pos.distSqr(worldPosition) >= 16 * 16) {
 				continue;
 			}
-			for (Direction direction : Direction.values()) {
-				BlockPos neighbor = pos.relative(direction);
+			for (var dir : Direction.values()) {
+				BlockPos neighbor = pos.relative(dir);
 				if (!visited.contains(neighbor) && SNHelper.isNetworkComponent(level, neighbor)) {
 					visited.add(neighbor);
 					queue.add(neighbor);
@@ -143,7 +148,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 				itemIcons.putIfAbsent(stack.getItem(), stack.copy());
 			}
 		}
-		for (Map.Entry<Item, long[]> entry : itemCounts.entrySet()) {
+		for (var entry : itemCounts.entrySet()) {
 			ItemStack icon = itemIcons.get(entry.getKey());
 			if (icon == null) {
 				continue;
@@ -177,6 +182,161 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		}
 	}
 
+	public List<ItemEntry> getItemEntries() {
+		return itemEntries;
+	}
+
+	public List<FluidEntry> getFluidEntries() {
+		return fluidEntries;
+	}
+
+	/** 让汇总缓存下次 tick 立即刷新(存取操作后调用) */
+	private void forceRefreshSoon() {
+		if (level == null || level.isClientSide) {
+			return;
+		}
+		nextRefreshTime = level.getGameTime();
+		this.setChanged();
+	}
+
+	// ============================================================
+	//  网络存取(终端语义:物品/流体均可存入与取出)
+	// ============================================================
+
+	/**
+	 * 把物品存入网络(依次塞入各物品储库)。返回实际存入数量。
+	 */
+	public int insertItem(ItemStack stack, boolean simulate) {
+		if (stack.isEmpty() || level == null || level.isClientSide) {
+			return 0;
+		}
+		refreshIfNeeded();
+		int inserted = 0;
+		ItemStack remaining = stack.copy();
+		for (SNItemReservoirBlockEntity reservoir : itemReservoirs) {
+			if (remaining.isEmpty()) {
+				break;
+			}
+			IItemHandler handler = reservoir.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+			if (handler == null) {
+				continue;
+			}
+			int before = remaining.getCount();
+			remaining = ItemHandlerHelper.insertItem(handler, remaining, simulate);
+			inserted += before - remaining.getCount();
+		}
+		if (inserted > 0 && !simulate) {
+			forceRefreshSoon();
+		}
+		return inserted;
+	}
+
+	/**
+	 * 从网络取出指定物品(按物品 ID+NBT 匹配,遍历各储库)。返回实际抽出的堆。
+	 */
+	public ItemStack extractItem(ItemStack filter, int amount, boolean simulate) {
+		if (filter.isEmpty() || amount <= 0 || level == null || level.isClientSide) {
+			return ItemStack.EMPTY;
+		}
+		refreshIfNeeded();
+		int remaining = amount;
+		ItemStack result = ItemStack.EMPTY;
+		for (SNItemReservoirBlockEntity reservoir : itemReservoirs) {
+			if (remaining <= 0) {
+				break;
+			}
+			IItemHandler handler = reservoir.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+			if (handler == null) {
+				continue;
+			}
+			for (int slot = 0; slot < handler.getSlots(); slot++) {
+				ItemStack stack = handler.getStackInSlot(slot);
+				if (stack.isEmpty() || !ItemStack.isSameItemSameTags(stack, filter)) {
+					continue;
+				}
+				ItemStack extracted = handler.extractItem(slot, Math.min(remaining, stack.getCount()), simulate);
+				if (extracted.isEmpty()) {
+					continue;
+				}
+				remaining -= extracted.getCount();
+				if (result.isEmpty()) {
+					result = extracted.copy();
+				} else {
+					result.grow(extracted.getCount());
+				}
+				if (remaining <= 0) {
+					break;
+				}
+			}
+		}
+		if (!result.isEmpty() && !simulate) {
+			forceRefreshSoon();
+		}
+		return result;
+	}
+
+	/**
+	 * 把流体存入网络(依次填入各流体储库)。返回实际存入量(mB)。
+	 */
+	public int fill(FluidStack stack, IFluidHandler.FluidAction action) {
+		if (stack.isEmpty() || level == null || level.isClientSide) {
+			return 0;
+		}
+		refreshIfNeeded();
+		int filled = 0;
+		FluidStack remaining = stack.copy();
+		for (SNFluidReservoirBlockEntity reservoir : fluidReservoirs) {
+			if (remaining.isEmpty()) {
+				break;
+			}
+			IFluidHandler handler = reservoir.getTank();
+			int amount = handler.fill(remaining, action);
+			filled += amount;
+			if (amount > 0) {
+				remaining.shrink(amount);
+			}
+		}
+		if (filled > 0 && !action.simulate()) {
+			forceRefreshSoon();
+		}
+		return filled;
+	}
+
+	/**
+	 * 从网络抽取流体(按流体类型匹配)。返回实际抽出的流体堆。
+	 */
+	public FluidStack drain(FluidStack resource, IFluidHandler.FluidAction action) {
+		if (resource.isEmpty() || level == null || level.isClientSide) {
+			return FluidStack.EMPTY;
+		}
+		refreshIfNeeded();
+		int drained = 0;
+		FluidStack result = FluidStack.EMPTY;
+		for (SNFluidReservoirBlockEntity reservoir : fluidReservoirs) {
+			if (drained >= resource.getAmount()) {
+				break;
+			}
+			IFluidHandler handler = reservoir.getTank();
+			// 必须用带类型过滤的重载,否则会从"最后一个罐"抽出无关流体(指哪取哪)
+			FluidStack request = resource.copy();
+			request.setAmount(resource.getAmount() - drained);
+			FluidStack amount = handler.drain(request, action);
+			if (amount.isEmpty()) {
+				continue;
+			}
+			drained += amount.getAmount();
+			if (result.isEmpty()) {
+				result = amount.copy();
+			} else {
+				result.grow(amount.getAmount());
+			}
+		}
+		if (!result.isEmpty() && !action.simulate()) {
+			forceRefreshSoon();
+		}
+		return result;
+	}
+
 	// ============================================================
 	//  LDLib GUI
 	// ============================================================
@@ -196,32 +356,31 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		title.setColor(0xFF5D5F60);
 		group.addWidget(title);
 
-		// 左侧:物品列表 + 搜索栏
-		SNAccessorListWidget itemList = new SNAccessorListWidget(this, SNAccessorListWidget.Kind.ITEMS, 8, 36, 76, 84);
-		group.addWidget(new TextFieldWidget(8, 20, 76, 12, () -> itemList.getFilter(), itemList::setFilter).setBordered(true));
+		// 物品列表(9×3,可滚动 + 搜索过滤)
+		SNAccessorListWidget itemList = new SNAccessorListWidget(this, SNAccessorListWidget.Kind.ITEMS, 9, 7, 34, 162, 54);
+		group.addWidget(new TextFieldWidget(7, 20, 162, 12, itemList::getFilter, itemList::setFilter).setClientSideWidget().setBordered(true));
 		group.addWidget(itemList);
 
-		// 右侧:流体列表 + 搜索栏
-		SNAccessorListWidget fluidList = new SNAccessorListWidget(this, SNAccessorListWidget.Kind.FLUIDS, 92, 36, 76, 84);
-		group.addWidget(new TextFieldWidget(92, 20, 76, 12, () -> fluidList.getFilter(), fluidList::setFilter).setBordered(true));
+		// 流体列表(9×2,紧邻物品区下方,无搜索栏)
+		SNAccessorListWidget fluidList = new SNAccessorListWidget(this, SNAccessorListWidget.Kind.FLUIDS, 9, 7, 92, 162, 36);
 		group.addWidget(fluidList);
 
 		// 玩家背包(3 行)+ 快捷栏(1 行)
 		Container inventory = player.getInventory();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
-				addPlayerSlot(group, inventory, row * 9 + col + 9, 7 + col * 18, 128 + row * 18);
+				addPlayerSlot(group, inventory, row * 9 + col + 9, 7 + col * 18, 136 + row * 18);
 			}
 		}
 		for (int col = 0; col < 9; col++) {
-			addPlayerSlot(group, inventory, col, 7 + col * 18, 198);
+			addPlayerSlot(group, inventory, col, 7 + col * 18, 196);
 		}
 
 		return group;
 	}
 
 	private void addPlayerSlot(WidgetGroup group, Container container, int slotIndex, int x, int y) {
-		SlotWidget slot = new SlotWidget();
+		SNPlayerSlot slot = new SNPlayerSlot(this, slotIndex);
 		slot.initTemplate();
 		slot.setContainerSlot(container, slotIndex);
 		slot.isPlayerContainer = true;
@@ -232,16 +391,16 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 
 	@Override
 	public boolean isInvalid() {
-		return isRemoved();
+		return this.isRemoved();
 	}
 
 	@Override
 	public boolean isRemote() {
-		return level != null && level.isClientSide;
+		return this.level != null && this.level.isClientSide;
 	}
 
 	@Override
 	public void markAsDirty() {
-		setChanged();
+		this.setChanged();
 	}
 }

@@ -29,5 +29,15 @@ public class GuiLanguage extends LanguageGenerate {
 				"Energy Cell",
 				"能量单元"
 		);
+		addGuiLang(
+				"accessor_item_count",
+				"Count: %s",
+				"数量: %s"
+		);
+		addGuiLang(
+				"accessor_fluid_amount",
+				"Amount: %s mB",
+				"总量: %s mB"
+		);
 	}
 }
