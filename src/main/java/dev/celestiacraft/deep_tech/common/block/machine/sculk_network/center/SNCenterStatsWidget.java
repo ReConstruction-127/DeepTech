@@ -107,7 +107,7 @@ public class SNCenterStatsWidget extends Widget {
 			if (blockId.isEmpty()) {
 				continue;
 			}
-			Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockId));
+			Block block = ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryParse(blockId));
 			if (block == null) {
 				continue;
 			}

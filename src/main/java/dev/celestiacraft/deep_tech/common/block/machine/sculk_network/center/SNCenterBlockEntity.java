@@ -56,7 +56,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-public class SNCenterBlockEntity extends BasicBlockEntity implements ITickableBlockEntity<SNCenterBlockEntity> {
+public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.BlockEntityUI, ITickableBlockEntity<SNCenterBlockEntity> {
 	private int energyStored = 0;
 	private static final int MAX_ENERGY = 10000;
 	private static final int SCAN_COST = 1;
