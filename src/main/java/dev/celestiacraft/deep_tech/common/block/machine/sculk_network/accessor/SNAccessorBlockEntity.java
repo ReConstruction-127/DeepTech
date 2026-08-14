@@ -352,14 +352,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 
 		// 物品列表(9×3,可滚动 + 搜索过滤)
 		SNAccessorListWidget itemList = new SNAccessorListWidget(this, SNAccessorListWidget.Kind.ITEMS, 9, 7, 34, 162, 54);
-		group.addWidget(new TextFieldWidget(
-				7,
-				20,
-				162,
-				12,
-				itemList::getFilter,
-				itemList::setFilter
-		).setClientSideWidget().setBordered(true));
+		group.addWidget(new TextFieldWidget(7, 20, 162, 12, itemList::getFilter, itemList::setFilter).setBordered(true).setClientSideWidget());
 		group.addWidget(itemList);
 
 		// 流体列表(9×2,紧邻物品区下方,无搜索栏)
