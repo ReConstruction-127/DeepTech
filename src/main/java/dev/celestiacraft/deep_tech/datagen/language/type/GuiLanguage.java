@@ -39,5 +39,30 @@ public class GuiLanguage extends LanguageGenerate {
 				"Amount: %s mB",
 				"总量: %s mB"
 		);
+		addGuiLang(
+				"center_component_count",
+				"Count: %s",
+				"数量: %s"
+		);
+		addGuiLang(
+				"center_component_total",
+				"Components: %s",
+				"部件总数: %s"
+		);
+		addGuiLang(
+				"center_master",
+				"Master: %s",
+				"主控: %s"
+		);
+		addGuiLang(
+				"center_yes",
+				"Yes",
+				"是"
+		);
+		addGuiLang(
+				"center_no",
+				"No",
+				"否"
+		);
 	}
 }
