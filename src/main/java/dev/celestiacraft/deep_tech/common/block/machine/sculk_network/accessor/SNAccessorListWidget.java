@@ -477,19 +477,52 @@ public class SNAccessorListWidget extends Widget {
 			return;
 		}
 
-		// 1) 格子有流体:先试着把网络流体灌入光标上的容器(装不下的自动还回网络)
+		// 1) 格子有流体:先试着把网络流体灌入光标上的容器
 		if (!key.isEmpty()) {
-			FluidStack drained = accessor.drain(new FluidStack(key.getFluid(), key.getAmount()), IFluidHandler.FluidAction.EXECUTE);
-			if (!drained.isEmpty()) {
-				FixedFluidSource source = new FixedFluidSource(drained);
-				FluidActionResult filled = FluidUtil.tryFillContainer(carried, source, Integer.MAX_VALUE, player, true);
-				if (!source.getFluid().isEmpty()) {
-					accessor.fill(source.getFluid(), IFluidHandler.FluidAction.EXECUTE);
+			IFluidHandler source = new IFluidHandler() {
+				@Override
+				public int getTanks() {
+					return 1;
 				}
-				if (filled.isSuccess()) {
-					container.setCarried(filled.getResult());
-					return;
+
+				@Override
+				public @NotNull FluidStack getFluidInTank(int tank) {
+					return key;
 				}
+
+				@Override
+				public int getTankCapacity(int tank) {
+					return Integer.MAX_VALUE;
+				}
+
+				@Override
+				public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
+					return stack.isFluidEqual(key);
+				}
+
+				@Override
+				public int fill(FluidStack resource, FluidAction action) {
+					return 0;
+				}
+
+				@Override
+				public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
+					if (resource.isEmpty() || !resource.isFluidEqual(key)) {
+						return FluidStack.EMPTY;
+					}
+					return accessor.drain(resource, action);
+				}
+
+				@Override
+				public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+					return accessor.drain(new FluidStack(key.getFluid(), maxDrain, key.getTag()), action);
+				}
+			};
+
+			FluidActionResult filled = FluidUtil.tryFillContainer(carried, source, Integer.MAX_VALUE, player, true);
+			if (filled.isSuccess()) {
+				container.setCarried(filled.getResult());
+				return;
 			}
 		}
 
