@@ -86,15 +86,15 @@ public class InteractionRecipeSerializer implements RecipeSerializer<Interaction
 
 		for (int i = 0; i < resultCount; i++) {
 			ItemStack stack = buf.readItem();
-			int weight = buf.readInt();
-			results.add(new ChanceResult(stack, weight));
+			double chance = buf.readDouble();
+			results.add(new ChanceResult(stack, chance));
 		}
 
 		boolean hasExtra = buf.readBoolean();
 		ExtraEffect extra = null;
 
 		if (hasExtra) {
-			float chance = buf.readFloat();
+			double chance = buf.readDouble();
 			ResourceLocation toBlockId = buf.readResourceLocation();
 			Block toBlock = ForgeRegistries.BLOCKS.getValue(toBlockId);
 			BlockState toState = (toBlock == null ? Blocks.AIR : toBlock).defaultBlockState();
