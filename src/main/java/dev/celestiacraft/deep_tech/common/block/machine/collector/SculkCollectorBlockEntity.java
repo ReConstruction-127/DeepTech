@@ -126,15 +126,12 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 
 	@Override
 	public boolean canInsertItem(int slot, ItemStack stack) {
-		if (slot >= FILTER_START) {
-			return true;
-		}
-		return slot < INPUT_SLOTS && stack.getItem() instanceof BlockItem;
+		return slot >= INPUT_START && slot < OUTPUT_START && stack.getItem() instanceof BlockItem;
 	}
 
 	@Override
 	public boolean canExtractItem(int slot, ItemStack stack) {
-		return slot >= INPUT_START && slot < TOTAL_SLOTS;
+		return slot >= OUTPUT_START && slot < FILTER_START;
 	}
 
 	@Override

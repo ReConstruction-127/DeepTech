@@ -15,15 +15,15 @@ public class EnergyCellConfig extends ConfigModule {
 
 	@Override
 	protected void addConfigs() {
-		MAX_ENERGY = builder.comment("Crusher's max energy stored")
+		MAX_ENERGY = builder.comment("Energy Cell's max energy stored")
 				.comment("type: int")
 				.comment("default: 1000000")
-				.defineInRange("crusher_max_energy_stored", 1000000, 1, Integer.MAX_VALUE);
+				.defineInRange("energy_cell_max_energy_stored", 1000000, 1, Integer.MAX_VALUE);
 
-		MAX_RECEIVE = builder.comment("Crusher's max energy receive")
+		MAX_RECEIVE = builder.comment("Energy Cell's max energy receive")
 				.comment("type: int")
 				.comment("default: 2147483647")
-				.defineInRange("crusher_max_energy_receive", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
+				.defineInRange("energy_cell_max_energy_receive", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
 
 		MAX_EXTRACT = builder.comment("最大输出速率 (FE/tick)")
 				.comment("type: int")

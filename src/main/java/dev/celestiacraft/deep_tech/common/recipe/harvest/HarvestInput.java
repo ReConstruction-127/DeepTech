@@ -63,7 +63,7 @@ public class HarvestInput {
 		if (block != null) {
 			return Ingredient.of(block);
 		}
-		if (blockTag != null) {
+		if (blockTag != null && level != null) {
 			List<ItemStack> stacks = new ArrayList<>();
 			level.registryAccess().registryOrThrow(Registries.BLOCK).getTag(blockTag)
 					.ifPresent(holders -> holders.forEach(holder -> stacks.add(new ItemStack(holder.value()))));
