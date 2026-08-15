@@ -37,7 +37,11 @@ public class SculkShearHandler {
 			return;
 		}
 
-		// 2. 必须手持剪刀
+		// 2. 必须手持剪刀且非创造模式
+		if (player.isCreative()) {
+			return;
+		}
+
 		ItemStack mainHand = player.getMainHandItem();
 		if (!mainHand.is(Items.SHEARS)) {
 			return;
