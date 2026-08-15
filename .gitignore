@@ -14,3 +14,11 @@ build
 /com/
 /libs/
 /dev/
+/assets/
+/data/
+/META-INF/
+/icon.png
+/pack.mcmeta
+/kubejs.plugins.txt
+/nebula_libs.mixins.json
+/nebula_libs.ftbquests.mixins.json
