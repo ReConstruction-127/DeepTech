@@ -33,7 +33,7 @@ public class InteractionRecipe implements Recipe<Container> {
 
 	public boolean matches(ItemStack trigger, BlockState target, boolean isRightClick) {
 		// 先检查物品和方块
-		if (!triggerItem.test(trigger) || !target.equals(targetBlockState)) {
+		if (!triggerItem.test(trigger) || !target.is(targetBlockState.getBlock())) {
 			return false;
 		}
 		// 再检查交互类型
