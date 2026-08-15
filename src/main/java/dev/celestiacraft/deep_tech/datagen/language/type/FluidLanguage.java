@@ -9,5 +9,10 @@ public class FluidLanguage extends LanguageGenerate {
 				"Liquid Experience",
 				"液态经验"
 		);
+		addFluidLanguage(
+				"sculk_culture",
+				"Sculk Culture",
+				"幽匿培养液"
+		);
 	}
 }

@@ -7,6 +7,7 @@ import com.tterrag.registrate.util.entry.FluidEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiFunction;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
+import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.texture.DTFluidTexture;
 import dev.celestiacraft.libs.api.register.fluid.BasicFluidType;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
@@ -183,6 +185,14 @@ public class DTFluidBuilder<T extends ForgeFlowingFluid> {
 
 	public BlockBuilder<LiquidBlock, FluidBuilder<T, NebulaRegistrate>> block() {
 		return builder().block();
+	}
+
+	/**
+	 * 自定义液块(如需要独立的方块 tick 通道), 注册行为与默认液块一致。
+	 */
+	public DTFluidBuilder<T> liquidBlock(NonNullBiFunction<NonNullSupplier<? extends T>, BlockBehaviour.Properties, ? extends LiquidBlock> factory) {
+		builder().block(factory).register();
+		return this;
 	}
 
 	public ItemBuilder<BucketItem, FluidBuilder<T, NebulaRegistrate>> bucket() {

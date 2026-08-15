@@ -17,18 +17,18 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.
 import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center.capability.SNCenterEnergyStorage;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,7 +64,6 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 	private int scanCooldown = 0;
 	private static final int SCAN_INTERVAL = 20;
 	private Set<BlockPos> currentScanResult = new HashSet<>();
-	private Set<BlockPos> previousScanResult = new HashSet<>();
 	private final List<BlockPos> foundReservoirs = new ArrayList<>();
 	private final List<BlockPos> foundItemInputPorts = new ArrayList<>();
 	private final List<BlockPos> foundItemOutputPorts = new ArrayList<>();  // 新增
@@ -97,8 +96,7 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		}
 
 		if (!isRemoved()) {
-			cleanupDebugMarkers((ServerLevel) level);
-			applyDebugMarkers((ServerLevel) level);
+			spawnNetworkParticles((ServerLevel) level);
 		}
 
 		tickCounter++;
@@ -120,7 +118,6 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		markDirty();
 
 		// 保存旧结果
-		previousScanResult = new HashSet<>(currentScanResult);
 		currentScanResult = new HashSet<>();
 		foundReservoirs.clear();
 		foundItemInputPorts.clear();
@@ -579,20 +576,21 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 	}
 
 	/**
-	 * 在所有扫描到的组件上方放一块玻璃(临时标记)
+	 * 网络扫描粒子:仅附近玩家手持扳手时,在每个扫描到的方块上生成青色 dust 粒子
 	 */
-	private void applyDebugMarkers(ServerLevel level) {
-		for (BlockPos pos : currentScanResult) {
-			BlockPos markerPos = pos.above();
-			// 只在空位放标记
-			if (level.isEmptyBlock(markerPos)) {
-				level.setBlock(markerPos, Blocks.GLASS.defaultBlockState(), 3);
-			}
+	private void spawnNetworkParticles(ServerLevel level) {
+		if (currentScanResult.isEmpty()) {
+			return;
+		}
+		if (!hasNearbyPlayerHoldingWrench(level)) {
+			return;
+		}
 
-			// 粒子效果: 在方块中心生成紫色粒子
+		DustParticleOptions dust = new DustParticleOptions(new org.joml.Vector3f(0.0f, 0.9f, 1.0f), 1.0f);
+		for (BlockPos pos : currentScanResult) {
 			Vec3 center = Vec3.atCenterOf(pos);
 			level.sendParticles(
-					ParticleTypes.END_ROD,
+					dust,
 					center.x,
 					center.y + 0.5,
 					center.z,
@@ -605,16 +603,18 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		}
 	}
 
-	/**
-	 * 移除上一轮放的玻璃标记
-	 */
-	private void cleanupDebugMarkers(ServerLevel level) {
-		for (BlockPos pos : previousScanResult) {
-			BlockPos markerPos = pos.above();
-			if (level.getBlockState(markerPos).getBlock() == Blocks.GLASS) {
-				level.setBlock(markerPos, Blocks.AIR.defaultBlockState(), 3);
+	/** 32 格内是否有玩家手持扳手(主手或副手) */
+	private boolean hasNearbyPlayerHoldingWrench(ServerLevel level) {
+		for (Player player : level.players()) {
+			if (player.distanceToSqr(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()) > 32 * 32) {
+				continue;
+			}
+			if (player.getMainHandItem().getItem() == ToolItems.WRENCH.get()
+					|| player.getOffhandItem().getItem() == ToolItems.WRENCH.get()) {
+				return true;
 			}
 		}
+		return false;
 	}
 
 	private IEnergyStorage getEnergyCapability() {

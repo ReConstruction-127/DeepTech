@@ -6,6 +6,12 @@ public class OtherLanguage extends LanguageGenerate {
 	public static void addLang() {
 		addJade();
 
+		addCustomLang(
+				"effect.deep_tech.infection",
+				"Infection",
+				"感染"
+		);
+
 		addCreativeTabLang(
 				"material",
 				"Deep Tech: Material",

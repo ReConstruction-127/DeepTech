@@ -5,10 +5,12 @@ import net.minecraft.resources.ResourceLocation;
 
 public class DTFluidTextures {
 	public static final DTFluidTexture
-			EXPERIENCE;
+			EXPERIENCE,
+			CULTURE;
 
 	static {
 		EXPERIENCE = add("liquid_experience/flowing", "liquid_experience/still");
+		CULTURE = add("sculk_culture/flowing", "sculk_culture/still");
 	}
 
 	private static DTFluidTexture add(String flowing, String still) {
