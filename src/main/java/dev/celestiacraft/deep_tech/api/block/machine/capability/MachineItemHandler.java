@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.api.block.machine.capability;
 
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +35,14 @@ public class MachineItemHandler extends ItemStackHandler {
 	@Override
 	public boolean isItemValid(int slot, @NotNull ItemStack stack) {
 		return machine.canInsertItem(slot, stack);
+	}
+
+	@Override
+	public void deserializeNBT(CompoundTag nbt) {
+		for (int i = 0; i < getSlots(); i++) {
+			setStackInSlot(i, ItemStack.EMPTY);
+		}
+		super.deserializeNBT(nbt);
 	}
 
 	@Override
