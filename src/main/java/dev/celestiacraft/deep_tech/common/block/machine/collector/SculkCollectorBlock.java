@@ -25,23 +25,23 @@ public class SculkCollectorBlock extends MachineBlock<SculkCollectorBlockEntity>
 	}
 
 	/**
-	 * 模型暂复用熔炉纹理(待补专有纹理): orientableWithBottom 的 off/on 两个模型
+	 * 占位模型(待换专有纹理): orientableWithBottom 的 off/on 两个模型
 	 */
 	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> genBlockState() {
 		return (context, provider) -> {
 			BlockModelBuilder modelOff = provider.models().orientableWithBottom(
 					"block/machine/sculk_collector/off",
-					provider.modLoc("block/machine/furnace/side_off"),
-					provider.modLoc("block/machine/furnace/face_off"),
-					provider.modLoc("block/machine/furnace/bottom"),
-					provider.modLoc("block/machine/furnace/top_off")
+					provider.modLoc("block/machine/sculk_collector/side_off"),
+					provider.modLoc("block/machine/sculk_collector/face_off"),
+					provider.modLoc("block/machine/sculk_collector/bottom"),
+					provider.modLoc("block/machine/sculk_collector/top_off")
 			);
 			BlockModelBuilder modelOn = provider.models().orientableWithBottom(
 					"block/machine/sculk_collector/on",
-					provider.modLoc("block/machine/furnace/side_on"),
-					provider.modLoc("block/machine/furnace/face_on"),
-					provider.modLoc("block/machine/furnace/bottom"),
-					provider.modLoc("block/machine/furnace/top_on")
+					provider.modLoc("block/machine/sculk_collector/side_on"),
+					provider.modLoc("block/machine/sculk_collector/face_on"),
+					provider.modLoc("block/machine/sculk_collector/bottom"),
+					provider.modLoc("block/machine/sculk_collector/top_on")
 			);
 			horizontalLitBlock(provider, context.get(), modelOff, modelOn);
 		};

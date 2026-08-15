@@ -14,7 +14,8 @@ import org.jetbrains.annotations.Nullable;
  * 幽匿采集器的能力(capability)统一入口, 单独类实现:
  * <ul>
  *   <li>能量: {@link ForgeCapabilities#ENERGY}, 存储上限 10000FE, 每 tick 挖矿耗 50FE</li>
- *   <li>物品: {@link ForgeCapabilities#ITEM_HANDLER}, 168 槽(81 输入回填 + 81 输出 + 6 过滤标记)</li>
+ *   <li>物品: {@link ForgeCapabilities#ITEM_HANDLER}, 18 槽(9 输入回填储存 + 9 输出)</li>
+ *   <li>过滤标记槽不在此列(只标记不存储, 仅玩家 GUI 可见)</li>
  * </ul>
  */
 public class SculkCollectorCapability {

@@ -3,9 +3,9 @@ package dev.celestiacraft.deep_tech.common.block.machine.collector;
 import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
-import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
+import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
@@ -18,8 +18,11 @@ import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.SculkCollectorConfig;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
@@ -42,33 +45,35 @@ import java.util.List;
 /**
  * 幽匿采集器:
  * <ul>
- *   <li>通电(50 FE/t)后以自身为原点, 半径 16 格、上下 5 格高度范围内挖方块, 每秒 20 个(每 tick 1 个)</li>
- *   <li>6 个过滤槽(只标记不存储, 默认幽匿系): 空的过滤 = 挖一切, 有标记 = 只挖标记方块</li>
- *   <li>掉落由数据驱动配方(deep_tech:harvest)决定(支持概率), 无配方则按最高等级不带精准的方式挖掘</li>
- *   <li>81 格输入槽中的任意可放置物品用于回填被清除的方块, 留空则直接清空</li>
- *   <li>81 格输出槽存放挖掘产物</li>
+ *   <li>通电(50 FE/t)后以自身为原点按游标扫描周围方块, 每 tick 挖 1 个; 挖掘范围可由 GUI 输入框实时调整</li>
+ *   <li>中间 2 列(隔一列)共 6 个幽灵过滤槽: 放入物品不消耗、仅显示为标记; 点击已标记槽标记立即消失;
+ *       所有过滤为空 = 挖一切, 有标记 = 只挖标记方块</li>
+ *   <li>右侧 3x3 输入槽存放回填方块(可放置方块, 不参与过滤); 挖掉方块后优先用输入槽中任意可放置方块回填, 全空则留空</li>
+ *   <li>左侧 3x3 输出槽存放挖掘产物</li>
+ *   <li>掉落由数据驱动配方(deep_tech:harvest)决定(支持概率), 无配方则直接按战利品表(钻石镐无限, 无精准)产出</li>
+ *   <li>不可破坏方块(如基岩, 破坏速度 &lt; 0)不会挖掘</li>
  * </ul>
  */
 public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollectorBlockEntity> implements IUIHolder.BlockEntityUI {
-	public static final int INPUT_SLOTS = 81;
-	public static final int OUTPUT_SLOTS = 81;
+	public static final int INPUT_SLOTS = 9;
+	public static final int OUTPUT_SLOTS = 9;
 	public static final int FILTER_SLOTS = 6;
 
 	public static final int INPUT_START = 0;
 	public static final int OUTPUT_START = INPUT_SLOTS;
-	public static final int FILTER_START = INPUT_SLOTS + OUTPUT_SLOTS;
-	public static final int TOTAL_SLOTS = FILTER_START + FILTER_SLOTS;
+	public static final int TOTAL_SLOTS = OUTPUT_START + OUTPUT_SLOTS;
 
-	public static final int RADIUS = 16;
-	public static final int HEIGHT = 5;
+	public static final int DEFAULT_RADIUS_XZ = 16;
+	public static final int DEFAULT_RADIUS_Y = 5;
+	public static final int MAX_RADIUS_XZ = 32;
+	public static final int MAX_RADIUS_Y = 16;
 	public static final int ENERGY_PER_HARVEST = 50;
 
-	private static final int RANGE_XZ = RADIUS * 2 + 1;
-	private static final int RANGE_Y = HEIGHT * 2 + 1;
-	private static final int SCAN_VOLUME = RANGE_XZ * RANGE_XZ * RANGE_Y;
-
 	private final SculkCollectorCapability caps = new SculkCollectorCapability(this);
+	private final ItemStackHandler filterHandler = new ItemStackHandler(FILTER_SLOTS);
 	private int scanIndex = 0;
+	private int radiusXZ = DEFAULT_RADIUS_XZ;
+	private int radiusY = DEFAULT_RADIUS_Y;
 
 	public SculkCollectorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -77,9 +82,8 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 
 	/** 新机器默认过滤幽匿系方块(加载存档时会用 NBT 覆盖) */
 	private void initDefaultFilters() {
-		ItemStackHandler handler = getItemHandler();
 		for (int i = 0; i < FILTER_SLOTS; i++) {
-			if (!handler.getStackInSlot(FILTER_START + i).isEmpty()) {
+			if (!filterHandler.getStackInSlot(i).isEmpty()) {
 				return;
 			}
 		}
@@ -91,7 +95,35 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 				Blocks.SCULK_SHRIEKER
 		};
 		for (int i = 0; i < defaults.length && i < FILTER_SLOTS; i++) {
-			handler.setStackInSlot(FILTER_START + i, new ItemStack(defaults[i]));
+			filterHandler.setStackInSlot(i, new ItemStack(defaults[i]));
+		}
+	}
+
+	// ---------------- 挖掘范围 ----------------
+
+	public int getRadiusXZ() {
+		return radiusXZ;
+	}
+
+	public void setRadiusXZ(int radiusXZ) {
+		this.radiusXZ = Math.max(1, Math.min(MAX_RADIUS_XZ, radiusXZ));
+		setChanged();
+	}
+
+	public int getRadiusY() {
+		return radiusY;
+	}
+
+	public void setRadiusY(int radiusY) {
+		this.radiusY = Math.max(1, Math.min(MAX_RADIUS_Y, radiusY));
+		setChanged();
+	}
+
+	private static int parseClamped(String text, int fallback) {
+		try {
+			return Integer.parseInt(text.trim());
+		} catch (NumberFormatException e) {
+			return fallback;
 		}
 	}
 
@@ -120,26 +152,32 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 	}
 
 	@Override
-	public int getMaxMachineSlot() {
-		return TOTAL_SLOTS;
-	}
-
-	@Override
 	public boolean canInsertItem(int slot, ItemStack stack) {
-		if (slot >= FILTER_START) {
-			return true;
-		}
 		return slot < INPUT_SLOTS && stack.getItem() instanceof BlockItem;
 	}
 
+	// ---------------- NBT ----------------
+
 	@Override
-	public boolean canExtractItem(int slot, ItemStack stack) {
-		return slot >= INPUT_START && slot < TOTAL_SLOTS;
+	protected void saveAdditional(@NotNull CompoundTag tag) {
+		super.saveAdditional(tag);
+		tag.put("Filters", filterHandler.serializeNBT());
+		tag.putInt("RadiusXZ", radiusXZ);
+		tag.putInt("RadiusY", radiusY);
 	}
 
 	@Override
-	public int getMachineSlotLimit(int slot) {
-		return slot >= FILTER_START ? 1 : 64;
+	public void load(@NotNull CompoundTag tag) {
+		super.load(tag);
+		if (tag.contains("Filters")) {
+			filterHandler.deserializeNBT(tag.getCompound("Filters"));
+		}
+		if (tag.contains("RadiusXZ")) {
+			radiusXZ = Math.max(1, Math.min(MAX_RADIUS_XZ, tag.getInt("RadiusXZ")));
+		}
+		if (tag.contains("RadiusY")) {
+			radiusY = Math.max(1, Math.min(MAX_RADIUS_Y, tag.getInt("RadiusY")));
+		}
 	}
 
 	// ---------------- Capability(单独类) ----------------
@@ -194,16 +232,19 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		}
 	}
 
-	/** 从游标开始扫描区域, 返回下一个可挖方块, 无则返回 null */
+	/** 从游标开始扫描当前范围, 返回下一个可挖方块, 无则返回 null */
 	private BlockPos scanNext(Level level, BlockPos origin) {
-		for (int i = 0; i < SCAN_VOLUME; i++) {
+		int rangeXZ = radiusXZ * 2 + 1;
+		int rangeY = radiusY * 2 + 1;
+		int volume = rangeXZ * rangeXZ * rangeY;
+		for (int i = 0; i < volume; i++) {
 			int idx = scanIndex;
-			scanIndex = (scanIndex + 1) % SCAN_VOLUME;
-			int dy = idx / (RANGE_XZ * RANGE_XZ);
-			int rem = idx % (RANGE_XZ * RANGE_XZ);
-			int dz = rem / RANGE_XZ;
-			int dx = rem % RANGE_XZ;
-			BlockPos pos = origin.offset(dx - RADIUS, dy - HEIGHT, dz - RADIUS);
+			scanIndex = (scanIndex + 1) % volume;
+			int dy = idx / (rangeXZ * rangeXZ);
+			int rem = idx % (rangeXZ * rangeXZ);
+			int dz = rem / rangeXZ;
+			int dx = rem % rangeXZ;
+			BlockPos pos = origin.offset(dx - radiusXZ, dy - radiusY, dz - radiusXZ);
 			if (pos.equals(origin)) {
 				continue;
 			}
@@ -222,11 +263,11 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		return null;
 	}
 
-	/** 过滤: 所有过滤槽为空 = 不过滤; 否则必须命中某个标记方块的物品 */
+	/** 过滤: 所有过滤标记为空 = 不过滤; 否则必须命中某个标记方块 */
 	private boolean matchesFilter(BlockState state) {
 		List<Block> filters = new ArrayList<>();
 		for (int i = 0; i < FILTER_SLOTS; i++) {
-			ItemStack stack = getItemHandler().getStackInSlot(FILTER_START + i);
+			ItemStack stack = filterHandler.getStackInSlot(i);
 			if (!stack.isEmpty() && stack.getItem() instanceof BlockItem item) {
 				filters.add(item.getBlock());
 			}
@@ -242,29 +283,20 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		return false;
 	}
 
+	/**
+	 * 是否可挖掘: 过滤命中的方块只要能破坏(破坏速度 >= 0, 如基岩为 -1)即可清除。
+	 * 掉落为空也照常清除, 避免"无掉落 = 不挖"的误判。
+	 */
 	private boolean isHarvestable(Level level, BlockPos pos, BlockState state) {
-		for (HarvestRecipe recipe : level.getRecipeManager().getAllRecipesFor(DTRecipes.HARVEST.getRecipeType())) {
-			if (recipe.matches(state, level)) {
-				return true;
-			}
-		}
-		if (level instanceof ServerLevel serverLevel) {
-			return !HarvestDropHelper.defaultDrops(serverLevel, pos, state).isEmpty();
-		}
-		return false;
+		return state.getDestroySpeed(level, pos) >= 0;
 	}
 
 	private List<ItemStack> computeDrops(Level level, BlockPos target) {
 		BlockState state = level.getBlockState(target);
-		HarvestRecipe recipe = null;
 		for (HarvestRecipe r : level.getRecipeManager().getAllRecipesFor(DTRecipes.HARVEST.getRecipeType())) {
 			if (r.matches(state, level)) {
-				recipe = r;
-				break;
+				return r.rollOutputs(level.getRandom());
 			}
-		}
-		if (recipe != null) {
-			return recipe.rollOutputs(level.getRandom());
 		}
 		if (level instanceof ServerLevel serverLevel) {
 			return HarvestDropHelper.defaultDrops(serverLevel, target, state);
@@ -289,14 +321,14 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 	}
 
 	/**
-	 * 将物品放入输出槽(81 格): 优先堆叠同物品槽, 其次空槽。
+	 * 将物品放入输出槽: 优先堆叠同物品槽, 其次空槽。
 	 *
 	 * @return 是否成功放入
 	 */
 	private boolean findOutputSpace(ItemStack stack, boolean simulate) {
 		ItemStackHandler handler = getItemHandler();
 		ItemStack remaining = stack.copy();
-		for (int i = OUTPUT_START; i < FILTER_START; i++) {
+		for (int i = OUTPUT_START; i < TOTAL_SLOTS; i++) {
 			ItemStack current = handler.getStackInSlot(i);
 			if (current.isEmpty()) {
 				if (!simulate) {
@@ -315,17 +347,10 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		return false;
 	}
 
-	/** 清除目标方块; 输入槽中有可放置物品则回填, 否则留空 */
+	/** 清除目标方块: 输入槽中有任意可放置方块则回填, 全空则留空 */
 	private void refillOrClear(Level level, BlockPos target) {
 		ItemStackHandler handler = getItemHandler();
-		int pickedSlot = -1;
-		for (int i = INPUT_START; i < OUTPUT_START; i++) {
-			ItemStack stack = handler.getStackInSlot(i);
-			if (!stack.isEmpty() && stack.getItem() instanceof BlockItem) {
-				pickedSlot = i;
-				break;
-			}
-		}
+		int pickedSlot = findFillSlot();
 		if (pickedSlot >= 0) {
 			ItemStack picked = handler.getStackInSlot(pickedSlot);
 			level.setBlockAndUpdate(target, ((BlockItem) picked.getItem()).getBlock().defaultBlockState());
@@ -336,6 +361,18 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		} else {
 			level.setBlockAndUpdate(target, Blocks.AIR.defaultBlockState());
 		}
+	}
+
+	/** 在输入槽(储存区)中找任意可放置方块 */
+	private int findFillSlot() {
+		ItemStackHandler handler = getItemHandler();
+		for (int i = INPUT_START; i < INPUT_START + INPUT_SLOTS; i++) {
+			ItemStack stack = handler.getStackInSlot(i);
+			if (!stack.isEmpty() && stack.getItem() instanceof BlockItem) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	// ---------------- GUI ----------------
@@ -357,28 +394,48 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		group.addWidget(new EnergyBarWidget(7, 25, this::getEnergyStored, getMaxEnergyStored()));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getItemHandler());
+		SimpleMachineInventory filterContainer = new SimpleMachineInventory(filterHandler);
 
-		// 6 个过滤标记槽(只标记不存储)
-		for (int i = 0; i < FILTER_SLOTS; i++) {
-			group.addWidget(createSlot(container, FILTER_START + i, 30 + i * 18, 25, true, true));
-		}
-
-		// 输入 9x9 / 输出 9x9, 可滚动
-		DraggableScrollableWidgetGroup scroll = new DraggableScrollableWidgetGroup(7, 40, 162, 124);
-		scroll.setYScrollBarWidth(3);
-		scroll.addWidget(new LabelWidget(1, 1, Component.translatable("gui.deep_tech.sculk_collector.input")));
-		for (int row = 0; row < 9; row++) {
-			for (int col = 0; col < 9; col++) {
-				scroll.addWidget(createSlot(container, INPUT_START + col + row * 9, col * 18, row * 18 + 12, true, true));
+		// 左侧 3x3 输出槽(挖掘产物)
+		for (int row = 0; row < 3; row++) {
+			for (int col = 0; col < 3; col++) {
+				group.addWidget(createSlot(container, OUTPUT_START + col + row * 3, 7 + col * 18, 74 + row * 18, false, true));
 			}
 		}
-		scroll.addWidget(new LabelWidget(1, 176, Component.translatable("gui.deep_tech.sculk_collector.output")));
-		for (int row = 0; row < 9; row++) {
-			for (int col = 0; col < 9; col++) {
-				scroll.addWidget(createSlot(container, OUTPUT_START + col + row * 9, col * 18, row * 18 + 188, false, true));
+
+		// 中间 2 列幽灵过滤槽(隔一空列): 只标记不存储, 点击即消失
+		for (int row = 0; row < 3; row++) {
+			group.addWidget(new FilterSlotWidget(filterHandler, row, 63, 74 + row * 18));
+			group.addWidget(new FilterSlotWidget(filterHandler, 3 + row, 97, 74 + row * 18));
+		}
+
+		// 右侧 3x3 输入槽(回填方块储存)
+		for (int row = 0; row < 3; row++) {
+			for (int col = 0; col < 3; col++) {
+				group.addWidget(createSlot(container, INPUT_START + col + row * 3, 115 + col * 18, 74 + row * 18, true, true));
 			}
 		}
-		group.addWidget(scroll);
+
+		// 挖掘范围(两列之间空列的下方)
+		LabelWidget radiusXzLabel = new LabelWidget(7, 122, Component.literal("横向"));
+		radiusXzLabel.setColor(0xFF5D5F60);
+		group.addWidget(radiusXzLabel);
+		TextFieldWidget radiusXzField = new TextFieldWidget(31, 121, 30, 12,
+				() -> String.valueOf(getRadiusXZ()),
+				text -> setRadiusXZ(parseClamped(text, getRadiusXZ())));
+		radiusXzField.setValidator(str -> str.replaceAll("[^0-9]", ""));
+		radiusXzField.setMaxStringLength(2);
+		group.addWidget(radiusXzField);
+
+		LabelWidget radiusYLabel = new LabelWidget(79, 122, Component.literal("纵向"));
+		radiusYLabel.setColor(0xFF5D5F60);
+		group.addWidget(radiusYLabel);
+		TextFieldWidget radiusYField = new TextFieldWidget(103, 121, 30, 12,
+				() -> String.valueOf(getRadiusY()),
+				text -> setRadiusY(parseClamped(text, getRadiusY())));
+		radiusYField.setValidator(str -> str.replaceAll("[^0-9]", ""));
+		radiusYField.setMaxStringLength(2);
+		group.addWidget(radiusYField);
 
 		addPlayerSlots(group, player);
 		return group;
@@ -388,11 +445,11 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		Container inventory = player.getInventory();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
-				group.addWidget(createSlot(inventory, col + row * 9 + 9, 7 + col * 18, 166 + row * 18, true, true));
+				group.addWidget(createSlot(inventory, col + row * 9 + 9, 7 + col * 18, 136 + row * 18, true, true));
 			}
 		}
 		for (int col = 0; col < 9; col++) {
-			group.addWidget(createSlot(inventory, col, 7 + col * 18, 220, true, true));
+			group.addWidget(createSlot(inventory, col, 7 + col * 18, 190, true, true));
 		}
 	}
 
@@ -405,5 +462,54 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		widget.setCanPutItems(canPut);
 		widget.setCanTakeItems(canTake);
 		return widget;
+	}
+
+	/**
+	 * 幽灵过滤槽: 放入物品仅把手中物品复制为标记(不消耗), 点击已标记槽标记立即消失(不产出任何物品)。
+	 * 标记数据通过 client action 同步到服务端, 供 matchesFilter 使用。
+	 */
+	private static class FilterSlotWidget extends SlotWidget {
+		private final ItemStackHandler filterHandler;
+		private final int index;
+
+		public FilterSlotWidget(ItemStackHandler filterHandler, int index, int x, int y) {
+			this.filterHandler = filterHandler;
+			this.index = index;
+			initTemplate();
+			setContainerSlot(new SimpleMachineInventory(filterHandler), index);
+			setSelfPosition(new Position(x, y));
+			setCanPutItems(true);
+			setCanTakeItems(true);
+		}
+
+		@Override
+		public boolean mouseClicked(double mouseX, double mouseY, int button) {
+			if (isMouseOverElement(mouseX, mouseY) && gui != null) {
+				ItemStack current = filterHandler.getStackInSlot(index);
+				if (!current.isEmpty()) {
+					filterHandler.setStackInSlot(index, ItemStack.EMPTY);
+					writeClientAction(1, buffer -> buffer.writeItemStack(ItemStack.EMPTY, false));
+					return true;
+				}
+				Player player = Minecraft.getInstance().player;
+				ItemStack finger = player != null ? player.containerMenu.getCarried() : ItemStack.EMPTY;
+				if (!finger.isEmpty()) {
+					ItemStack marker = finger.copy();
+					marker.setCount(1);
+					filterHandler.setStackInSlot(index, marker);
+					writeClientAction(1, buffer -> buffer.writeItemStack(marker, false));
+					return true;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public void handleClientAction(int id, FriendlyByteBuf buffer) {
+			super.handleClientAction(id, buffer);
+			if (id == 1) {
+				filterHandler.setStackInSlot(index, buffer.readItem());
+			}
+		}
 	}
 }
