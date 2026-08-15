@@ -11,7 +11,7 @@ import net.minecraft.world.level.material.FlowingFluid;
 import java.util.function.Supplier;
 
 /**
- * 培养液液块:独立的方块 tick 通道, 确保源块与流动液体都持续触发感染/转化。
+ * 培养液液块:独立的方块 tick 通道, 确保源块与流动液体都持续触发感染。
  * 流体自身的 tick 只在流动时被调度, 静止的源块只 tick 一次, 因此必须由方块 tick 驱动。
  */
 public class SculkCultureLiquidBlock extends LiquidBlock {

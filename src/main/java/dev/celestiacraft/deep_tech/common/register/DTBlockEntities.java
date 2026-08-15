@@ -4,6 +4,7 @@ import com.tterrag.registrate.util.entry.BlockEntityEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.collector.SculkCollectorBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.energy_cell.EnergyCellBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
@@ -34,6 +35,7 @@ public class DTBlockEntities {
 	public static final BlockEntityEntry<SNItemOutputPortBlockEntity> SN_ITEM_OUTPUT_PORT;
 	public static final BlockEntityEntry<SNFluidOutputPortBlockEntity> SN_FLUID_OUTPUT_PORT;
 	public static final BlockEntityEntry<SNAccessorBlockEntity> SN_ACCESSOR;
+	public static final BlockEntityEntry<SculkCollectorBlockEntity> SCULK_COLLECTOR;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
@@ -62,6 +64,9 @@ public class DTBlockEntities {
 
 		SN_ACCESSOR = DeepTech.REGISTRATE.blockEntity("sculk_network_accessor", SNAccessorBlockEntity::new)
 				.validBlock(MachineBlocks.SN_ACCESSOR)
+				.register();
+		SCULK_COLLECTOR = DeepTech.REGISTRATE.blockEntity("sculk_collector", SculkCollectorBlockEntity::new)
+				.validBlock(MachineBlocks.SCULK_COLLECTOR)
 				.register();
 
 		SN_CENTER = DeepTech.REGISTRATE.blockEntity("sculk_network_center", SNCenterBlockEntity::new)

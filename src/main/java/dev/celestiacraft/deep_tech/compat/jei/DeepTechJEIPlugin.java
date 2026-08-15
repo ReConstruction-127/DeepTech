@@ -4,12 +4,14 @@ import com.lowdragmc.lowdraglib.gui.modular.ModularUIGuiContainer;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
+import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.deep_tech.compat.jei.category.AlloyCategory;
 import dev.celestiacraft.deep_tech.compat.jei.category.CrushingCategory;
+import dev.celestiacraft.deep_tech.compat.jei.category.HarvestCategory;
 import dev.celestiacraft.deep_tech.compat.jei.category.InteractionCategory;
 import dev.celestiacraft.deep_tech.compat.jei.handler.MachineGuiHandler;
 import dev.celestiacraft.libs.compat.jei.api.ingredient.JeiIngredientTypes;
@@ -44,7 +46,8 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		registration.addRecipeCategories(
 				CrushingCategory.builder(helper),
 				AlloyCategory.builder(helper),
-				InteractionCategory.builder(helper)
+				InteractionCategory.builder(helper),
+				HarvestCategory.builder(helper)
 		);
 	}
 
@@ -65,10 +68,12 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		List<CrushingRecipe> crushing = manager.getAllRecipesFor(DTRecipes.CRUSHING.getRecipeType());
 		List<AlloyRecipe> alloy = manager.getAllRecipesFor(DTRecipes.ALLOY.getRecipeType());
 		List<InteractionRecipe> interaction = manager.getAllRecipesFor(DTRecipes.INTERACTION.getRecipeType());
+		List<HarvestRecipe> harvest = manager.getAllRecipesFor(DTRecipes.HARVEST.getRecipeType());
 
 		registration.addRecipes(DTJeiRecipeType.CRUSHING, crushing);
 		registration.addRecipes(DTJeiRecipeType.ALLOY, alloy);
 		registration.addRecipes(DTJeiRecipeType.INTERACTION, interaction);
+		registration.addRecipes(DTJeiRecipeType.HARVEST, harvest);
 	}
 
 	@Override
@@ -83,6 +88,11 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		registration.addRecipeCatalyst(
 				MachineBlocks.ALLOY_FURNACE.get(),
 				DTJeiRecipeType.ALLOY
+		);
+
+		registration.addRecipeCatalyst(
+				MachineBlocks.SCULK_COLLECTOR.get(),
+				DTJeiRecipeType.HARVEST
 		);
 
 		// 交互配方使用扳手作为催化剂

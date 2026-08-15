@@ -39,5 +39,10 @@ public class BlockLanguage extends LanguageGenerate {
 				"Energy Cell",
 				"能量单元"
 		);
+		addBlockLanguage(
+				"sculk_collector",
+				"Sculk Collector",
+				"幽匿采集器"
+		);
 	}
 }

@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * 幽匿培养液行为:液体每 tick 检测所在格内的实体并给予「感染」效果;
- * 液体流经的位置会将下方实体方块转化为幽匿块(与玩家走过留下的轨迹一致)。
+ * 液体流经的位置会将下方实体方块转化为幽匿块。
  */
 public final class SculkCultureFluid {
 

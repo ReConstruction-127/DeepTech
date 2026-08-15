@@ -6,6 +6,7 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.collector.SculkCollectorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.energy_cell.EnergyCellBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
@@ -34,6 +35,7 @@ public class MachineBlocks {
 	public static final BlockEntry<SNItemInputPortBlock> SN_ITEM_INPUT_PORT;
 	public static final BlockEntry<SNItemOutputPortBlock> SN_ITEM_OUTPUT_PORT;
 	public static final BlockEntry<SNAccessorBlock> SN_ACCESSOR;
+	public static final BlockEntry<SculkCollectorBlock> SCULK_COLLECTOR;
 
 	public static final BlockEntry<SNFluidReservoirBlock> SN_FLUID_RESERVOIR;
 	public static final BlockEntry<SNFluidInputPortBlock> SN_FLUID_INPUT_PORT;
@@ -171,6 +173,16 @@ public class MachineBlocks {
 				.tab(DTCreativeTabs.getTabKey("machine"))
 				.tag(DeepTechItemTags.MACHINES)
 				.model(NonNullBiConsumer.noop())
+				.build()
+				.register();
+
+		SCULK_COLLECTOR = DeepTech.REGISTRATE.block("sculk_collector", SculkCollectorBlock::new)
+				.blockstate(SculkCollectorBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tab(DTCreativeTabs.getTabKey("machine"))
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/sculk_collector/off"))
 				.build()
 				.register();
 

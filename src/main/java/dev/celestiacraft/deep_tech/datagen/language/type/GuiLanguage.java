@@ -64,5 +64,15 @@ public class GuiLanguage extends LanguageGenerate {
 				"No",
 				"否"
 		);
+		addGuiLang(
+				"sculk_collector_input",
+				"Refill Input",
+				"回填输入"
+		);
+		addGuiLang(
+				"sculk_collector_output",
+				"Output",
+				"输出"
+		);
 	}
 }

@@ -1,0 +1,46 @@
+package dev.celestiacraft.deep_tech.compat.jei.category;
+
+import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestInput;
+import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestRecipe;
+import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
+import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
+
+public class HarvestCategory {
+	public static SimpleJeiCategory<HarvestRecipe> builder(IGuiHelper helper) {
+		IDrawable drawable = helper.getSlotDrawable();
+		Font font = Minecraft.getInstance().font;
+
+		return SimpleJeiCategory.builder(DTJeiRecipeType.HARVEST, helper)
+				.setTitle(MachineBlocks.SCULK_COLLECTOR.get().getName())
+				// 这个setSize()是必须的
+				.setSize(128, 64)
+				.setIcon(MachineBlocks.SCULK_COLLECTOR.asStack())
+				.setRecipe((builder, recipe, group) -> {
+					Level level = Minecraft.getInstance().level;
+
+					builder.addSlot(RecipeIngredientRole.INPUT, 10, 20)
+							.addIngredients(recipe.getInput().toJeiIngredient(level));
+
+					builder.addSlot(RecipeIngredientRole.OUTPUT, 62, 20)
+							.addItemStacks(HarvestInput.toJeiOutputs(recipe.getResults()));
+				})
+				.setDraw((recipe, view, graphics, mouseX, mouseY) -> {
+					// 输入槽
+					drawable.draw(graphics, 9, 19);
+					// 输出槽
+					drawable.draw(graphics, 61, 19);
+
+					graphics.drawString(font, Component.literal("范围: 16 x16 x10"), 10, 44, 0xFF0095e0, true);
+					graphics.drawString(font, Component.literal("按概率产出"), 10, 56, 0xFFe08500, true);
+				})
+				.build();
+	}
+}
