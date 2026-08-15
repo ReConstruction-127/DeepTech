@@ -46,9 +46,11 @@ import java.util.List;
  * 幽匿采集器:
  * <ul>
  *   <li>通电(50 FE/t)后以自身为原点按游标扫描周围方块, 每 tick 挖 1 个; 挖掘范围可由 GUI 输入框实时调整</li>
- *   <li>中间 2 列(隔一列)共 6 个幽灵过滤槽: 放入物品不消耗、仅显示为标记; 点击已标记槽标记立即消失;
- *       所有过滤为空 = 挖一切, 有标记 = 只挖标记方块</li>
- *   <li>右侧 3x3 输入槽存放回填方块(可放置方块, 不参与过滤); 挖掉方块后优先用输入槽中任意可放置方块回填, 全空则留空</li>
+ *   <li>中间两列过滤, 每行一一配对:
+ *       左列 = 挖掘过滤(幽灵槽, 放入不消耗、点击即消失, 只标记不存储);
+ *       右列 = 回填过滤(真实槽, 存放用于回填的方块)。如: 幽匿块-草方块 = 挖幽匿块后回填草方块,
+ *       右列为空且无耗尽 = 挖掉留空, 右列对应物品耗尽 = 跳过该行不再挖掘</li>
+ *   <li>右侧 3x3 输入槽保留为方块储存区(玩家/管道可存入取出, 不参与自动回填)</li>
  *   <li>左侧 3x3 输出槽存放挖掘产物</li>
  *   <li>掉落由数据驱动配方(deep_tech:harvest)决定(支持概率), 无配方则直接按战利品表(钻石镐无限, 无精准)产出</li>
  *   <li>不可破坏方块(如基岩, 破坏速度 &lt; 0)不会挖掘</li>
@@ -57,7 +59,8 @@ import java.util.List;
 public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollectorBlockEntity> implements IUIHolder.BlockEntityUI {
 	public static final int INPUT_SLOTS = 9;
 	public static final int OUTPUT_SLOTS = 9;
-	public static final int FILTER_SLOTS = 6;
+	public static final int FILTER_SLOTS = 3;
+	public static final int FILL_SLOTS = 3;
 
 	public static final int INPUT_START = 0;
 	public static final int OUTPUT_START = INPUT_SLOTS;
@@ -71,6 +74,8 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 
 	private final SculkCollectorCapability caps = new SculkCollectorCapability(this);
 	private final ItemStackHandler filterHandler = new ItemStackHandler(FILTER_SLOTS);
+	private final ItemStackHandler fillHandler = new ItemStackHandler(FILL_SLOTS);
+	private final boolean[] fillExhausted = new boolean[FILL_SLOTS];
 	private int scanIndex = 0;
 	private int radiusXZ = DEFAULT_RADIUS_XZ;
 	private int radiusY = DEFAULT_RADIUS_Y;
@@ -90,9 +95,7 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		Block[] defaults = {
 				Blocks.SCULK,
 				Blocks.SCULK_VEIN,
-				Blocks.SCULK_CATALYST,
-				Blocks.SCULK_SENSOR,
-				Blocks.SCULK_SHRIEKER
+				Blocks.SCULK_CATALYST
 		};
 		for (int i = 0; i < defaults.length && i < FILTER_SLOTS; i++) {
 			filterHandler.setStackInSlot(i, new ItemStack(defaults[i]));
@@ -162,6 +165,12 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 	protected void saveAdditional(@NotNull CompoundTag tag) {
 		super.saveAdditional(tag);
 		tag.put("Filters", filterHandler.serializeNBT());
+		tag.put("FillSlots", fillHandler.serializeNBT());
+		int[] exhausted = new int[fillExhausted.length];
+		for (int i = 0; i < fillExhausted.length; i++) {
+			exhausted[i] = fillExhausted[i] ? 1 : 0;
+		}
+		tag.putIntArray("FillExhausted", exhausted);
 		tag.putInt("RadiusXZ", radiusXZ);
 		tag.putInt("RadiusY", radiusY);
 	}
@@ -171,6 +180,15 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		super.load(tag);
 		if (tag.contains("Filters")) {
 			filterHandler.deserializeNBT(tag.getCompound("Filters"));
+		}
+		if (tag.contains("FillSlots")) {
+			fillHandler.deserializeNBT(tag.getCompound("FillSlots"));
+		}
+		if (tag.contains("FillExhausted")) {
+			int[] loaded = tag.getIntArray("FillExhausted");
+			for (int i = 0; i < fillExhausted.length; i++) {
+				fillExhausted[i] = i < loaded.length && loaded[i] != 0;
+			}
 		}
 		if (tag.contains("RadiusXZ")) {
 			radiusXZ = Math.max(1, Math.min(MAX_RADIUS_XZ, tag.getInt("RadiusXZ")));
@@ -204,19 +222,20 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 			entity.setLit(level, pos, state, false);
 			return;
 		}
-		BlockPos target = entity.scanNext(level, pos);
+		ScanResult target = entity.scanNext(level, pos);
 		if (target == null) {
 			entity.setLit(level, pos, state, false);
 			return;
 		}
 		entity.setLit(level, pos, state, true);
 
-		List<ItemStack> drops = entity.computeDrops(level, target);
+		BlockPos targetPos = target.pos();
+		List<ItemStack> drops = entity.computeDrops(level, targetPos);
 		if (!entity.canStoreAll(drops)) {
 			return;
 		}
 		entity.storeAll(drops);
-		entity.refillOrClear(level, target);
+		entity.refillOrClear(level, targetPos, target.row());
 
 		entity.setEnergy(entity.getEnergy() - ENERGY_PER_HARVEST);
 		entity.setChanged();
@@ -232,8 +251,11 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		}
 	}
 
-	/** 从游标开始扫描当前范围, 返回下一个可挖方块, 无则返回 null */
-	private BlockPos scanNext(Level level, BlockPos origin) {
+	/**
+	 * 从游标开始扫描当前范围, 返回下一个可挖方块及其配对的回填行, 无则返回 null。
+	 * 命中行若已耗尽(fillExhausted)则跳过该方块不挖。
+	 */
+	private ScanResult scanNext(Level level, BlockPos origin) {
 		int rangeXZ = radiusXZ * 2 + 1;
 		int rangeY = radiusY * 2 + 1;
 		int volume = rangeXZ * rangeXZ * rangeY;
@@ -252,35 +274,38 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 			if (state.isAir() || !state.getFluidState().isEmpty()) {
 				continue;
 			}
-			if (!matchesFilter(state)) {
+			int row = matchedFilterRow(state);
+			if (row < 0) {
 				continue;
 			}
 			if (!isHarvestable(level, pos, state)) {
 				continue;
 			}
-			return pos;
+			return new ScanResult(pos, row);
 		}
 		return null;
 	}
 
-	/** 过滤: 所有过滤标记为空 = 不过滤; 否则必须命中某个标记方块 */
-	private boolean matchesFilter(BlockState state) {
-		List<Block> filters = new ArrayList<>();
+	/**
+	 * 返回该方块命中的第一个有效过滤行(左列), 无效返回 -1。
+	 * 行有效 = 回填槽仍有货(可回填), 或回填槽留空且未耗尽(挖掉留空); 耗尽的行视为无效。
+	 */
+	private int matchedFilterRow(BlockState state) {
 		for (int i = 0; i < FILTER_SLOTS; i++) {
-			ItemStack stack = filterHandler.getStackInSlot(i);
-			if (!stack.isEmpty() && stack.getItem() instanceof BlockItem item) {
-				filters.add(item.getBlock());
+			ItemStack filter = filterHandler.getStackInSlot(i);
+			if (!filter.isEmpty() && filter.getItem() instanceof BlockItem item && state.is(item.getBlock())) {
+				if (isFillRowActive(i)) {
+					return i;
+				}
+				return -1;
 			}
 		}
-		if (filters.isEmpty()) {
-			return true;
-		}
-		for (Block block : filters) {
-			if (state.is(block)) {
-				return true;
-			}
-		}
-		return false;
+		return -1;
+	}
+
+	/** 行是否还有效: 回填槽有货, 或留空且未耗尽 */
+	private boolean isFillRowActive(int row) {
+		return !fillHandler.getStackInSlot(row).isEmpty() || !fillExhausted[row];
 	}
 
 	/**
@@ -347,32 +372,21 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		return false;
 	}
 
-	/** 清除目标方块: 输入槽中有任意可放置方块则回填, 全空则留空 */
-	private void refillOrClear(Level level, BlockPos target) {
-		ItemStackHandler handler = getItemHandler();
-		int pickedSlot = findFillSlot();
-		if (pickedSlot >= 0) {
-			ItemStack picked = handler.getStackInSlot(pickedSlot);
-			level.setBlockAndUpdate(target, ((BlockItem) picked.getItem()).getBlock().defaultBlockState());
-			picked.shrink(1);
-			if (picked.isEmpty()) {
-				handler.setStackInSlot(pickedSlot, ItemStack.EMPTY);
+	/**
+	 * 清除目标方块: 用该配对行(右列)的回填槽物品替换, 槽满则放物品, 用完最后一块标记该行耗尽;
+	 * 回填槽为空(留空配置)则放空气。
+	 */
+	private void refillOrClear(Level level, BlockPos target, int row) {
+		ItemStack fill = fillHandler.getStackInSlot(row);
+		if (!fill.isEmpty() && fill.getItem() instanceof BlockItem blockItem) {
+			level.setBlockAndUpdate(target, blockItem.getBlock().defaultBlockState());
+			fill.shrink(1);
+			if (fill.isEmpty()) {
+				fillExhausted[row] = true;
 			}
 		} else {
 			level.setBlockAndUpdate(target, Blocks.AIR.defaultBlockState());
 		}
-	}
-
-	/** 在输入槽(储存区)中找任意可放置方块 */
-	private int findFillSlot() {
-		ItemStackHandler handler = getItemHandler();
-		for (int i = INPUT_START; i < INPUT_START + INPUT_SLOTS; i++) {
-			ItemStack stack = handler.getStackInSlot(i);
-			if (!stack.isEmpty() && stack.getItem() instanceof BlockItem) {
-				return i;
-			}
-		}
-		return -1;
 	}
 
 	// ---------------- GUI ----------------
@@ -394,7 +408,6 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		group.addWidget(new EnergyBarWidget(7, 25, this::getEnergyStored, getMaxEnergyStored()));
 
 		SimpleMachineInventory container = new SimpleMachineInventory(getItemHandler());
-		SimpleMachineInventory filterContainer = new SimpleMachineInventory(filterHandler);
 
 		// 左侧 3x3 输出槽(挖掘产物)
 		for (int row = 0; row < 3; row++) {
@@ -403,13 +416,13 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 			}
 		}
 
-		// 中间 2 列幽灵过滤槽(隔一空列): 只标记不存储, 点击即消失
+		// 中间两列过滤, 每行配对: 左列幽灵挖掘过滤 + 右列真实回填槽
 		for (int row = 0; row < 3; row++) {
 			group.addWidget(new FilterSlotWidget(filterHandler, row, 63, 74 + row * 18));
-			group.addWidget(new FilterSlotWidget(filterHandler, 3 + row, 97, 74 + row * 18));
+			group.addWidget(new FillSlotWidget(row, 97, 74 + row * 18));
 		}
 
-		// 右侧 3x3 输入槽(回填方块储存)
+		// 右侧 3x3 输入槽(方块储存区, 不参与自动回填)
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 3; col++) {
 				group.addWidget(createSlot(container, INPUT_START + col + row * 3, 115 + col * 18, 74 + row * 18, true, true));
@@ -464,9 +477,13 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		return widget;
 	}
 
+	/** 扫描命中结果: 目标方块 + 其配对的回填行 */
+	private record ScanResult(BlockPos pos, int row) {
+	}
+
 	/**
-	 * 幽灵过滤槽: 放入物品仅把手中物品复制为标记(不消耗), 点击已标记槽标记立即消失(不产出任何物品)。
-	 * 标记数据通过 client action 同步到服务端, 供 matchesFilter 使用。
+	 * 幽灵过滤槽(左列): 放入物品仅把手中物品复制为标记(不消耗), 点击已标记槽标记立即消失(不产出任何物品)。
+	 * 标记数据通过 client action 同步到服务端, 供 matchedFilterRow 使用。
 	 */
 	private static class FilterSlotWidget extends SlotWidget {
 		private final ItemStackHandler filterHandler;
@@ -510,6 +527,33 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 			if (id == 1) {
 				filterHandler.setStackInSlot(index, buffer.readItem());
 			}
+		}
+	}
+
+	/**
+	 * 回填过滤槽(右列): 与左列同行的挖掘过滤配对, 真实存放回填方块,
+	 * 回填时消耗; 玩家放入/取走物品都会重置该行的"耗尽"标记。
+	 */
+	private class FillSlotWidget extends SlotWidget {
+		private final int index;
+
+		public FillSlotWidget(int index, int x, int y) {
+			this.index = index;
+			initTemplate();
+			setContainerSlot(new SimpleMachineInventory(fillHandler), index);
+			setSelfPosition(new Position(x, y));
+			setCanPutItems(true);
+			setCanTakeItems(true);
+		}
+
+		@Override
+		public boolean mouseClicked(double mouseX, double mouseY, int button) {
+			if (isMouseOverElement(mouseX, mouseY) && gui != null) {
+				boolean consumed = super.mouseClicked(mouseX, mouseY, button);
+				fillExhausted[index] = false;
+				return consumed;
+			}
+			return false;
 		}
 	}
 }
