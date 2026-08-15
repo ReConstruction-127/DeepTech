@@ -8,3 +8,9 @@ build
 /run-data
 /src/generated/*
 /bin/
+
+# 解包/依赖产物，禁止提交
+*.class
+/com/
+/libs/
+/dev/
