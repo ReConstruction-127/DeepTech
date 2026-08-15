@@ -725,7 +725,7 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 
 	// ============================================================
 	//  NBT 持久化
-	// ============================================================ 
+	// ============================================================
 
 	@Override
 	protected void write(CompoundTag tag) {
