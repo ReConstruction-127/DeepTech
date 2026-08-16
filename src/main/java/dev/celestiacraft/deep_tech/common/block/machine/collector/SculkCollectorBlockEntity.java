@@ -45,12 +45,21 @@ import java.util.List;
 /**
  * 幽匿采集器:
  * <ul>
- *   <li>通电(50 FE/t)后以自身为原点按游标扫描周围方块, 每 tick 挖 1 个; 挖掘范围可由 GUI 输入框实时调整</li>
+ *   <li>通入红石信号才工作; 每个 tick 按 config 速度(默认 1 块/tick)执行, 每块耗 config 电量(默认 200 FE);
+ *       挖掘范围由 GUI 输入框实时调整(横向 XZ 半径 / 纵向向下深度); 挖除使用 level.destroyBlock
+ *       (不产生世界掉落, 掉落一律入输出槽)</li>
+ *   <li>不挖掘机器所在层, 深度从机器下一格开始计算</li>
  *   <li>中间两列过滤, 每行一一配对:
  *       左列 = 挖掘过滤(幽灵槽, 放入不消耗、点击即消失, 只标记不存储);
  *       右列 = 回填过滤(幽灵槽, 同样只标记, 指定该行挖掉后用右侧储存区中的何种方块回填;
- *       ：右列为空 = 挖掉留空; 储存区中找不到该回填方块(耗尽) = 跳过该行不再挖掘)</li>
- *   <li>右侧 3x3 储存区: 存放真实回填方块, 机器按右列回填过滤从中抽取自动放置到世界上; 也用能力向管道提供出入</li>
+ *       右列为空 = 挖掉留空; 储存区中找不到该回填方块(耗尽) = 跳过该行不再挖掘)</li>
+ *   <li>三种工作模式:
+ *       HARVEST(左列有过滤) = 挑选挖掘+按行回填;
+ *       FILL(左列全空、右列标记全部相同方块) = 填充机: 把工作区域内的空气填充成对应方块,
+ *       从最底层开始一层一层向上, 不挖掘;
+ *       CLEAR(左右全部留空) = 清空机: 挖掉工作区域内全部方块留空, 从最上层开始一层一层向下;
+ *       右列标记了不同方块(混用)则机器不工作</li>
+ *   <li>右侧 3x3 储存区: 存放真实回填方块, 机器按回填过滤从中抽取自动放置到世界上; 也用能力向管道提供出入</li>
  *   <li>左侧 3x3 输出槽存放挖掘产物</li>
  *   <li>掉落由数据驱动配方(deep_tech:harvest)决定(支持概率), 无配方则直接按战利品表(钻石镐无限, 无精准)产出</li>
  *   <li>不可破坏方块(如基岩, 破坏速度 &lt; 0)不会挖掘</li>
@@ -66,17 +75,22 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 	public static final int TOTAL_SLOTS = OUTPUT_START + OUTPUT_SLOTS;
 
 	public static final int DEFAULT_RADIUS_XZ = 16;
-	public static final int DEFAULT_RADIUS_Y = 5;
+	public static final int DEFAULT_DEPTH = 5;
 	public static final int MAX_RADIUS_XZ = 32;
-	public static final int MAX_RADIUS_Y = 16;
-	public static final int ENERGY_PER_HARVEST = 50;
+	public static final int MAX_DEPTH = 16;
 
 	private final SculkCollectorCapability caps = new SculkCollectorCapability(this);
 	private final ItemStackHandler filterHandler = new ItemStackHandler(FILTER_SLOTS);
 	private final ItemStackHandler backfillFilterHandler = new ItemStackHandler(FILTER_SLOTS);
-	private int scanIndex = 0;
+	private int scanLayer = 0;
+	private int scanXZ = 0;
+	private int fillLayer = 0;
+	private int fillXZ = 0;
+	/** 空转冷却: 完整扫完一轮零命中后休眠的 tick 数, 避免每 tick 全量扫描空区域 */
+	private static final int IDLE_RESCAN_TICKS = 20;
+	private int rescanCooldown = 0;
 	private int radiusXZ = DEFAULT_RADIUS_XZ;
-	private int radiusY = DEFAULT_RADIUS_Y;
+	private int depth = DEFAULT_DEPTH;
 
 	public SculkCollectorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
@@ -93,7 +107,7 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		Block[] defaults = {
 				Blocks.SCULK,
 				Blocks.SCULK_VEIN,
-				Blocks.SCULK_CATALYST
+				Blocks.SCULK_SHRIEKER
 		};
 		for (int i = 0; i < defaults.length && i < FILTER_SLOTS; i++) {
 			filterHandler.setStackInSlot(i, new ItemStack(defaults[i]));
@@ -111,13 +125,17 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		setChanged();
 	}
 
-	public int getRadiusY() {
-		return radiusY;
+	public int getDepth() {
+		return depth;
 	}
 
-	public void setRadiusY(int radiusY) {
-		this.radiusY = Math.max(1, Math.min(MAX_RADIUS_Y, radiusY));
+	public void setDepth(int depth) {
+		this.depth = Math.max(1, Math.min(MAX_DEPTH, depth));
 		setChanged();
+	}
+
+	public int getEnergyPerHarvest() {
+		return SculkCollectorConfig.ENERGY_PER_HARVEST.get();
 	}
 
 	private static int parseClamped(String text, int fallback) {
@@ -165,7 +183,7 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		tag.put("Filters", filterHandler.serializeNBT());
 		tag.put("BackfillFilters", backfillFilterHandler.serializeNBT());
 		tag.putInt("RadiusXZ", radiusXZ);
-		tag.putInt("RadiusY", radiusY);
+		tag.putInt("Depth", depth);
 	}
 
 	@Override
@@ -180,8 +198,8 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		if (tag.contains("RadiusXZ")) {
 			radiusXZ = Math.max(1, Math.min(MAX_RADIUS_XZ, tag.getInt("RadiusXZ")));
 		}
-		if (tag.contains("RadiusY")) {
-			radiusY = Math.max(1, Math.min(MAX_RADIUS_Y, tag.getInt("RadiusY")));
+		if (tag.contains("Depth")) {
+			depth = Math.max(1, Math.min(MAX_DEPTH, tag.getInt("Depth")));
 		}
 	}
 
@@ -200,36 +218,102 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 
 	// ---------------- 工作逻辑 ----------------
 
+	/** 工作模式: 左列有过滤 = 挑选挖掘+按行回填; 双空 = 全清空; 左列空右列同方块 = 填充空气; 右列方块混用 = 不工作 */
+	private enum WorkMode {
+		HARVEST, CLEAR, FILL, INVALID
+	}
+
 	@Override
 	public void serverTick(Level level, BlockPos pos, BlockState state, SculkCollectorBlockEntity entity) {
 		if (level.isClientSide()) {
 			return;
 		}
-		if (entity.getEnergy() < ENERGY_PER_HARVEST) {
+		if (level.getBestNeighborSignal(pos) <= 0) {
 			entity.setLit(level, pos, state, false);
 			return;
 		}
-		ScanResult target = entity.scanNext(level, pos);
-		if (target == null) {
+		WorkMode mode = entity.computeWorkMode();
+		if (mode == WorkMode.INVALID) {
+			entity.setLit(level, pos, state, false);
+			return;
+		}
+		if (entity.rescanCooldown > 0) {
+			entity.rescanCooldown--;
+			entity.setLit(level, pos, state, false);
+			return;
+		}
+		int speed = SculkCollectorConfig.HARVEST_SPEED.get();
+		int worked = 0;
+		for (int t = 0; t < speed; t++) {
+			if (entity.getEnergy() < entity.getEnergyPerHarvest()) {
+				break;
+			}
+			if (mode == WorkMode.FILL) {
+				BlockPos fillPos = entity.scanFill(level, pos);
+				if (fillPos == null) {
+					entity.rescanCooldown = IDLE_RESCAN_TICKS;
+					break;
+				}
+				if (!entity.placeFill(level, fillPos)) {
+					continue;
+				}
+			} else {
+				ScanResult target = entity.scanNext(level, pos);
+				if (target == null) {
+					entity.rescanCooldown = IDLE_RESCAN_TICKS;
+					break;
+				}
+				BlockPos targetPos = target.pos();
+				List<ItemStack> drops = entity.computeDrops(level, targetPos);
+				if (!entity.canStoreAll(drops)) {
+					break;
+				}
+				entity.storeAll(drops);
+				level.destroyBlock(targetPos, false);
+				if (mode == WorkMode.HARVEST) {
+					entity.refillOrClear(level, targetPos, target.row());
+				}
+			}
+			entity.setEnergy(entity.getEnergy() - entity.getEnergyPerHarvest());
+			worked++;
+		}
+		if (worked == 0) {
 			entity.setLit(level, pos, state, false);
 			return;
 		}
 		entity.setLit(level, pos, state, true);
-
-		BlockPos targetPos = target.pos();
-		List<ItemStack> drops = entity.computeDrops(level, targetPos);
-		if (!entity.canStoreAll(drops)) {
-			return;
-		}
-		entity.storeAll(drops);
-		entity.refillOrClear(level, targetPos, target.row());
-
-		entity.setEnergy(entity.getEnergy() - ENERGY_PER_HARVEST);
 		entity.setChanged();
 		entity.setSyncCounter(entity.getSyncCounter() + 1);
 		if (entity.getSyncCounter() % 5 == 0) {
 			entity.sync();
 		}
+	}
+
+	/** 根据左右过滤槽内容判定当前工作模式 */
+	private WorkMode computeWorkMode() {
+		boolean anyFilter = false;
+		for (int i = 0; i < FILTER_SLOTS; i++) {
+			if (!filterHandler.getStackInSlot(i).isEmpty()) {
+				anyFilter = true;
+				break;
+			}
+		}
+		if (anyFilter) {
+			return WorkMode.HARVEST;
+		}
+		ItemStack first = ItemStack.EMPTY;
+		for (int i = 0; i < FILTER_SLOTS; i++) {
+			ItemStack stack = backfillFilterHandler.getStackInSlot(i);
+			if (stack.isEmpty()) {
+				continue;
+			}
+			if (first.isEmpty()) {
+				first = stack;
+			} else if (!ItemStack.isSameItem(first, stack)) {
+				return WorkMode.INVALID;
+			}
+		}
+		return first.isEmpty() ? WorkMode.CLEAR : WorkMode.FILL;
 	}
 
 	private void setLit(Level level, BlockPos pos, BlockState state, boolean lit) {
@@ -239,45 +323,116 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 	}
 
 	/**
-	 * 从游标开始扫描当前范围, 返回下一个可挖方块及其配对的回填行, 无则返回 null。
-	 * 命中行若已耗尽(fillExhausted)则跳过该方块不挖。
+	 * 扫描下一个可挖方块(HARVEST/CLEAR 模式): 不挖机器所在层, 深度从机器下一格开始。
+	 * 逐层从上到下: 当前层(scanLayer)内的 XZ 位置(scanXZ)全部扫完才推进到下一层。
+	 * 命中行若已耗尽(储存区无其回填方块且右列有标记)则跳过该方块不挖。
 	 */
 	private ScanResult scanNext(Level level, BlockPos origin) {
 		int rangeXZ = radiusXZ * 2 + 1;
-		int rangeY = radiusY * 2 + 1;
-		int volume = rangeXZ * rangeXZ * rangeY;
-		for (int i = 0; i < volume; i++) {
-			int idx = scanIndex;
-			scanIndex = (scanIndex + 1) % volume;
-			int dy = idx / (rangeXZ * rangeXZ);
-			int rem = idx % (rangeXZ * rangeXZ);
-			int dz = rem / rangeXZ;
-			int dx = rem % rangeXZ;
-			BlockPos pos = origin.offset(dx - radiusXZ, dy - radiusY, dz - radiusXZ);
-			if (pos.equals(origin)) {
-				continue;
+		int cells = rangeXZ * rangeXZ;
+		for (int attempt = 0; attempt < depth; attempt++) {
+			int y = origin.getY() - scanLayer - 1;
+			for (; scanXZ < cells; scanXZ++) {
+				int idx = scanXZ;
+				int dz = idx / rangeXZ;
+				int dx = idx % rangeXZ;
+				BlockPos pos = new BlockPos(origin.getX() + dx - radiusXZ, y, origin.getZ() + dz - radiusXZ);
+				BlockState state = level.getBlockState(pos);
+				if (state.isAir() || !state.getFluidState().isEmpty()) {
+					continue;
+				}
+				int row = matchedFilterRow(state);
+				if (row < 0) {
+					continue;
+				}
+				if (!isHarvestable(level, pos, state)) {
+					continue;
+				}
+				scanXZ++;
+				return new ScanResult(pos, row);
 			}
-			BlockState state = level.getBlockState(pos);
-			if (state.isAir() || !state.getFluidState().isEmpty()) {
-				continue;
-			}
-			int row = matchedFilterRow(state);
-			if (row < 0) {
-				continue;
-			}
-			if (!isHarvestable(level, pos, state)) {
-				continue;
-			}
-			return new ScanResult(pos, row);
+			scanXZ = 0;
+			scanLayer = (scanLayer + 1) % depth;
 		}
 		return null;
 	}
 
 	/**
+	 * 扫描下一处需填充的空气(FILL 模式): 独立游标(fillLayer/fillXZ, 不与挖掘共享),
+	 * 始终从最底层(fillLayer=0)开始, 当前层内全部扫完才推进到上一层。
+	 */
+	private BlockPos scanFill(Level level, BlockPos origin) {
+		int rangeXZ = radiusXZ * 2 + 1;
+		int cells = rangeXZ * rangeXZ;
+		for (int attempt = 0; attempt < depth; attempt++) {
+			int y = origin.getY() - (depth - fillLayer);
+			for (; fillXZ < cells; fillXZ++) {
+				int idx = fillXZ;
+				int dz = idx / rangeXZ;
+				int dx = idx % rangeXZ;
+				BlockPos pos = new BlockPos(origin.getX() + dx - radiusXZ, y, origin.getZ() + dz - radiusXZ);
+				if (level.isOutsideBuildHeight(pos) || !level.getWorldBorder().isWithinBounds(pos)) {
+					continue;
+				}
+				if (level.getBlockState(pos).isAir()) {
+					fillXZ++;
+					return pos;
+				}
+			}
+			fillXZ = 0;
+			fillLayer = (fillLayer + 1) % depth;
+		}
+		return null;
+	}
+
+	/** 填充机要放置的方块(右列全部相同的过滤标记) */
+	private ItemStack getFillBlock() {
+		for (int i = 0; i < FILTER_SLOTS; i++) {
+			ItemStack stack = backfillFilterHandler.getStackInSlot(i);
+			if (!stack.isEmpty()) {
+				return stack;
+			}
+		}
+		return ItemStack.EMPTY;
+	}
+
+	/** 从右侧储存区抽取回填方块放置到目标空气位置, 无货则不放置 */
+	private boolean placeFill(Level level, BlockPos pos) {
+		ItemStack fillFilter = getFillBlock();
+		if (fillFilter.isEmpty()) {
+			return false;
+		}
+		ItemStackHandler handler = getItemHandler();
+		for (int i = INPUT_START; i < INPUT_START + INPUT_SLOTS; i++) {
+			ItemStack stack = handler.getStackInSlot(i);
+			if (!stack.isEmpty() && ItemStack.isSameItem(fillFilter, stack)) {
+				level.setBlockAndUpdate(pos, ((BlockItem) stack.getItem()).getBlock().defaultBlockState());
+				stack.shrink(1);
+				if (stack.isEmpty()) {
+					handler.setStackInSlot(i, ItemStack.EMPTY);
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * 返回该方块命中的第一个有效过滤行(左列), 无效返回 -1。
 	 * 行有效 = 右列回填过滤为空(留空), 或右侧储存区中仍有该回填方块; 耗尽的行视为无效。
+	 * 左列全部留空(清空模式) = 全部方块都可挖, 无回填行。
 	 */
 	private int matchedFilterRow(BlockState state) {
+		boolean anyFilter = false;
+		for (int i = 0; i < FILTER_SLOTS; i++) {
+			if (!filterHandler.getStackInSlot(i).isEmpty()) {
+				anyFilter = true;
+				break;
+			}
+		}
+		if (!anyFilter) {
+			return FILTER_SLOTS - 1;
+		}
 		for (int i = 0; i < FILTER_SLOTS; i++) {
 			ItemStack filter = filterHandler.getStackInSlot(i);
 			if (!filter.isEmpty() && filter.getItem() instanceof BlockItem item && state.is(item.getBlock())) {
@@ -450,15 +605,15 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		radiusXzField.setMaxStringLength(2);
 		group.addWidget(radiusXzField);
 
-		LabelWidget radiusYLabel = new LabelWidget(79, 122, Component.literal("纵向"));
-		radiusYLabel.setColor(0xFF5D5F60);
-		group.addWidget(radiusYLabel);
-		TextFieldWidget radiusYField = new TextFieldWidget(103, 121, 30, 12,
-				() -> String.valueOf(getRadiusY()),
-				text -> setRadiusY(parseClamped(text, getRadiusY())));
-		radiusYField.setValidator(str -> str.replaceAll("[^0-9]", ""));
-		radiusYField.setMaxStringLength(2);
-		group.addWidget(radiusYField);
+		LabelWidget depthLabel = new LabelWidget(79, 122, Component.literal("深度"));
+		depthLabel.setColor(0xFF5D5F60);
+		group.addWidget(depthLabel);
+		TextFieldWidget depthField = new TextFieldWidget(103, 121, 30, 12,
+				() -> String.valueOf(getDepth()),
+				text -> setDepth(parseClamped(text, getDepth())));
+		depthField.setValidator(str -> str.replaceAll("[^0-9]", ""));
+		depthField.setMaxStringLength(2);
+		group.addWidget(depthField);
 
 		addPlayerSlots(group, player);
 		return group;
