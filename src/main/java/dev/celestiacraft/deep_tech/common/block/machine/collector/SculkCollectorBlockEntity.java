@@ -468,11 +468,15 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		Container inventory = player.getInventory();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
-				group.addWidget(createSlot(inventory, col + row * 9 + 9, 7 + col * 18, 136 + row * 18, true, true));
+				SlotWidget widget = createSlot(inventory, col + row * 9 + 9, 7 + col * 18, 136 + row * 18, true, true);
+				widget.setLocationInfo(true, false);
+				group.addWidget(widget);
 			}
 		}
 		for (int col = 0; col < 9; col++) {
-			group.addWidget(createSlot(inventory, col, 7 + col * 18, 190, true, true));
+			SlotWidget widget = createSlot(inventory, col, 7 + col * 18, 190, true, true);
+			widget.setLocationInfo(true, true);
+			group.addWidget(widget);
 		}
 	}
 
@@ -510,6 +514,18 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 			setCanTakeItems(true);
 		}
 
+		/**
+		 * 槽注册进菜单后立即移除(换成空占位): 过滤槽不参与双击收拢/快速移动/交换等
+		 * 任何菜单级物品操作, 杜绝标记被收走造成复制; 渲染仍直接读 filterHandler, 不受影响。
+		 */
+		@Override
+		public void initWidget() {
+			super.initWidget();
+			if (slotReference != null && getGui() != null) {
+				getGui().removeNativeSlot(slotReference);
+			}
+		}
+
 		@Override
 		public boolean mouseClicked(double mouseX, double mouseY, int button) {
 			if (isMouseOverElement(mouseX, mouseY) && gui != null) {
@@ -537,7 +553,36 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 			super.handleClientAction(id, buffer);
 			if (id == 1) {
 				filterHandler.setStackInSlot(index, buffer.readItem());
+				onSlotChanged();
 			}
+		}
+
+		/** 打开 GUI 时客户端从服务端拉取当前标记真值, 保证重启/重进后显示与服务器一致 */
+		@Override
+		public void writeInitialData(FriendlyByteBuf buffer) {
+			super.writeInitialData(buffer);
+			buffer.writeItemStack(filterHandler.getStackInSlot(index), false);
+		}
+
+		@Override
+		public void readInitialData(FriendlyByteBuf buffer) {
+			super.readInitialData(buffer);
+			filterHandler.setStackInSlot(index, buffer.readItem());
+		}
+
+		/**
+		 * 阻止基类把携带中的物品经 superMouseReleased 放入槽内(会吞掉手上物品)。
+		 * 按下(标记/清除)已由 mouseClicked 处理, 松开不再做任何容器交互。
+		 */
+		@Override
+		public boolean mouseReleased(double mouseX, double mouseY, int button) {
+			return isMouseOverElement(mouseX, mouseY) && gui != null;
+		}
+
+		/** 阻止拖拽分裂等把物品匀入槽内的容器交互 */
+		@Override
+		public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+			return isMouseOverElement(mouseX, mouseY) && gui != null;
 		}
 	}
 }
