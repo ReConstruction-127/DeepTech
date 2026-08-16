@@ -38,8 +38,6 @@ public class HarvestCategory {
 					// 输出槽
 					drawable.draw(graphics, 61, 19);
 
-					graphics.drawString(font, Component.literal("范围: 16 x16 x10"), 10, 44, 0xFF0095e0, true);
-					graphics.drawString(font, Component.literal("按概率产出"), 10, 56, 0xFFe08500, true);
 				})
 				.build();
 	}

@@ -559,15 +559,15 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 	@Override
 	public ModularUI createUI(Player player) {
 		WidgetGroup group = createUIWidget(player);
-		return new ModularUI(176, 240, this, player).widget(group);
+		return new ModularUI(194, 195, this, player).widget(group);
 	}
 
 	private WidgetGroup createUIWidget(Player player) {
-		WidgetGroup group = new WidgetGroup(0, 0, 176, 240);
+		WidgetGroup group = new WidgetGroup(0, 0, 194, 195);
 		group.setBackground(new ResourceTexture(DeepTech.loadGui("sculk_collector")));
 
-		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.SCULK_COLLECTOR.get().getName());
-		title.setColor(0xFF5D5F60);
+		LabelWidget title = new LabelWidget(28, 8, MachineBlocks.SCULK_COLLECTOR.get().getName());
+		title.setColor(0xFF97CCD6);
 		group.addWidget(title);
 
 		group.addWidget(new EnergyBarWidget(7, 25, this::getEnergyStored, getMaxEnergyStored()));
@@ -577,38 +577,38 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		// 左侧 3x3 输出槽(挖掘产物)
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 3; col++) {
-				group.addWidget(createSlot(container, OUTPUT_START + col + row * 3, 7 + col * 18, 74 + row * 18, false, true));
+				group.addWidget(createSlot(container, OUTPUT_START + col + row * 3, 27 + col * 18, 25 + row * 18, false, true));
 			}
 		}
 
 		// 中间两列过滤, 每行配对: 左列幽灵挖掘过滤 + 右列幽灵回填过滤(从右侧储存区抽取回填)
 		for (int row = 0; row < 3; row++) {
-			group.addWidget(new FilterSlotWidget(filterHandler, row, 63, 74 + row * 18));
-			group.addWidget(new FilterSlotWidget(backfillFilterHandler, row, 97, 74 + row * 18));
+			group.addWidget(new FilterSlotWidget(filterHandler, row, 83, 25 + row * 18));
+			group.addWidget(new FilterSlotWidget(backfillFilterHandler, row, 115, 25 + row * 18));
 		}
 
 		// 右侧 3x3 储存区(回填方块真实存储, 按右列回填过滤自动抽取放置)
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 3; col++) {
-				group.addWidget(createSlot(container, INPUT_START + col + row * 3, 115 + col * 18, 74 + row * 18, true, true));
+				group.addWidget(createSlot(container, INPUT_START + col + row * 3, 135 + col * 18, 25 + row * 18, true, true));
 			}
 		}
 
 		// 挖掘范围(两列之间空列的下方)
-		LabelWidget radiusXzLabel = new LabelWidget(7, 122, Component.literal("横向"));
-		radiusXzLabel.setColor(0xFF5D5F60);
+		LabelWidget radiusXzLabel = new LabelWidget(28, 84, Component.literal("↔"));
+		radiusXzLabel.setColor(0xFF97CCD6);
 		group.addWidget(radiusXzLabel);
-		TextFieldWidget radiusXzField = new TextFieldWidget(31, 121, 30, 12,
+		TextFieldWidget radiusXzField = new TextFieldWidget(37, 83, 30, 12,
 				() -> String.valueOf(getRadiusXZ()),
 				text -> setRadiusXZ(parseClamped(text, getRadiusXZ())));
 		radiusXzField.setValidator(str -> str.replaceAll("[^0-9]", ""));
 		radiusXzField.setMaxStringLength(2);
 		group.addWidget(radiusXzField);
 
-		LabelWidget depthLabel = new LabelWidget(79, 122, Component.literal("深度"));
-		depthLabel.setColor(0xFF5D5F60);
+		LabelWidget depthLabel = new LabelWidget(28, 97, Component.literal("▼"));
+		depthLabel.setColor(0xFF97CCD6);
 		group.addWidget(depthLabel);
-		TextFieldWidget depthField = new TextFieldWidget(103, 121, 30, 12,
+		TextFieldWidget depthField = new TextFieldWidget(37, 96, 30, 12,
 				() -> String.valueOf(getDepth()),
 				text -> setDepth(parseClamped(text, getDepth())));
 		depthField.setValidator(str -> str.replaceAll("[^0-9]", ""));
@@ -623,13 +623,13 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 		Container inventory = player.getInventory();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
-				SlotWidget widget = createSlot(inventory, col + row * 9 + 9, 7 + col * 18, 136 + row * 18, true, true);
+				SlotWidget widget = createSlot(inventory, col + row * 9 + 9, 27 + col * 18, 112 + row * 18, true, true);
 				widget.setLocationInfo(true, false);
 				group.addWidget(widget);
 			}
 		}
 		for (int col = 0; col < 9; col++) {
-			SlotWidget widget = createSlot(inventory, col, 7 + col * 18, 190, true, true);
+			SlotWidget widget = createSlot(inventory, col, 27 + col * 18, 170, true, true);
 			widget.setLocationInfo(true, true);
 			group.addWidget(widget);
 		}
@@ -667,6 +667,8 @@ public class SculkCollectorBlockEntity extends MachineBlockEntity<SculkCollector
 			setSelfPosition(new Position(x, y));
 			setCanPutItems(true);
 			setCanTakeItems(true);
+			// 背景格子已画进 GUI 大图, 不再绘制槽位背景
+			setBackgroundTexture(null);
 		}
 
 		/**
