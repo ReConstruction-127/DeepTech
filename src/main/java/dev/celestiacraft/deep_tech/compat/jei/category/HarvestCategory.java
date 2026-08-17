@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.compat.jei.category;
 
+import dev.celestiacraft.deep_tech.api.client.texture.DTTextures;
 import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestInput;
 import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestRecipe;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
@@ -26,17 +27,20 @@ public class HarvestCategory {
 				.setRecipe((builder, recipe, group) -> {
 					Level level = Minecraft.getInstance().level;
 
-					builder.addSlot(RecipeIngredientRole.INPUT, 10, 20)
+					builder.addSlot(RecipeIngredientRole.INPUT, 12, 12)
 							.addIngredients(recipe.getInput().toJeiIngredient(level));
 
-					builder.addSlot(RecipeIngredientRole.OUTPUT, 62, 20)
+					builder.addSlot(RecipeIngredientRole.OUTPUT, 62, 12)
 							.addItemStacks(HarvestInput.toJeiOutputs(recipe.getResults()));
 				})
 				.setDraw((recipe, view, graphics, mouseX, mouseY) -> {
 					// 输入槽
-					drawable.draw(graphics, 9, 19);
+					drawable.draw(graphics, 11, 11);
 					// 输出槽
-					drawable.draw(graphics, 61, 19);
+					drawable.draw(graphics, 61, 11);
+
+					DTTextures.PROGRESS_COLLECTOR.render(graphics, 39, 15);
+					DTTextures.ICON_COLLECTOR.render(graphics, 92, 4);
 
 				})
 				.build();
