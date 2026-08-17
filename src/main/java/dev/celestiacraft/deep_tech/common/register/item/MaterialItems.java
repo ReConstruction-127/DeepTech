@@ -12,6 +12,7 @@ public class MaterialItems {
 	public static ItemEntry<BasicItem> SCULK_BONE;
 	public static ItemEntry<BasicItem> SCULK_BONEMEAL;
 	public static ItemEntry<BasicItem> SCULK_CIRCUIT;
+	public static ItemEntry<BasicItem> DENSE_SCULK_CHUNK;
 
 	static {
 		DTCreativeTabs.getTab("material");
@@ -38,6 +39,11 @@ public class MaterialItems {
 
 		SCULK_CIRCUIT = DeepTech.REGISTRATE.item("sculk_circuit", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_circuit"))
+				.tab(DTCreativeTabs.getTabKey("material"))
+				.register();
+
+		DENSE_SCULK_CHUNK = DeepTech.REGISTRATE.item("dense_sculk_chunk", BasicItem::new)
+				.model(ItemModelGen.generated("item/dense_sculk_chunk"))
 				.tab(DTCreativeTabs.getTabKey("material"))
 				.register();
 	}

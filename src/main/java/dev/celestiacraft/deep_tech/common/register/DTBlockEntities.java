@@ -17,6 +17,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNIte
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_nursery.SculkNurseryBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 
 public class DTBlockEntities {
@@ -36,6 +37,7 @@ public class DTBlockEntities {
 	public static final BlockEntityEntry<SNFluidOutputPortBlockEntity> SN_FLUID_OUTPUT_PORT;
 	public static final BlockEntityEntry<SNAccessorBlockEntity> SN_ACCESSOR;
 	public static final BlockEntityEntry<SculkCollectorBlockEntity> SCULK_COLLECTOR;
+	public static final BlockEntityEntry<SculkNurseryBlockEntity> SCULK_NURSERY;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
@@ -67,6 +69,10 @@ public class DTBlockEntities {
 				.register();
 		SCULK_COLLECTOR = DeepTech.REGISTRATE.blockEntity("sculk_collector", SculkCollectorBlockEntity::new)
 				.validBlock(MachineBlocks.SCULK_COLLECTOR)
+				.register();
+
+		SCULK_NURSERY = DeepTech.REGISTRATE.blockEntity("sculk_nursery", SculkNurseryBlockEntity::new)
+				.validBlock(MachineBlocks.SCULK_NURSERY)
 				.register();
 
 		SN_CENTER = DeepTech.REGISTRATE.blockEntity("sculk_network_center", SNCenterBlockEntity::new)

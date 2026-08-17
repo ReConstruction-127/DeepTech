@@ -4,6 +4,7 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.datagen.recipes.type.AlloyRecipeGen;
 import dev.celestiacraft.deep_tech.datagen.recipes.type.CraftingRecipeGen;
 import dev.celestiacraft.deep_tech.datagen.recipes.type.CrushingRecipeGen;
+import dev.celestiacraft.deep_tech.datagen.recipes.type.CultivationRecipeGen;
 import dev.celestiacraft.deep_tech.datagen.recipes.type.HarvestRecipeGen;
 import dev.celestiacraft.deep_tech.datagen.recipes.type.InteractionRecipeGen;
 import net.minecraft.data.PackOutput;
@@ -42,9 +43,14 @@ public class DTRecipeProvider extends RecipeProvider {
 	protected void buildRecipes(@NotNull Consumer<FinishedRecipe> consumer) {
 		crushing(consumer);
 		alloy(consumer);
+		cultivation(consumer);
 		interaction(consumer);
 		harvest(consumer);
 		shaped(consumer);
+	}
+
+	private void cultivation(Consumer<FinishedRecipe> consumer) {
+		CultivationRecipeGen.register(consumer);
 	}
 
 	private void harvest(Consumer<FinishedRecipe> consumer) {

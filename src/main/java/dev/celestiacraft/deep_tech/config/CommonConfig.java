@@ -13,6 +13,8 @@ public class CommonConfig {
 	public static final AlloyFurnaceConfig ALLOY_FURNACE;
 	public static final EnergyCellConfig ENERGY_CELL;
 	public static final SculkCollectorConfig SCULK_COLLECTOR;
+	public static final SculkNurseryConfig SCULK_NURSERY;
+	public static final ProcessorConfig PROCESSOR;
 
 	static {
 		BUILDER.comment("All settings below will only take effect after restarting the server or client.")
@@ -24,6 +26,8 @@ public class CommonConfig {
 		ENERGY_CELL = new EnergyCellConfig(BUILDER);
 		ALLOY_FURNACE = new AlloyFurnaceConfig(BUILDER);
 		SCULK_COLLECTOR = new SculkCollectorConfig(BUILDER);
+		SCULK_NURSERY = new SculkNurseryConfig(BUILDER);
+		PROCESSOR = new ProcessorConfig(BUILDER);
 
 		SPEC = BUILDER.build();
 		BUILDER.pop();

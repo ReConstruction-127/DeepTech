@@ -34,5 +34,10 @@ public class ItemLanguage extends LanguageGenerate {
 				"Sculk Circuit",
 				"幽匿电路"
 		);
+		addItemLanguage(
+				"dense_sculk_chunk",
+				"Dense Sculk Chunk",
+				"致密幽匿碎块"
+		);
 	}
 }

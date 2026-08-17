@@ -44,5 +44,10 @@ public class BlockLanguage extends LanguageGenerate {
 				"Sculk Collector",
 				"幽匿采集器"
 		);
+		addBlockLanguage(
+				"sculk_nursery",
+				"Sculk Nursery",
+				"幽匿培育室"
+		);
 	}
 }
