@@ -1,10 +1,10 @@
 package dev.celestiacraft.deep_tech.common.effect;
 
+import dev.celestiacraft.libs.api.register.effect.BasicEffect;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,24 +20,17 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * 玩家浮空时不进行任何转换;每 20 tick 损失经验值(若为玩家)并扣血。
  * 被此效果杀死的生物由 {@link InfectionEvents} 放置幽匿催生体。
  */
-public class InfectionEffect extends MobEffect {
-
+public class InfectionEffect extends BasicEffect {
 	private static final String AGE_KEY = "dt_infection_age";
 	private static final DustParticleOptions VEIN_DUST = new DustParticleOptions(new org.joml.Vector3f(0.0f, 0.9f, 1.0f), 1.0f);
 
-	public InfectionEffect() {
-		super(MobEffectCategory.HARMFUL, 0x1E4A45);
-	}
-
-	@Override
-	public boolean isDurationEffectTick(int duration, int amplifier) {
-		// 每 2 tick 铺一段轨迹(保持连续),扣血/经验每 20 tick
-		return duration % 2 == 0;
+	public InfectionEffect(MobEffectCategory category, int color) {
+		super(category, color);
 	}
 
 	@Override
 	public void applyEffectTick(LivingEntity entity, int amplifier) {
-		if (entity.level().isClientSide) {
+		if (entity.level().isClientSide()) {
 			return;
 		}
 		Level level = entity.level();

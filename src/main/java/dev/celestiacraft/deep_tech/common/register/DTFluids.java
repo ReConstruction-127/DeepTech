@@ -30,7 +30,9 @@ public class DTFluids {
 				.flowing(DTFluidTextures.CULTURE.getFlowing())
 				.still(DTFluidTextures.CULTURE.getStill())
 				.tint(0xFF2F6E55)
-				.liquidBlock((supplier, props) -> new SculkCultureLiquidBlock(supplier::get, props))
+				.liquidBlock((supplier, properties) -> {
+					return new SculkCultureLiquidBlock(supplier, properties);
+				})
 				.bucket()
 				.model(DTFluidTexture.forgeFluidBucket("sculk_culture"))
 				.build()

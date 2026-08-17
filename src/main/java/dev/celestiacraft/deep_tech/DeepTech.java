@@ -41,7 +41,7 @@ public class DeepTech {
 		DTBlockEntities.register();
 		DTRecipes.register();
 		DTFluids.register();
-		DTEffects.register(bus);
+		DTEffects.register();
 		// 创造模式标签页注册请确保一定在最下面
 		DTCreativeTabs.register(bus);
 
