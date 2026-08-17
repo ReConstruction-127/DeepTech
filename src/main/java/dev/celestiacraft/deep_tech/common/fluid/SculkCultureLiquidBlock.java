@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
@@ -15,19 +16,18 @@ import java.util.function.Supplier;
  * 流体自身的 tick 只在流动时被调度, 静止的源块只 tick 一次, 因此必须由方块 tick 驱动。
  */
 public class SculkCultureLiquidBlock extends LiquidBlock {
-
 	public SculkCultureLiquidBlock(Supplier<? extends FlowingFluid> fluid, Properties properties) {
 		super(fluid, properties);
 	}
 
 	@Override
-	public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+	public void onPlace(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState oldState, boolean isMoving) {
 		super.onPlace(state, level, pos, oldState, isMoving);
 		level.scheduleTick(pos, this, 5);
 	}
 
 	@Override
-	public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+	public void tick(BlockState state, @NotNull ServerLevel level, @NotNull BlockPos pos, @NotNull RandomSource random) {
 		if (!state.getFluidState().isEmpty()) {
 			SculkCultureFluid.tickFluid(level, pos);
 			level.scheduleTick(pos, this, 5);

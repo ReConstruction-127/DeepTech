@@ -105,6 +105,7 @@ public class MachineBlocks {
 				.model(ItemModelGen.withModel("block/machine/energy_cell"))
 				.build()
 				.register();
+
 		SN_CENTER = DeepTech.REGISTRATE.block("sculk_network_center", SNCenterBlock::new)
 				.blockstate(NonNullBiConsumer.noop())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -114,6 +115,7 @@ public class MachineBlocks {
 				.model(NonNullBiConsumer.noop())
 				.build()
 				.register();
+
 		SN_ITEM_RESERVOIR = DeepTech.REGISTRATE.block("sculk_network_item_reservoir", SNItemReservoirBlock::new)
 				.blockstate(NonNullBiConsumer.noop())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -123,6 +125,7 @@ public class MachineBlocks {
 				.model(NonNullBiConsumer.noop())
 				.build()
 				.register();
+
 		SN_ITEM_INPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_item_input_port", SNItemInputPortBlock::new)
 				.blockstate(NonNullBiConsumer.noop())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -132,6 +135,7 @@ public class MachineBlocks {
 				.model(NonNullBiConsumer.noop())
 				.build()
 				.register();
+
 		SN_ITEM_OUTPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_item_output_port", SNItemOutputPortBlock::new)
 				.blockstate(NonNullBiConsumer.noop())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -141,6 +145,7 @@ public class MachineBlocks {
 				.model(NonNullBiConsumer.noop())
 				.build()
 				.register();
+
 		SN_FLUID_RESERVOIR = DeepTech.REGISTRATE.block("sculk_network_fluid_reservoir", SNFluidReservoirBlock::new)
 				.blockstate(NonNullBiConsumer.noop())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -150,6 +155,7 @@ public class MachineBlocks {
 				.model(NonNullBiConsumer.noop())
 				.build()
 				.register();
+
 		SN_FLUID_INPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_fluid_input_port", SNFluidInputPortBlock::new)
 				.blockstate(NonNullBiConsumer.noop())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -159,6 +165,7 @@ public class MachineBlocks {
 				.model(NonNullBiConsumer.noop())
 				.build()
 				.register();
+
 		SN_FLUID_OUTPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_fluid_output_port", SNFluidOutputPortBlock::new)
 				.blockstate(NonNullBiConsumer.noop())
 				.tag(DeepTechBlockTags.MACHINES)
@@ -168,6 +175,7 @@ public class MachineBlocks {
 				.model(NonNullBiConsumer.noop())
 				.build()
 				.register();
+
 		SN_ACCESSOR = DeepTech.REGISTRATE.block("sculk_network_accessor", SNAccessorBlock::new)
 				.blockstate(NonNullBiConsumer.noop())
 				.tag(DeepTechBlockTags.MACHINES)

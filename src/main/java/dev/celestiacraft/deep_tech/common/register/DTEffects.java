@@ -1,21 +1,25 @@
 package dev.celestiacraft.deep_tech.common.register;
 
+import com.tterrag.registrate.util.entry.RegistryEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.effect.InfectionEffect;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.effect.MobEffectCategory;
 
 public class DTEffects {
-	public static final DeferredRegister<MobEffect> REGISTRY = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, DeepTech.MODID);
+	public static final RegistryEntry<InfectionEffect> INFECTION;
 
-	/** 感染 */
-	public static final RegistryObject<MobEffect> INFECTION = REGISTRY.register("infection", InfectionEffect::new);
+	static {
+		INFECTION = DeepTech.REGISTRATE.effect("infection", InfectionEffect::new)
+				.category(MobEffectCategory.HARMFUL)
+				.color(0x1E4A45)
+				.durationEffectTick((duration, amplifier) ->{
+					// 每 2 tick 铺一段轨迹(保持连续),扣血/经验每 20 tick
+					return duration % 2 == 0;
+				})
+				.register();
+	}
 
-	public static void register(IEventBus bus) {
-		REGISTRY.register(bus);
+	public static void register() {
 		DeepTech.registerLog("Effects");
 	}
 }

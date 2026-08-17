@@ -9,12 +9,15 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class SNAccessorBlock extends BasicEntityBlock<SNAccessorBlockEntity> {
 	public SNAccessorBlock(BlockBehaviour.Properties properties) {
-		super(properties);
+		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+				.strength(5.0F, 5.0F)
+				.requiresCorrectToolForDrops());
 	}
 
 	@Override
