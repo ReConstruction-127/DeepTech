@@ -18,6 +18,7 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -29,7 +30,9 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlock<T> {
 	public MachineBlock(Properties properties) {
-		super(properties);
+		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+				.strength(5.0F, 5.0F)
+				.requiresCorrectToolForDrops());
 	}
 
 	@Override
