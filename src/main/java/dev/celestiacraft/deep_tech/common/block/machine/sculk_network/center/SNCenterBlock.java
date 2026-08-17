@@ -7,12 +7,15 @@ import dev.celestiacraft.libs.api.register.block.BasicEntityBlock;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class SNCenterBlock extends BasicEntityBlock<SNCenterBlockEntity> {
 	public SNCenterBlock(BlockBehaviour.Properties properties) {
-		super(properties);
+		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+				.strength(5.0F, 5.0F)
+				.requiresCorrectToolForDrops());
 	}
 
 	@Override

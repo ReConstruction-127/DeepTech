@@ -62,7 +62,7 @@ public class InfectionEffect extends MobEffect {
 		entity.getPersistentData().putInt(AGE_KEY, age);
 		if (age % 10 == 0) {
 			if (entity instanceof Player player) {
-				player.giveExperiencePoints(-(2 + amplifier * 2));
+				player.giveExperiencePoints(-(2 + (amplifier << 1)));
 			}
 			entity.hurt(entity.damageSources().magic(), 1.0f + amplifier);
 		}

@@ -7,13 +7,17 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.fluids.FluidStack;
 
 // 正确: 接 Properties 参数并传递给父类
 public class SNFluidOutputPortBlock extends SNPortBlock<SNFluidOutputPortBlockEntity> {
 	public SNFluidOutputPortBlock(Properties properties) {
-		super(properties.noOcclusion());
+		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+				.noOcclusion()
+				.strength(5.0F, 5.0F)
+				.requiresCorrectToolForDrops());
 	}
 
 	@Override
