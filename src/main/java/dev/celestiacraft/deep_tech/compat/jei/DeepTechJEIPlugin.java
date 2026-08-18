@@ -3,16 +3,22 @@ package dev.celestiacraft.deep_tech.compat.jei;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUIGuiContainer;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.recipe.alloy.AlloyRecipe;
+import dev.celestiacraft.deep_tech.common.recipe.assembling.AssemblingRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
+import dev.celestiacraft.deep_tech.common.recipe.cultivation.CultivationRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionRecipe;
+import dev.celestiacraft.deep_tech.common.recipe.processor.ProcessorRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.deep_tech.compat.jei.category.AlloyCategory;
+import dev.celestiacraft.deep_tech.compat.jei.category.AssemblerCategory;
 import dev.celestiacraft.deep_tech.compat.jei.category.CrushingCategory;
+import dev.celestiacraft.deep_tech.compat.jei.category.CultivationCategory;
 import dev.celestiacraft.deep_tech.compat.jei.category.HarvestCategory;
 import dev.celestiacraft.deep_tech.compat.jei.category.InteractionCategory;
+import dev.celestiacraft.deep_tech.compat.jei.category.ProcessorCategory;
 import dev.celestiacraft.deep_tech.compat.jei.handler.MachineGuiHandler;
 import dev.celestiacraft.libs.compat.jei.api.ingredient.JeiIngredientTypes;
 import mezz.jei.api.IModPlugin;
@@ -47,7 +53,10 @@ public class DeepTechJEIPlugin implements IModPlugin {
 				CrushingCategory.builder(helper),
 				AlloyCategory.builder(helper),
 				InteractionCategory.builder(helper),
-				HarvestCategory.builder(helper)
+				HarvestCategory.builder(helper),
+				CultivationCategory.builder(helper),
+				ProcessorCategory.builder(helper),
+				AssemblerCategory.builder(helper)
 		);
 	}
 
@@ -69,11 +78,17 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		List<AlloyRecipe> alloy = manager.getAllRecipesFor(DTRecipes.ALLOY.getRecipeType());
 		List<InteractionRecipe> interaction = manager.getAllRecipesFor(DTRecipes.INTERACTION.getRecipeType());
 		List<HarvestRecipe> harvest = manager.getAllRecipesFor(DTRecipes.HARVEST.getRecipeType());
+		List<CultivationRecipe> cultivation = manager.getAllRecipesFor(DTRecipes.CULTIVATION.getRecipeType());
+		List<ProcessorRecipe> processing = manager.getAllRecipesFor(DTRecipes.PROCESSING.getRecipeType());
+		List<AssemblingRecipe> assembling = manager.getAllRecipesFor(DTRecipes.ASSEMBLING.getRecipeType());
 
 		registration.addRecipes(DTJeiRecipeType.CRUSHING, crushing);
 		registration.addRecipes(DTJeiRecipeType.ALLOY, alloy);
 		registration.addRecipes(DTJeiRecipeType.INTERACTION, interaction);
 		registration.addRecipes(DTJeiRecipeType.HARVEST, harvest);
+		registration.addRecipes(DTJeiRecipeType.CULTIVATION, cultivation);
+		registration.addRecipes(DTJeiRecipeType.PROCESSING, processing);
+		registration.addRecipes(DTJeiRecipeType.ASSEMBLING, assembling);
 	}
 
 	@Override
@@ -93,6 +108,21 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		registration.addRecipeCatalyst(
 				MachineBlocks.SCULK_COLLECTOR.get(),
 				DTJeiRecipeType.HARVEST
+		);
+
+		registration.addRecipeCatalyst(
+				MachineBlocks.SCULK_NURSERY.get(),
+				DTJeiRecipeType.CULTIVATION
+		);
+
+		registration.addRecipeCatalyst(
+				MachineBlocks.PROCESSOR.get(),
+				DTJeiRecipeType.PROCESSING
+		);
+
+		registration.addRecipeCatalyst(
+				MachineBlocks.ASSEMBLER.get(),
+				DTJeiRecipeType.ASSEMBLING
 		);
 
 		// 交互配方使用扳手作为催化剂

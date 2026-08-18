@@ -13,6 +13,8 @@ public class MaterialItems {
 	public static ItemEntry<BasicItem> SCULK_BONEMEAL;
 	public static ItemEntry<BasicItem> SCULK_CIRCUIT;
 	public static ItemEntry<BasicItem> DENSE_SCULK_CHUNK;
+	public static ItemEntry<BasicItem> SCULK_ALLOY_PLATE;
+	public static ItemEntry<BasicItem> ADVANCED_SCULK_CONTROL_CIRCUIT;
 
 	static {
 		DTCreativeTabs.getTab("material");
@@ -44,6 +46,16 @@ public class MaterialItems {
 
 		DENSE_SCULK_CHUNK = DeepTech.REGISTRATE.item("dense_sculk_chunk", BasicItem::new)
 				.model(ItemModelGen.generated("item/dense_sculk_chunk"))
+				.tab(DTCreativeTabs.getTabKey("material"))
+				.register();
+
+		SCULK_ALLOY_PLATE = DeepTech.REGISTRATE.item("sculk_alloy_plate", BasicItem::new)
+				.model(ItemModelGen.generated("item/sculk_alloy_plate"))
+				.tab(DTCreativeTabs.getTabKey("material"))
+				.register();
+
+		ADVANCED_SCULK_CONTROL_CIRCUIT = DeepTech.REGISTRATE.item("advanced_sculk_control_circuit", BasicItem::new)
+				.model(ItemModelGen.generated("item/advanced_sculk_control_circuit"))
 				.tab(DTCreativeTabs.getTabKey("material"))
 				.register();
 	}

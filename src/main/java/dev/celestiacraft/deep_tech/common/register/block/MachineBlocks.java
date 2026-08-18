@@ -20,6 +20,8 @@ import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNIte
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.sculk_nursery.SculkNurseryBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.processor.ProcessorBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.assembler.AssemblerBlock;
 import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 import dev.celestiacraft.deep_tech.tags.DeepTechBlockTags;
 import dev.celestiacraft.deep_tech.tags.DeepTechItemTags;
@@ -38,6 +40,8 @@ public class MachineBlocks {
 	public static final BlockEntry<SNAccessorBlock> SN_ACCESSOR;
 	public static final BlockEntry<SculkCollectorBlock> SCULK_COLLECTOR;
 	public static final BlockEntry<SculkNurseryBlock> SCULK_NURSERY;
+	public static final BlockEntry<ProcessorBlock> PROCESSOR;
+	public static final BlockEntry<AssemblerBlock> ASSEMBLER;
 
 	public static final BlockEntry<SNFluidReservoirBlock> SN_FLUID_RESERVOIR;
 	public static final BlockEntry<SNFluidInputPortBlock> SN_FLUID_INPUT_PORT;
@@ -203,6 +207,26 @@ public class MachineBlocks {
 				.tab(DTCreativeTabs.getTabKey("machine"))
 				.tag(DeepTechItemTags.MACHINES)
 				.model(ItemModelGen.withModel("block/machine/sculk_nursery/on"))
+				.build()
+				.register();
+
+		PROCESSOR = DeepTech.REGISTRATE.block("processor", ProcessorBlock::new)
+				.blockstate(ProcessorBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tab(DTCreativeTabs.getTabKey("machine"))
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/processor/on"))
+				.build()
+				.register();
+
+		ASSEMBLER = DeepTech.REGISTRATE.block("assembler", AssemblerBlock::new)
+				.blockstate(AssemblerBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tab(DTCreativeTabs.getTabKey("machine"))
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/assembler/on"))
 				.build()
 				.register();
 	}

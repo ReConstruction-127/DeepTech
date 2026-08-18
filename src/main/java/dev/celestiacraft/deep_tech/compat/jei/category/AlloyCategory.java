@@ -6,7 +6,6 @@ import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.libs.api.recipe.ingredient.item.IngredientWithCount;
 import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;
-import dev.celestiacraft.libs.compat.jei.api.ingredient.JeiIngredientTypes;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -35,7 +34,7 @@ public class AlloyCategory {
 
 					for (int i = 0; i < slotCount; i++) {
 						builder.addSlot(RecipeIngredientRole.INPUT, INPUT_X[i], INPUT_Y)
-								.addIngredient(JeiIngredientTypes.INGREDIENT_WITH_COUNT, inputs.get(i));
+								.addItemStacks(inputs.get(i).toItemStacks());
 					}
 
 					builder.addSlot(RecipeIngredientRole.OUTPUT, OUTPUT_X, OUTPUT_Y)

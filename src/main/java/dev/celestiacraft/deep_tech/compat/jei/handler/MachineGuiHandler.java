@@ -2,8 +2,11 @@ package dev.celestiacraft.deep_tech.compat.jei.handler;
 
 import com.lowdragmc.lowdraglib.gui.modular.ModularUIGuiContainer;
 import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.assembler.AssemblerBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.processor.ProcessorBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.sculk_nursery.SculkNurseryBlockEntity;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
@@ -24,6 +27,9 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 		register(CrusherBlockEntity.class, this::crusher);
 		register(AlloyFurnaceBlockEntity.class, this::alloyFurnace);
 		register(SculkFurnaceBlockEntity.class, this::sculkFurnace);
+		register(SculkNurseryBlockEntity.class, this::sculkNursery);
+		register(ProcessorBlockEntity.class, this::processor);
+		register(AssemblerBlockEntity.class, this::assembler);
 	}
 
 	private <T> void register(Class<T> clazz, Function<ModularUIGuiContainer, Collection<IGuiClickableArea>> handler) {
@@ -70,6 +76,36 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 				RecipeTypes.SMELTING,
 				RecipeTypes.BLASTING,
 				RecipeTypes.SMOKING
+		));
+	}
+
+	private Collection<IGuiClickableArea> sculkNursery(ModularUIGuiContainer screen) {
+		return List.of(IGuiClickableArea.createBasic(
+				88,
+				32,
+				16,
+				16,
+				DTJeiRecipeType.CULTIVATION
+		));
+	}
+
+	private Collection<IGuiClickableArea> processor(ModularUIGuiContainer screen) {
+		return List.of(IGuiClickableArea.createBasic(
+				78,
+				40,
+				14,
+				14,
+				DTJeiRecipeType.PROCESSING
+		));
+	}
+
+	private Collection<IGuiClickableArea> assembler(ModularUIGuiContainer screen) {
+		return List.of(IGuiClickableArea.createBasic(
+				148,
+				59,
+				14,
+				22,
+				DTJeiRecipeType.ASSEMBLING
 		));
 	}
 }

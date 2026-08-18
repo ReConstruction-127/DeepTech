@@ -30,6 +30,11 @@ public class BlockLanguage extends LanguageGenerate {
 				"机器框架"
 		);
 		addBlockLanguage(
+				"reinforced_machine_frame",
+				"Reinforced Machine Frame",
+				"强化机器框架"
+		);
+		addBlockLanguage(
 				"resonance_node",
 				"Resonance Node",
 				"共振节点"
@@ -48,6 +53,16 @@ public class BlockLanguage extends LanguageGenerate {
 				"sculk_nursery",
 				"Sculk Nursery",
 				"幽匿培育室"
+		);
+		addBlockLanguage(
+				"processor",
+				"Processor",
+				"加工机"
+		);
+		addBlockLanguage(
+				"assembler",
+				"Assembler",
+				"组装机"
 		);
 	}
 }

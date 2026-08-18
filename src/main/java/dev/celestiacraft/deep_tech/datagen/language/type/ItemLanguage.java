@@ -39,5 +39,15 @@ public class ItemLanguage extends LanguageGenerate {
 				"Dense Sculk Chunk",
 				"致密幽匿碎块"
 		);
+		addItemLanguage(
+				"sculk_alloy_plate",
+				"Sculk Alloy Plate",
+				"幽匿合金板"
+		);
+		addItemLanguage(
+				"advanced_sculk_control_circuit",
+				"Advanced Sculk Control Circuit",
+				"高级幽匿控制电路"
+		);
 	}
 }

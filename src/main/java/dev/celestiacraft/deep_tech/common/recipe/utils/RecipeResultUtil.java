@@ -6,6 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 /**
@@ -15,6 +17,32 @@ import net.minecraftforge.registries.ForgeRegistries;
  */
 public class RecipeResultUtil {
 	private RecipeResultUtil() {
+	}
+
+	/**
+	 * 从配方的 fluid 对象中解析流体
+	 * <p>
+	 * JSON 格式: {@code {"fluid": "minecraft:water", "amount": 1000}}, amount 缺省为 1000
+	 *
+	 * @param obj 配方的流体 JSON 对象
+	 * @return 解析得到的流体
+	 * @throws JsonSyntaxException 当 fluid 缺失, ID 非法或流体不存在时抛出
+	 */
+	public static FluidStack fluidStackFromJson(JsonObject obj) {
+		String fluidName = GsonHelper.getAsString(obj, "fluid");
+		ResourceLocation fluidId = ResourceLocation.tryParse(fluidName);
+		if (fluidId == null) {
+			throw new JsonSyntaxException("Invalid fluid id: '" + fluidName + "'");
+		}
+		Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidId);
+		if (fluid == null) {
+			throw new JsonSyntaxException("Unknown fluid: '" + fluidName + "'");
+		}
+		int amount = GsonHelper.getAsInt(obj, "amount", 1000);
+		if (amount < 1) {
+			throw new JsonSyntaxException("Invalid fluid amount: " + amount);
+		}
+		return new FluidStack(fluid, amount);
 	}
 
 	/**

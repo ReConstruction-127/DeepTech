@@ -15,6 +15,7 @@ public class CommonConfig {
 	public static final SculkCollectorConfig SCULK_COLLECTOR;
 	public static final SculkNurseryConfig SCULK_NURSERY;
 	public static final ProcessorConfig PROCESSOR;
+	public static final AssemblerConfig ASSEMBLER;
 
 	static {
 		BUILDER.comment("All settings below will only take effect after restarting the server or client.")
@@ -28,6 +29,7 @@ public class CommonConfig {
 		SCULK_COLLECTOR = new SculkCollectorConfig(BUILDER);
 		SCULK_NURSERY = new SculkNurseryConfig(BUILDER);
 		PROCESSOR = new ProcessorConfig(BUILDER);
+		ASSEMBLER = new AssemblerConfig(BUILDER);
 
 		SPEC = BUILDER.build();
 		BUILDER.pop();
