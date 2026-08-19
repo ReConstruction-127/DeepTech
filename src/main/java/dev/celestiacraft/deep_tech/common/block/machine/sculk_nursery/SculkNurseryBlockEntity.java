@@ -48,12 +48,12 @@ import java.util.List;
  */
 public class SculkNurseryBlockEntity extends MachineBlockEntity<SculkNurseryBlockEntity> implements IUIHolder.BlockEntityUI {
 	private static final int TANK_SIZE = 16;
-	private static final int TANK_HEIGHT = 40;
+	private static final int TANK_HEIGHT = 30;
 	// 流体槽位置手动配置: 按罐索引一一对应 (x, y), 不再自动逐槽推算
 	private static final int[] FLUID_INPUT_TANK_X = {40, 56};
-	private static final int[] FLUID_INPUT_TANK_Y = {25, 25};
+	private static final int[] FLUID_INPUT_TANK_Y = {29, 29};
 	private static final int[] FLUID_OUTPUT_TANK_X = {120, 136};
-	private static final int[] FLUID_OUTPUT_TANK_Y = {25, 25};
+	private static final int[] FLUID_OUTPUT_TANK_Y = {29, 29};
 
 	private final SculkNurseryCapability caps = new SculkNurseryCapability(this);
 
@@ -289,18 +289,18 @@ public class SculkNurseryBlockEntity extends MachineBlockEntity<SculkNurseryBloc
 	@Override
 	public ModularUI createUI(Player player) {
 		WidgetGroup group = createUIWidget(player);
-		return new ModularUI(194, 195, this, player).widget(group);
+		return new ModularUI(194, 187, this, player).widget(group);
 	}
 
 	private WidgetGroup createUIWidget(Player player) {
-		WidgetGroup group = new WidgetGroup(0, 0, 194, 195);
+		WidgetGroup group = new WidgetGroup(0, 0, 194, 187);
 		group.setBackground(new ResourceTexture(DeepTech.loadGui("sculk_nursery")));
 
 		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.SCULK_NURSERY.get().getName());
 		title.setColor(0xFF97CCD6);
 		group.addWidget(title);
 
-		group.addWidget(new EnergyBarWidget(9, 25, this::getEnergyStored, getMaxEnergyStored()));
+		group.addWidget(new EnergyBarWidget(16, 29, this::getEnergyStored, getMaxEnergyStored()));
 
 		// 2 输入罐(左) + 2 输出罐(右): 比例填充式流体槽, 支持拿着桶点击槽位灌入/抽取 (同幽匿发电机/幽匿网络缓存器)
 		// LDLib TankWidget 的桶点击是对整个 IFluidTransfer 做 fill/drain(不区分罐索引),
@@ -333,7 +333,7 @@ public class SculkNurseryBlockEntity extends MachineBlockEntity<SculkNurseryBloc
 		}
 
 		group.addWidget(new VerticalProgressBarWidget(
-				88, 32, 16, 16,
+				89, 33, 16, 16,
 				this::getProgress,
 				this::getMaxProgress,
 				new ResourceTexture(DeepTech.loadGui("elements/progress_nursery_back")),
@@ -344,12 +344,12 @@ public class SculkNurseryBlockEntity extends MachineBlockEntity<SculkNurseryBloc
 
 		// 2 物品输入槽 (可放可取, shift 可取回背包)
 		for (int i = 0; i < getItemInputSlotCount(); i++) {
-			group.addWidget(createSlot(container, getItemInputSlotIndex(i), 39 + i * 18, 70, true, true));
+			group.addWidget(createSlot(container, getItemInputSlotIndex(i), 39 + i * 18, 60, true, true));
 		}
 
 		// 4 物品输出槽 (可取不可放, shift 取回背包)
 		for (int i = 0; i < getItemOutputSlotCount(); i++) {
-			group.addWidget(createSlot(container, getItemOutputSlotIndex(i), 119 + i * 18, 70, false, true));
+			group.addWidget(createSlot(container, getItemOutputSlotIndex(i), 101 + i * 18, 60, false, true));
 		}
 
 		addPlayerSlots(group, player);
@@ -360,14 +360,14 @@ public class SculkNurseryBlockEntity extends MachineBlockEntity<SculkNurseryBloc
 		Container inventory = player.getInventory();
 		for (int row = 0; row < 3; row++) {
 			for (int col = 0; col < 9; col++) {
-				SlotWidget widget = createSlot(inventory, col + row * 9 + 9, 9 + col * 18, 100 + row * 18, true, true);
+				SlotWidget widget = createSlot(inventory, col + row * 9 + 9, 7 + col * 18, 100 + row * 18, true, true);
 				// isPlayerContainer 必须为 true, shift-click 时 LDLib 才把这里当作玩家背包目标槽
 				widget.setLocationInfo(true, false);
 				group.addWidget(widget);
 			}
 		}
 		for (int col = 0; col < 9; col++) {
-			SlotWidget widget = createSlot(inventory, col, 9 + col * 18, 158, true, true);
+			SlotWidget widget = createSlot(inventory, col, 7 + col * 18, 158, true, true);
 			widget.setLocationInfo(true, true);
 			group.addWidget(widget);
 		}
