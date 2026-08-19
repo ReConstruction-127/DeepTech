@@ -22,7 +22,7 @@ public class HarvestCategory {
 		return SimpleJeiCategory.builder(DTJeiRecipeType.HARVEST, helper)
 				.setTitle(MachineBlocks.SCULK_COLLECTOR.get().getName())
 				// 这个setSize()是必须的
-				.setSize(128, 64)
+				.setSize(128, 40)
 				.setIcon(MachineBlocks.SCULK_COLLECTOR.asStack())
 				.setRecipe((builder, recipe, group) -> {
 					Level level = Minecraft.getInstance().level;
