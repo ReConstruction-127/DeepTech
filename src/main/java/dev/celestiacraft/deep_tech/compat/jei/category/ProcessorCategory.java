@@ -18,7 +18,7 @@ import java.util.List;
 public class ProcessorCategory {
 	private static final int[] INPUT_X = {10, 28};
 	private static final int INPUT_Y = 20;
-	private static final int[] OUTPUT_X = {62, 80};
+	private static final int[] OUTPUT_X = {69, 87};
 	private static final int OUTPUT_Y = 20;
 
 	public static SimpleJeiCategory<ProcessorRecipe> builder(IGuiHelper helper) {
@@ -27,7 +27,7 @@ public class ProcessorCategory {
 		return SimpleJeiCategory.builder(DTJeiRecipeType.PROCESSING, helper)
 				.setTitle(MachineBlocks.PROCESSOR.get().getName())
 				// 这个setSize()是必须的
-				.setSize(128, 64)
+				.setSize(140, 64)
 				.setIcon(MachineBlocks.PROCESSOR.asStack())
 				.setRecipe((builder, recipe, group) -> {
 					List<IngredientWithCount> inputs = recipe.getItemInputs();
@@ -53,7 +53,8 @@ public class ProcessorCategory {
 					for (int x : OUTPUT_X) {
 						drawable.draw(graphics, x - 1, OUTPUT_Y - 1);
 					}
-					DTTextures.PROGRESS_CRUSHER.render(graphics, 49, 24);
+					DTTextures.PROGRESS_PROCESSOR.render(graphics, 49, 24);
+					DTTextures.ICON_PROCESSOR.render(graphics, 108, 12);
 
 					Font font = Minecraft.getInstance().font;
 

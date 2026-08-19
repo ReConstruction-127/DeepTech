@@ -7,6 +7,7 @@ import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import dev.celestiacraft.libs.api.recipe.ingredient.item.IngredientWithCount;
 import dev.celestiacraft.libs.compat.jei.api.SimpleJeiCategory;
+import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
@@ -33,7 +34,7 @@ public class CultivationCategory {
 		return SimpleJeiCategory.builder(DTJeiRecipeType.CULTIVATION, helper)
 				.setTitle(MachineBlocks.SCULK_NURSERY.get().getName())
 				// 这个setSize()是必须的
-				.setSize(128, 88)
+				.setSize(150, 88)
 				.setIcon(MachineBlocks.SCULK_NURSERY.asStack())
 				.setRecipe((builder, recipe, group) -> {
 					List<IngredientWithCount> itemInputs = recipe.getItemInputs();
@@ -52,9 +53,15 @@ public class CultivationCategory {
 					}
 
 					List<net.minecraft.world.item.ItemStack> itemOutputs = recipe.getItemOutputs();
+					boolean hasChance = recipe.getItemOutputChance() < 1.0F;
+					int chancePercent = Math.round(recipe.getItemOutputChance() * 100);
 					for (int i = 0; i < itemOutputs.size() && i < ITEM_OUTPUT_X.length * ITEM_OUTPUT_Y.length; i++) {
-						builder.addSlot(RecipeIngredientRole.OUTPUT, ITEM_OUTPUT_X[i % ITEM_OUTPUT_X.length], ITEM_OUTPUT_Y[i / ITEM_OUTPUT_X.length])
+						IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.OUTPUT, ITEM_OUTPUT_X[i % ITEM_OUTPUT_X.length], ITEM_OUTPUT_Y[i / ITEM_OUTPUT_X.length])
 								.addItemStack(itemOutputs.get(i));
+						if (hasChance) {
+							slot.addTooltipCallback((view, tooltip) -> tooltip
+									.add(Component.literal("产出概率: " + chancePercent + "%")));
+						}
 					}
 
 					List<FluidStack> fluidOutputs = recipe.getFluidOutputs();
@@ -81,7 +88,8 @@ public class CultivationCategory {
 					for (int x : FLUID_OUTPUT_X) {
 						drawable.draw(graphics, x - 1, FLUID_OUTPUT_Y - 1);
 					}
-					DTTextures.PROGRESS_COLLECTOR.render(graphics, 49, 20);
+					DTTextures.PROGRESS_DNA.render(graphics, 50, 26);
+					DTTextures.ICON_DNA.render(graphics, 110, 18);
 
 					Font font = Minecraft.getInstance().font;
 
@@ -90,12 +98,6 @@ public class CultivationCategory {
 
 					Component timeText = Component.literal("⏱ " + recipe.getProcessingTime() + " tick");
 					graphics.drawString(font, timeText, 8, 73, 0xFFe08500, true);
-
-					if (recipe.getItemOutputChance() < 1.0F) {
-						int percent = Math.round(recipe.getItemOutputChance() * 100);
-						Component chanceText = Component.literal("⚗ 物品产出概率 " + percent + "%");
-						graphics.drawString(font, chanceText, 8, 82, 0xFF38b764, true);
-					}
 				})
 				.build();
 	}

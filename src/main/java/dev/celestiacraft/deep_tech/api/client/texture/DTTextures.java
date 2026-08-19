@@ -5,9 +5,15 @@ public class DTTextures {
 			PROGRESS_CRUSHER,
 			PROGRESS_ALLOYER,
 			PROGRESS_COLLECTOR,
+			PROGRESS_ASM,
+			PROGRESS_DNA,
+			PROGRESS_PROCESSOR,
 			ICON_CRUSHER,
 			ICON_ALLOYER,
 			ICON_COLLECTOR,
+			ICON_PROCESSOR,
+			ICON_DNA,
+			ICON_ASM,
 			RIGHT_CLICK,
 			LEFT_CLICK,
 			RECYCLE,
@@ -18,9 +24,15 @@ public class DTTextures {
 		PROGRESS_CRUSHER = addGuiTexture("elements/jei/elements", 0, 0, 16, 7);
 		PROGRESS_ALLOYER = addGuiTexture("elements/jei/elements", 0, 7, 10, 15);
 		PROGRESS_COLLECTOR = addGuiTexture("elements/jei/elements", 0, 22, 12, 9);
+		PROGRESS_ASM = addGuiTexture("elements/jei/elements", 0, 31, 16, 4);
+		PROGRESS_DNA = addGuiTexture("elements/jei/elements", 0, 35, 6, 16);
+		PROGRESS_PROCESSOR = addGuiTexture("elements/jei/elements", 0, 51, 16, 7);
 		ICON_CRUSHER = addGuiTexture("elements/jei/elements", 224, 0, 32, 32);
 		ICON_ALLOYER = addGuiTexture("elements/jei/elements", 224, 32, 32, 32);
 		ICON_COLLECTOR = addGuiTexture("elements/jei/elements", 224, 64, 32, 32);
+		ICON_PROCESSOR = addGuiTexture("elements/jei/elements", 224, 96, 32, 32);
+		ICON_DNA = addGuiTexture("elements/jei/elements", 224, 128, 32, 32);
+		ICON_ASM = addGuiTexture("elements/jei/elements", 224, 160, 32, 32);
 		RIGHT_CLICK = addGuiTexture("elements/jei/elements", 17, 1, 18, 18);
 		LEFT_CLICK = addGuiTexture("elements/jei/elements", 17, 21, 18, 18);
 		RECYCLE = addGuiTexture("elements/jei/elements", 17, 41, 18, 18);

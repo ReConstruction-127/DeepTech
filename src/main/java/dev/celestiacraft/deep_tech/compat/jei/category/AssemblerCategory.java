@@ -18,15 +18,15 @@ import java.util.List;
 
 public class AssemblerCategory {
 	private static final int[] INPUT_X = {8, 26, 44, 62};
-	private static final int[] INPUT_Y = {20, 38, 56, 74};
-	private static final int CATALYST_X = 82;
-	private static final int CATALYST_Y = 56;
+	private static final int[] INPUT_Y = {0, 18, 36, 54};
+	private static final int CATALYST_X = 104;
+	private static final int CATALYST_Y = 0;
 	private static final int FLUID_INPUT_X = 82;
-	private static final int[] FLUID_INPUT_Y = {20, 38};
+	private static final int[] FLUID_INPUT_Y = {36, 54};
 	private static final int[] OUTPUT_X = {128, 146};
-	private static final int[] OUTPUT_Y = {20, 38};
+	private static final int[] OUTPUT_Y = {0, 18};
 	private static final int FLUID_OUTPUT_X = 128;
-	private static final int FLUID_OUTPUT_Y = 56;
+	private static final int FLUID_OUTPUT_Y = 54;
 
 	public static SimpleJeiCategory<AssemblingRecipe> builder(IGuiHelper helper) {
 		IDrawable drawable = helper.getSlotDrawable();
@@ -90,13 +90,14 @@ public class AssemblerCategory {
 					if (!recipe.getFluidOutputs().isEmpty()) {
 						drawable.draw(graphics, FLUID_OUTPUT_X - 1, FLUID_OUTPUT_Y - 1);
 					}
-					DTTextures.PROGRESS_ALLOYER.render(graphics, 106, 38);
+					DTTextures.PROGRESS_ASM.render(graphics, 104, 24);
+					DTTextures.ICON_ASM.render(graphics, 7, 74);
 
 					Font font = Minecraft.getInstance().font;
 
 					if (!recipe.getCatalyst().isEmpty()) {
-						Component catalystText = Component.literal("催化剂 (不消耗)");
-						graphics.drawString(font, catalystText, CATALYST_X - 4, CATALYST_Y - 10, 0xFF9c6b30, true);
+						Component catalystText = Component.literal("(不消耗)");
+						graphics.drawString(font, catalystText, CATALYST_X - 4, CATALYST_Y, 0xFF00FFFF, true);
 					}
 
 					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");
