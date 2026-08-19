@@ -48,12 +48,12 @@ import java.util.List;
  */
 public class SculkNurseryBlockEntity extends MachineBlockEntity<SculkNurseryBlockEntity> implements IUIHolder.BlockEntityUI {
 	private static final int TANK_SIZE = 16;
-	private static final int TANK_HEIGHT = 30;
+	private static final int TANK_HEIGHT = 29;
 	// 流体槽位置手动配置: 按罐索引一一对应 (x, y), 不再自动逐槽推算
-	private static final int[] FLUID_INPUT_TANK_X = {40, 56};
-	private static final int[] FLUID_INPUT_TANK_Y = {29, 29};
-	private static final int[] FLUID_OUTPUT_TANK_X = {120, 136};
-	private static final int[] FLUID_OUTPUT_TANK_Y = {29, 29};
+	private static final int[] FLUID_INPUT_TANK_X = {40, 58};
+	private static final int[] FLUID_INPUT_TANK_Y = {30, 30};
+	private static final int[] FLUID_OUTPUT_TANK_X = {120, 138};
+	private static final int[] FLUID_OUTPUT_TANK_Y = {30, 30};
 
 	private final SculkNurseryCapability caps = new SculkNurseryCapability(this);
 

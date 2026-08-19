@@ -11,6 +11,7 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.fluid.SingleTankFluidTransfer;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.ProportionalTankWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.block.machine.assembler.capability.AssemblerCapability;
@@ -47,13 +48,13 @@ import java.util.List;
  * </ul>
  */
 public class AssemblerBlockEntity extends MachineBlockEntity<AssemblerBlockEntity> implements IUIHolder.BlockEntityUI {
-	private static final int TANK_SIZE = 26;
-	private static final int TANK_HEIGHT = 30;
+	private static final int TANK_SIZE = 16;
+	private static final int TANK_HEIGHT = 70;
 	// 流体槽位置手动配置: 按罐索引一一对应 (x, y), 不再自动逐槽推算
-	private static final int[] FLUID_INPUT_TANK_X = {28, 28};
-	private static final int[] FLUID_INPUT_TANK_Y = {25, 59};
-	private static final int[] FLUID_OUTPUT_TANK_X = {168};
-	private static final int[] FLUID_OUTPUT_TANK_Y = {25};
+	private static final int[] FLUID_INPUT_TANK_X = {25, 43};
+	private static final int[] FLUID_INPUT_TANK_Y = {26, 26};
+	private static final int[] FLUID_OUTPUT_TANK_X = {187};
+	private static final int[] FLUID_OUTPUT_TANK_Y = {26};
 	private static final int INPUT_COLUMNS = 4;
 	private static final int INPUT_ROWS = 4;
 
@@ -400,8 +401,8 @@ public class AssemblerBlockEntity extends MachineBlockEntity<AssemblerBlockEntit
 			).setBackground(new ResourceTexture(DeepTech.loadGui("elements/tank_back"))));
 		}
 
-		group.addWidget(new VerticalProgressBarWidget(
-				148, 59, 14, 22,
+		group.addWidget(new ProgressBarWidget(
+				133, 71, 16, 16,
 				this::getProgress,
 				this::getMaxProgress,
 				new ResourceTexture(DeepTech.loadGui("elements/progress_assembler_back")),
@@ -416,7 +417,7 @@ public class AssemblerBlockEntity extends MachineBlockEntity<AssemblerBlockEntit
 				group.addWidget(createSlot(
 						container,
 						getItemInputSlotIndex(col + row * INPUT_COLUMNS),
-						62 + col * 18,
+						60 + col * 18,
 						25 + row * 18,
 						true,
 						true
@@ -425,11 +426,11 @@ public class AssemblerBlockEntity extends MachineBlockEntity<AssemblerBlockEntit
 		}
 
 		// 催化剂槽 (不消耗, 可放可取)
-		group.addWidget(createSlot(container, CATALYST_SLOT, 134, 25, true, true));
+		group.addWidget(createSlot(container, CATALYST_SLOT, 150, 25, true, true));
 
 		// 4 物品输出槽 (2x2)
-		int[] outputX = {162, 180};
-		int[] outputY = {59, 77};
+		int[] outputX = {150, 168};
+		int[] outputY = {60, 78};
 		for (int i = 0; i < getItemOutputSlotCount(); i++) {
 			group.addWidget(createSlot(
 					container,

@@ -10,6 +10,7 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.recipe.processor.ProcessorRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
@@ -174,7 +175,7 @@ public class ProcessorBlockEntity extends MachineBlockEntity<ProcessorBlockEntit
 		group.setBackground(new ResourceTexture(DeepTech.loadGui("processor")));
 
 		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.PROCESSOR.get().getName());
-		title.setColor(0xFF5D5F60);
+		title.setColor(0xFF97CCD6);
 		group.addWidget(title);
 
 		group.addWidget(new EnergyBarWidget(
@@ -184,8 +185,8 @@ public class ProcessorBlockEntity extends MachineBlockEntity<ProcessorBlockEntit
 				getMaxEnergyStored()
 		));
 
-		group.addWidget(new VerticalProgressBarWidget(
-				78,
+		group.addWidget(new ProgressBarWidget(
+				80,
 				40,
 				14,
 				14,
