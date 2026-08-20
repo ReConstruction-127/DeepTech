@@ -13,6 +13,7 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.fluids.FluidStack;
 
 import java.util.List;
 
@@ -53,7 +54,8 @@ public class AssemblerCategory {
 					for (int i = 0; i < fluidInputCount; i++) {
 						CultivationFluidInput input = fluidInputs.get(i);
 						builder.addSlot(RecipeIngredientRole.INPUT, FLUID_INPUT_X, FLUID_INPUT_Y[i])
-								.addFluidStack(input.fluid(), input.amount());
+								.addFluidStack(input.fluid(), input.amount())
+								.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.literal(input.amount() + " mB")));
 					}
 
 					List<net.minecraft.world.item.ItemStack> itemOutputs = recipe.getItemOutputs();
@@ -63,8 +65,10 @@ public class AssemblerCategory {
 					}
 
 					if (!recipe.getFluidOutputs().isEmpty()) {
+						FluidStack fluidOutput = recipe.getFluidOutputs().get(0);
 						builder.addSlot(RecipeIngredientRole.OUTPUT, FLUID_OUTPUT_X, FLUID_OUTPUT_Y)
-								.addFluidStack(recipe.getFluidOutputs().get(0).getFluid(), recipe.getFluidOutputs().get(0).getAmount());
+								.addFluidStack(fluidOutput.getFluid(), fluidOutput.getAmount())
+								.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.literal(fluidOutput.getAmount() + " mB")));
 					}
 				})
 				.setDraw((recipe, view, graphics, mouseX, mouseY) -> {
@@ -96,14 +100,14 @@ public class AssemblerCategory {
 					Font font = Minecraft.getInstance().font;
 
 					if (!recipe.getCatalyst().isEmpty()) {
-						Component catalystText = Component.literal("(不消耗)");
+						Component catalystText = Component.translatable("jei.deep_tech.catalyst_no_consume");
 						graphics.drawString(font, catalystText, CATALYST_X - 4, CATALYST_Y, 0xFF00FFFF, true);
 					}
 
-					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");
+					Component energyText = Component.translatable("jei.deep_tech.energy_cost", recipe.getEnergyCost());
 					graphics.drawString(font, energyText, 88, 86, 0xFF0095e0, true);
 
-					Component timeText = Component.literal("⏱ " + recipe.getProcessingTime() + " tick");
+					Component timeText = Component.translatable("jei.deep_tech.time_cost", recipe.getProcessingTime());
 					graphics.drawString(font, timeText, 88, 96, 0xFFe08500, true);
 				})
 				.build();

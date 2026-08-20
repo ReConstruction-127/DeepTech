@@ -6,11 +6,13 @@ import net.minecraft.resources.ResourceLocation;
 public class DTFluidTextures {
 	public static final DTFluidTexture
 			EXPERIENCE,
-			CULTURE;
+			CULTURE,
+			INDUCTION;
 
 	static {
 		EXPERIENCE = add("liquid_experience/flowing", "liquid_experience/still");
 		CULTURE = add("sculk_culture/flowing", "sculk_culture/still");
+		INDUCTION = add("sculk_induction_fluid/flowing", "sculk_induction_fluid/still");
 	}
 
 	private static DTFluidTexture add(String flowing, String still) {

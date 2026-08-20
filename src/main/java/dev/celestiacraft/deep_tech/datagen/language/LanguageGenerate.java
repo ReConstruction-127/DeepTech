@@ -4,10 +4,16 @@ import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.datagen.language.type.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LanguageGenerate {
 	public static final List<List<String>> TRANSLATION_LIST = new ArrayList<>();
+
+	/** 配置注释文本:key -> {英文, 中文},运行时供 ForgeConfigSpec 注释使用 */
+	private static final Map<String, String[]> CONFIG_LANG = new LinkedHashMap<>();
+	private static boolean configLangRegistered = false;
 
 	public static void register() {
 		ItemLanguage.addLang();
@@ -16,6 +22,37 @@ public class LanguageGenerate {
 		GuiLanguage.addLang();
 		OtherLanguage.addLang();
 		MaterialLanguage.addLang();
+		JeiLanguage.addLang();
+	}
+
+	/**
+	 * 注册配置注释文本(运行时使用,不会写入语言文件)。
+	 * Forge 配置注释无法 i18n,TOML 中始终写入英文。
+	 */
+	public static void registerConfigLang() {
+		if (configLangRegistered) {
+			return;
+		}
+		configLangRegistered = true;
+		ConfigLanguage.addLang();
+	}
+
+	/** 读取配置注释的英文文本 */
+	public static String configEnglish(String key) {
+		registerConfigLang();
+		String[] entry = CONFIG_LANG.get(key);
+		return entry == null ? key : entry[0];
+	}
+
+	/** 读取配置注释的中文文本 */
+	public static String configChinese(String key) {
+		registerConfigLang();
+		String[] entry = CONFIG_LANG.get(key);
+		return entry == null ? key : entry[1];
+	}
+
+	protected static void addConfigLang(String key, String english, String chinese) {
+		CONFIG_LANG.put(key, new String[]{english, chinese});
 	}
 
 	protected static void addLanguage(String type, String key, String english, String chinese) {

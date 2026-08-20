@@ -14,5 +14,10 @@ public class FluidLanguage extends LanguageGenerate {
 				"Sculk Culture",
 				"幽匿培养液"
 		);
+		addFluidLanguage(
+				"sculk_induction_fluid",
+				"Sculk Induction Fluid",
+				"幽匿诱导液"
+		);
 	}
 }

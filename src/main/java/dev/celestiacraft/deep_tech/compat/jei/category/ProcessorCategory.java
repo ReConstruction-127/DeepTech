@@ -58,10 +58,10 @@ public class ProcessorCategory {
 
 					Font font = Minecraft.getInstance().font;
 
-					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");
+					Component energyText = Component.translatable("jei.deep_tech.energy_cost", recipe.getEnergyCost());
 					graphics.drawString(font, energyText, 10, 44, 0xFF0095e0, true);
 
-					Component timeText = Component.literal("⏱ " + recipe.getProcessingTime() + " tick");
+					Component timeText = Component.translatable("jei.deep_tech.time_cost", recipe.getProcessingTime());
 					graphics.drawString(font, timeText, 10, 56, 0xFFe08500, true);
 				})
 				.build();

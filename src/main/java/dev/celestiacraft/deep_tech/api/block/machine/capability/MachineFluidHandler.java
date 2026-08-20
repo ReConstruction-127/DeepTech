@@ -162,12 +162,14 @@ public class MachineFluidHandler implements IFluidHandler, INBTSerializable<Comp
 				if (stored.isEmpty() || !stored.isFluidEqual(resource)) {
 					return FluidStack.EMPTY;
 				}
-				return drainTank(tank, resource.getAmount(), action, true);
+				// UI 单罐视图不套 canDrainFluid 策略: 玩家手动点击该罐用桶抽取应始终可行,
+				// 策略只约束聚合 handler(管道/自动化)的输出方向.
+				return drainTank(tank, resource.getAmount(), action, false);
 			}
 
 			@Override
 			public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-				return drainTank(tank, maxDrain, action, true);
+				return drainTank(tank, maxDrain, action, false);
 			}
 		};
 	}

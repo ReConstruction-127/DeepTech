@@ -64,5 +64,15 @@ public class GuiLanguage extends LanguageGenerate {
 				"No",
 				"否"
 		);
+		addGuiLang(
+				"energy_stored",
+				"%s FE / %s FE",
+				"能量: %s / %s FE"
+		);
+		addGuiLang(
+				"fluid_stored",
+				"%s mB / %s mB",
+				"液体: %s / %s mB"
+		);
 	}
 }

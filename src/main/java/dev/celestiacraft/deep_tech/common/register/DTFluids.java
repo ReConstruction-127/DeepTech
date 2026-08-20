@@ -13,6 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class DTFluids {
 	public static final FluidEntry<ForgeFlowingFluid.Flowing> LIQUID_EXPERIENCE;
 	public static final FluidEntry<ForgeFlowingFluid.Flowing> SCULK_CULTURE;
+	public static final FluidEntry<ForgeFlowingFluid.Flowing> SCULK_INDUCTION_FLUID;
 
 	static {
 		DTCreativeTabs.getTab("material");
@@ -29,12 +30,19 @@ public class DTFluids {
 		SCULK_CULTURE = DTFluidBuilder.of("sculk_culture")
 				.flowing(DTFluidTextures.CULTURE.getFlowing())
 				.still(DTFluidTextures.CULTURE.getStill())
-				.tint(0xFF2F6E55)
 				.liquidBlock((supplier, properties) -> {
 					return new SculkCultureLiquidBlock(supplier, properties);
 				})
 				.bucket()
 				.model(DTFluidTexture.forgeFluidBucket("sculk_culture"))
+				.build()
+				.register();
+
+		SCULK_INDUCTION_FLUID = DTFluidBuilder.of("sculk_induction_fluid")
+				.flowing(DTFluidTextures.INDUCTION.getFlowing())
+				.still(DTFluidTextures.INDUCTION.getStill())
+				.bucket()
+				.model(DTFluidTexture.forgeFluidBucket("sculk_induction_fluid"))
 				.build()
 				.register();
 
@@ -44,10 +52,12 @@ public class DTFluids {
 			DeepTech.LOGGER.info("[DTFluids] preheating fluid sources...");
 			LIQUID_EXPERIENCE.getSource();
 			SCULK_CULTURE.getSource();
+			SCULK_INDUCTION_FLUID.getSource();
 			DeepTech.LOGGER.info("[DTFluids] fluid sources ready");
-			DeepTech.LOGGER.info("[DTFluids] registry direct read: liquid_experience={}, sculk_culture={}",
+			DeepTech.LOGGER.info("[DTFluids] registry direct read: liquid_experience={}, sculk_culture={}, sculk_induction_fluid={}",
 					ForgeRegistries.FLUIDS.getValue(DeepTech.loadResource("liquid_experience")),
-					ForgeRegistries.FLUIDS.getValue(DeepTech.loadResource("sculk_culture")));
+					ForgeRegistries.FLUIDS.getValue(DeepTech.loadResource("sculk_culture")),
+					ForgeRegistries.FLUIDS.getValue(DeepTech.loadResource("sculk_induction_fluid")));
 		});
 	}
 

@@ -50,6 +50,62 @@ public class CrushingRecipeGen extends DTRecipeProvider {
 				.energyCost(20)
 				.processingTime(100)
 				.save(consumer, save("crushing/block/sand"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Items.WITHER_ROSE)
+				.output(MaterialItems.ALKALOID_POWDER, 16)
+				.energyCost(20)
+				.processingTime(100)
+				.save(consumer, save("crushing/alkaloid_powder1"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Items.LILY_OF_THE_VALLEY)
+				.output(MaterialItems.ALKALOID_POWDER, 8)
+				.energyCost(20)
+				.processingTime(100)
+				.save(consumer, save("crushing/alkaloid_powder2"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Items.ALLIUM)
+				.output(MaterialItems.ALKALOID_POWDER, 8)
+				.energyCost(20)
+				.processingTime(100)
+				.save(consumer, save("crushing/alkaloid_powder3"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Items.BLUE_ORCHID)
+				.output(MaterialItems.ALKALOID_POWDER, 8)
+				.energyCost(20)
+				.processingTime(100)
+				.save(consumer, save("crushing/alkaloid_powder4"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Items.SUNFLOWER)
+				.output(MaterialItems.ALKALOID_POWDER, 1)
+				.energyCost(20)
+				.processingTime(100)
+				.save(consumer, save("crushing/alkaloid_powder5"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Items.LILAC)
+				.output(MaterialItems.ALKALOID_POWDER, 1)
+				.energyCost(20)
+				.processingTime(100)
+				.save(consumer, save("crushing/alkaloid_powder6"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Items.ROSE_BUSH)
+				.output(MaterialItems.ALKALOID_POWDER, 1)
+				.energyCost(20)
+				.processingTime(100)
+				.save(consumer, save("crushing/alkaloid_powder7"));
+
+		CrushingRecipeBuilder.builder()
+				.input(Items.PEONY)
+				.output(MaterialItems.ALKALOID_POWDER, 1)
+				.energyCost(20)
+				.processingTime(100)
+				.save(consumer, save("crushing/alkaloid_powder8"));
 	}
 
 	private static void addRawOreCrushing(Consumer<FinishedRecipe> consumer) {

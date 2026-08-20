@@ -62,8 +62,7 @@ public class EnergyBarWidget extends Widget {
 		super.drawInForeground(graphics, mouseX, mouseY, partialTicks);
 
 		if (isMouseOverElement(mouseX, mouseY)) {
-			String text = String.format("%s FE / %s FE", energy.get(), maxEnergy);
-			setHoverTooltips(Component.literal(text));
+			setHoverTooltips(Component.translatable("gui.deep_tech.energy_stored", energy.get(), maxEnergy));
 		}
 	}
 }

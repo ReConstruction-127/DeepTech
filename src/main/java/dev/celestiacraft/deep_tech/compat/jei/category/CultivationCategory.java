@@ -49,7 +49,8 @@ public class CultivationCategory {
 					for (int i = 0; i < fluidInputCount; i++) {
 						CultivationFluidInput input = fluidInputs.get(i);
 						builder.addSlot(RecipeIngredientRole.INPUT, FLUID_INPUT_X[i], FLUID_INPUT_Y)
-								.addFluidStack(input.fluid(), input.amount());
+								.addFluidStack(input.fluid(), input.amount())
+								.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.literal(input.amount() + " mB")));
 					}
 
 					List<net.minecraft.world.item.ItemStack> itemOutputs = recipe.getItemOutputs();
@@ -59,16 +60,18 @@ public class CultivationCategory {
 						IRecipeSlotBuilder slot = builder.addSlot(RecipeIngredientRole.OUTPUT, ITEM_OUTPUT_X[i % ITEM_OUTPUT_X.length], ITEM_OUTPUT_Y[i / ITEM_OUTPUT_X.length])
 								.addItemStack(itemOutputs.get(i));
 						if (hasChance) {
-							slot.addTooltipCallback((view, tooltip) -> tooltip
-									.add(Component.literal("产出概率: " + chancePercent + "%")));
+							slot.addRichTooltipCallback((view, tooltip) -> tooltip
+									.add(Component.translatable("jei.deep_tech.output_chance", chancePercent)));
 						}
 					}
 
 					List<FluidStack> fluidOutputs = recipe.getFluidOutputs();
 					int fluidOutputCount = Math.min(fluidOutputs.size(), FLUID_OUTPUT_X.length);
 					for (int i = 0; i < fluidOutputCount; i++) {
+						FluidStack fluidOutput = fluidOutputs.get(i);
 						builder.addSlot(RecipeIngredientRole.OUTPUT, FLUID_OUTPUT_X[i], FLUID_OUTPUT_Y)
-								.addFluidStack(fluidOutputs.get(i).getFluid(), fluidOutputs.get(i).getAmount());
+								.addFluidStack(fluidOutput.getFluid(), fluidOutput.getAmount())
+								.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.literal(fluidOutput.getAmount() + " mB")));
 					}
 				})
 				.setDraw((recipe, view, graphics, mouseX, mouseY) -> {
@@ -93,10 +96,10 @@ public class CultivationCategory {
 
 					Font font = Minecraft.getInstance().font;
 
-					Component energyText = Component.literal("⚡ " + recipe.getEnergyCost() + " FE / tick");
+					Component energyText = Component.translatable("jei.deep_tech.energy_cost", recipe.getEnergyCost());
 					graphics.drawString(font, energyText, 8, 64, 0xFF0095e0, true);
 
-					Component timeText = Component.literal("⏱ " + recipe.getProcessingTime() + " tick");
+					Component timeText = Component.translatable("jei.deep_tech.time_cost", recipe.getProcessingTime());
 					graphics.drawString(font, timeText, 8, 73, 0xFFe08500, true);
 				})
 				.build();

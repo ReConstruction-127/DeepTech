@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.config;
 
 import dev.celestiacraft.deep_tech.config.common.machine.*;
+import dev.celestiacraft.deep_tech.datagen.language.LanguageGenerate;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class CommonConfig {
@@ -18,7 +19,7 @@ public class CommonConfig {
 	public static final AssemblerConfig ASSEMBLER;
 
 	static {
-		BUILDER.comment("All settings below will only take effect after restarting the server or client.")
+		BUILDER.comment(LanguageGenerate.configEnglish("general.comment"))
 				.push("general");
 
 		CRUSHER = new CrusherConfig(BUILDER);

@@ -117,8 +117,7 @@ public class FluidTankWidget extends Widget {
 		super.drawInForeground(graphics, mouseX, mouseY, partialTicks);
 
 		if (isMouseOverElement(mouseX, mouseY)) {
-			String text = String.format("%s mB / %s mB", fluidGetter.get(), maxFluid);
-			setHoverTooltips(Component.literal(text));
+			setHoverTooltips(Component.translatable("gui.deep_tech.fluid_stored", fluidGetter.get(), maxFluid));
 		}
 	}
 }

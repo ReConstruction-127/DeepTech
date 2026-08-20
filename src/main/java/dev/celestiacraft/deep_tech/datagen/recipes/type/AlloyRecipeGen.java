@@ -34,6 +34,14 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 				.save(consumer, save("alloy/sculk_alloy/copper"));
 
 		AlloyRecipeBuilder.builder()
+				.input(Tags.Items.INGOTS_IRON)
+				.input(MaterialItems.SCULK_CHUNK)
+				.output(MaterialItems.SCULK_STEEL)
+				.energyCost(100)
+				.processingTime(20 * 20)
+				.save(consumer, save("alloy/sculk_alloy/iron"));
+
+		AlloyRecipeBuilder.builder()
 				.input(Tags.Items.GEMS_AMETHYST, 1)
 				.input(MaterialItems.SCULK_CHUNK)
 				.output(Items.ECHO_SHARD, 1)
@@ -75,7 +83,7 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 
 		addModCompatRecipe(Create.ID, "andestie_alloy_4", consumer, (recipe) -> {
 			AlloyRecipeBuilder.builder()
-					.input(CommonMetal.ZINC.nuggets)
+					.input(CommonMetal.ZINC.ingots)
 					.input(Items.ANDESITE, 9)
 					.output(AllBlocks.ANDESITE_ALLOY_BLOCK)
 					.energyCost(100 * 9)

@@ -67,7 +67,7 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 		InteractionRecipeBuilder.builder()
 				.trigger(MaterialItems.SCULK_BONEMEAL)
 				.target(Blocks.SCULK)
-				.extraEffect(0.5, Blocks.SCULK_CATALYST)
+				.extraEffect(1, Blocks.SCULK_CATALYST)
 				.consume(true)
 				.type(InteractionType.LEFT_CLICK)
 				.save(consumer, save("interaction/sculk_catalyst"));
