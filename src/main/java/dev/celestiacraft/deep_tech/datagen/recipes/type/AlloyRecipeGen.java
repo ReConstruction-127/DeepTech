@@ -22,6 +22,14 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 	public static void register(Consumer<FinishedRecipe> consumer) {
 		addSculkAlloy(consumer);
 		addCompatRecipe(consumer);
+
+		AlloyRecipeBuilder.builder()
+				.input(Tags.Items.GEMS_AMETHYST, 1)
+				.input(MaterialItems.SCULK_CHUNK)
+				.output(Items.ECHO_SHARD, 1)
+				.energyCost(100)
+				.processingTime(20 * 20)
+				.save(consumer, save("alloy/echo_shard"));
 	}
 
 	private static void addSculkAlloy(Consumer<FinishedRecipe> consumer) {
@@ -40,14 +48,6 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 				.energyCost(100)
 				.processingTime(20 * 20)
 				.save(consumer, save("alloy/sculk_alloy/iron"));
-
-		AlloyRecipeBuilder.builder()
-				.input(Tags.Items.GEMS_AMETHYST, 1)
-				.input(MaterialItems.SCULK_CHUNK)
-				.output(Items.ECHO_SHARD, 1)
-				.energyCost(100)
-				.processingTime(20 * 20)
-				.save(consumer, save("alloy/sculk_alloy/echo_shard"));
 	}
 
 	private static void addCompatRecipe(Consumer<FinishedRecipe> consumer) {
