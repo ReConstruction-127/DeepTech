@@ -19,7 +19,7 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	public static void register(Consumer<FinishedRecipe> consumer) {
+	public static void addRecipes(Consumer<FinishedRecipe> consumer) {
 		addSculkAlloy(consumer);
 		addCompatRecipe(consumer);
 

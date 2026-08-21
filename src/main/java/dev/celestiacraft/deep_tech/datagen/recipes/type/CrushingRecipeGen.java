@@ -17,7 +17,7 @@ public class CrushingRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	public static void register(Consumer<FinishedRecipe> consumer) {
+	public static void addRecipes(Consumer<FinishedRecipe> consumer) {
 		addRawOreCrushing(consumer);
 		addBlockCrushing(consumer);
 

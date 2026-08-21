@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.api.recipe.builder.harvest;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestOutput;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -24,8 +25,9 @@ public class HarvestRecipeResult implements FinishedRecipe {
 	}
 
 	@Override
-	public void serializeRecipeData(JsonObject json) {
+	public void serializeRecipeData(@NotNull JsonObject json) {
 		JsonObject input = new JsonObject();
+
 		if (builder.getInputBlock() != null) {
 			input.addProperty("block", builder.getInputBlock().builtInRegistryHolder().key().location().toString());
 		} else {
@@ -34,7 +36,7 @@ public class HarvestRecipeResult implements FinishedRecipe {
 		json.add("input", input);
 
 		JsonArray results = new JsonArray();
-		for (HarvestRecipeBuilder.HarvestOutput output : builder.getOutputs()) {
+		for (HarvestOutput output : builder.getOutputs()) {
 			JsonObject result = new JsonObject();
 			result.addProperty("item", output.stack.getItem().builtInRegistryHolder().key().location().toString());
 			if (output.stack.getCount() != 1) {

@@ -1,8 +1,6 @@
 package dev.celestiacraft.deep_tech.datagen.recipes.type;
 
 import dev.celestiacraft.deep_tech.api.recipe.builder.processor.ProcessorRecipeBuilder;
-import dev.celestiacraft.deep_tech.api.register.material.DTMaterial;
-import dev.celestiacraft.deep_tech.common.register.DTItems;
 import dev.celestiacraft.deep_tech.common.register.DTMaterials;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
@@ -17,8 +15,7 @@ public class ProcessorRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	public static void register(Consumer<FinishedRecipe> consumer) {
-		// 铁锭 -> 铁板 (铁板已在 DTMaterials.IRON 注册)
+	public static void addRecipes(Consumer<FinishedRecipe> consumer) {
 		ProcessorRecipeBuilder.builder()
 				.itemInput(Items.IRON_INGOT)
 				.itemOutput(DTMaterials.IRON.getPlate())

@@ -1,6 +1,8 @@
 package dev.celestiacraft.deep_tech.compat.kubejs;
 
 import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestInput;
+import dev.celestiacraft.deep_tech.common.recipe.interaction.InteractionType;
 import dev.celestiacraft.deep_tech.compat.kubejs.recipe.schema.AlloySchema;
 import dev.celestiacraft.deep_tech.compat.kubejs.recipe.schema.AssemblingSchema;
 import dev.celestiacraft.deep_tech.compat.kubejs.recipe.schema.CultivationSchema;
@@ -28,5 +30,7 @@ public class DeepTechKubeJSPlugin extends KubeJSPlugin {
 	@Override
 	public void registerBindings(BindingsEvent event) {
 		event.add("DeepTech", DeepTech.class);
+		event.add("HarvestInput", HarvestInput.class);
+		event.add("InteractionType", InteractionType.class);
 	}
 }

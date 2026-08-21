@@ -13,23 +13,23 @@ import dev.latvian.mods.kubejs.recipe.RecipeExceptionJS;
  * itemOutput/fluidOutput.
  */
 public class CultivationRecipeJS extends DTRecipeJS {
-	public CultivationRecipeJS itemInput(Object from) {
-		addItem(CultivationSchema.ITEM_INPUTS, from);
+	public CultivationRecipeJS itemInput(InputItem input) {
+		addItem(CultivationSchema.ITEM_INPUTS, input);
 		return this;
 	}
 
-	public CultivationRecipeJS fluidInput(Object from) {
-		addFluidInput(CultivationSchema.FLUID_INPUTS, from);
+	public CultivationRecipeJS fluidInput(InputFluid input) {
+		addFluidInput(CultivationSchema.FLUID_INPUTS, input);
 		return this;
 	}
 
-	public CultivationRecipeJS itemOutput(Object from) {
-		addItemOutput(CultivationSchema.ITEM_OUTPUTS, from);
+	public CultivationRecipeJS itemOutput(OutputItem output) {
+		addItemOutput(CultivationSchema.ITEM_OUTPUTS, output);
 		return this;
 	}
 
-	public CultivationRecipeJS fluidOutput(Object from) {
-		addFluidOutput(CultivationSchema.FLUID_OUTPUTS, from);
+	public CultivationRecipeJS fluidOutput(OutputFluid output) {
+		addFluidOutput(CultivationSchema.FLUID_OUTPUTS, output);
 		return this;
 	}
 
@@ -37,7 +37,8 @@ public class CultivationRecipeJS extends DTRecipeJS {
 	public void serialize() {
 		InputItem[] itemInputs = getValue(CultivationSchema.ITEM_INPUTS);
 		InputFluid[] fluidInputs = getValue(CultivationSchema.FLUID_INPUTS);
-		boolean hasInput = (itemInputs != null && itemInputs.length > 0) || (fluidInputs != null && fluidInputs.length > 0);
+		boolean hasInput = (itemInputs != null && itemInputs.length > 0)
+				|| (fluidInputs != null && fluidInputs.length > 0);
 		if (!hasInput) {
 			throw new RecipeExceptionJS("Cultivation recipe needs at least one item or fluid input!");
 		}

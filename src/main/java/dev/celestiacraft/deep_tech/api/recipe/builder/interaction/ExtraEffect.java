@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class ExtraEffect {
-	public final double chance;
-	public final BlockState toState;
-	public final List<ItemStack> extraDrops;
+	private final double chance;
+	private final BlockState state;
+	private final List<ItemStack> extraDrops;
 }

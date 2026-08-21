@@ -1,34 +1,42 @@
 package dev.celestiacraft.deep_tech.compat.kubejs.recipe.recipejs;
 
+import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestInput;
 import dev.celestiacraft.deep_tech.compat.kubejs.api.DTRecipeJS;
 import dev.celestiacraft.deep_tech.compat.kubejs.recipe.schema.HarvestSchema;
 import dev.latvian.mods.kubejs.item.OutputItem;
 import dev.latvian.mods.kubejs.recipe.RecipeExceptionJS;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentBuilderMap;
-import net.minecraft.world.level.block.Block;
 
 import java.util.Map;
 
 /**
  * 收割机配方的链式构建器, 对应 {@code HarvestRecipeBuilder} 的 input/result.
  * <p>
- * input 接受方块 id、{@code #方块标签} 或 {"block": ...} / {"block_tag": ...} 对象.
+ * input 直接使用配方运行时类型 {@link HarvestInput}: 方块或方块标签.
  */
 public class HarvestRecipeJS extends DTRecipeJS {
-	public HarvestRecipeJS input(Object from) {
-		if (from instanceof CharSequence s && !s.toString().isEmpty() && s.toString().charAt(0) == '#') {
-			setValue(HarvestSchema.INPUT, HarvestSchema.INPUT_COMPONENT.read(this, Map.of("block_tag", s.toString())));
-		} else if (from instanceof CharSequence || from instanceof Block) {
-			setValue(HarvestSchema.INPUT, HarvestSchema.INPUT_COMPONENT.read(this, Map.of("block", from)));
+	public HarvestRecipeJS input(HarvestInput input) {
+		if (input == null || input.isEmpty()) {
+			throw new RecipeExceptionJS("Harvest input can't be empty!");
+		}
+
+		if (input.getBlock() != null) {
+			setValue(HarvestSchema.INPUT, HarvestSchema.INPUT_COMPONENT.read(
+					this,
+					Map.of("block", input.getBlock())
+			));
 		} else {
-			setValue(HarvestSchema.INPUT, HarvestSchema.INPUT_COMPONENT.read(this, from));
+			setValue(HarvestSchema.INPUT, HarvestSchema.INPUT_COMPONENT.read(
+					this,
+					Map.of("block_tag", input.getBlockTag())
+			));
 		}
 
 		return this;
 	}
 
-	public HarvestRecipeJS result(Object from) {
-		addItemOutput(HarvestSchema.RESULTS, from);
+	public HarvestRecipeJS result(OutputItem output) {
+		addItemOutput(HarvestSchema.RESULTS, output);
 		return this;
 	}
 

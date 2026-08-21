@@ -17,10 +17,7 @@ public class AssemblingRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	public static void register(Consumer<FinishedRecipe> consumer) {
-		// 高级幽匿控制电路: 8 幽匿脉络 + 1 回响碎片 + 4 致密幽匿碎块 + 4 红石粉
-		//   + 1 幽匿合金板 + 1 幽匿之骨 + 10mB 幽匿培养液, 催化剂 幽匿电路(不消耗)
-		//   -> 1 高级幽匿控制电路 + 10mB 水
+	public static void addRecipes(Consumer<FinishedRecipe> consumer) {
 		AssemblingRecipeBuilder.builder()
 				.itemInput(Items.SCULK_VEIN, 8)
 				.itemInput(Items.ECHO_SHARD, 1)

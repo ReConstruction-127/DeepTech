@@ -10,13 +10,13 @@ import dev.latvian.mods.kubejs.recipe.RecipeExceptionJS;
  * 处理器配方的链式构建器, 对应 {@code ProcessorRecipeBuilder} 的 itemInput/itemOutput.
  */
 public class ProcessorRecipeJS extends DTRecipeJS {
-	public ProcessorRecipeJS itemInput(Object from) {
-		addItem(ProcessorSchema.ITEM_INPUTS, from);
+	public ProcessorRecipeJS itemInput(InputItem input) {
+		addItem(ProcessorSchema.ITEM_INPUTS, input);
 		return this;
 	}
 
-	public ProcessorRecipeJS itemOutput(Object from) {
-		addItemOutput(ProcessorSchema.ITEM_OUTPUTS, from);
+	public ProcessorRecipeJS itemOutput(OutputItem output) {
+		addItemOutput(ProcessorSchema.ITEM_OUTPUTS, output);
 		return this;
 	}
 

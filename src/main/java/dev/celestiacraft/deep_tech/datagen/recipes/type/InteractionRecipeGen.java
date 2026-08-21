@@ -18,8 +18,7 @@ public class InteractionRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	// 静态注册方法(与 CrushingRecipeGen 保持一致)
-	public static void register(Consumer<FinishedRecipe> consumer) {
+	public static void addRecipes(Consumer<FinishedRecipe> consumer) {
 		// 压板: 左键
 		InteractionRecipeBuilder.builder()
 				.trigger(Tags.Items.INGOTS_IRON)

@@ -56,38 +56,38 @@ public class DTRecipeProvider extends RecipeProvider {
 	}
 
 	private void furnace(Consumer<FinishedRecipe> consumer) {
-		FurnaceRecipeGen.register(consumer);
+		FurnaceRecipeGen.addRecipes(consumer);
 	}
 
 	private void cultivation(Consumer<FinishedRecipe> consumer) {
-		CultivationRecipeGen.register(consumer);
+		CultivationRecipeGen.addRecipes(consumer);
 	}
 
 	private void harvest(Consumer<FinishedRecipe> consumer) {
-		HarvestRecipeGen.register(consumer);
+		HarvestRecipeGen.addRecipes(consumer);
 	}
 
 	private void crushing(Consumer<FinishedRecipe> consumer) {
-		CrushingRecipeGen.register(consumer);
+		CrushingRecipeGen.addRecipes(consumer);
 	}
 
 	private void alloy(Consumer<FinishedRecipe> consumer) {
-		AlloyRecipeGen.register(consumer);
+		AlloyRecipeGen.addRecipes(consumer);
 	}
 
 	private void processing(Consumer<FinishedRecipe> consumer) {
-		ProcessorRecipeGen.register(consumer);
+		ProcessorRecipeGen.addRecipes(consumer);
 	}
 
 	private void assembling(Consumer<FinishedRecipe> consumer) {
-		AssemblingRecipeGen.register(consumer);
+		AssemblingRecipeGen.addRecipes(consumer);
 	}
 
 	private void interaction(Consumer<FinishedRecipe> consumer) {
-		InteractionRecipeGen.register(consumer);
+		InteractionRecipeGen.addRecipes(consumer);
 	}
 
 	private void shaped(Consumer<FinishedRecipe> consumer) {
-		CraftingRecipeGen.register(consumer);
+		CraftingRecipeGen.addRecipes(consumer);
 	}
 }

@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.common.recipe.harvest;
 
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
@@ -24,16 +25,11 @@ import java.util.List;
  * 匹配不使用容器, 而是直接匹配世界中的方块状态 {@link #matches(BlockState, Level)}。
  */
 @Getter
+@AllArgsConstructor
 public class HarvestRecipe implements Recipe<Container> {
 	private final ResourceLocation id;
 	private final HarvestInput input;
-	private final List<HarvestResult> results;
-
-	public HarvestRecipe(ResourceLocation id, HarvestInput input, List<HarvestResult> results) {
-		this.id = id;
-		this.input = input;
-		this.results = results;
-	}
+	private final List<HarvestOutput> results;
 
 	/** 方块状态是否匹配本配方 */
 	public boolean matches(BlockState state, Level level) {
@@ -43,9 +39,9 @@ public class HarvestRecipe implements Recipe<Container> {
 	/** 按概率掷出本次采集的输出 */
 	public List<ItemStack> rollOutputs(RandomSource random) {
 		List<ItemStack> outputs = new ArrayList<>();
-		for (HarvestResult result : results) {
-			if (random.nextDouble() < result.chance) {
-				outputs.add(result.stack.copy());
+		for (HarvestOutput result : results) {
+			if (random.nextDouble() < result.getChance()) {
+				outputs.add(result.getStack().copy());
 			}
 		}
 		return outputs;
@@ -68,7 +64,7 @@ public class HarvestRecipe implements Recipe<Container> {
 
 	@Override
 	public @NotNull ItemStack getResultItem(@NotNull RegistryAccess access) {
-		return results.isEmpty() ? ItemStack.EMPTY : results.get(0).stack;
+		return results.isEmpty() ? ItemStack.EMPTY : results.get(0).getStack();
 	}
 
 	@Override

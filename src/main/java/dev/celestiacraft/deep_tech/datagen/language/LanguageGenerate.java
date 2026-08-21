@@ -92,6 +92,7 @@ public class LanguageGenerate {
 
 	protected static void addFluidLanguage(String key, String english, String chinese) {
 		addLanguage("fluid", key, english, chinese);
+		addLanguage("block", key, english, chinese);
 		addItemLanguage(key + "_bucket", english + " Bucket", chinese + "桶");
 	}
 

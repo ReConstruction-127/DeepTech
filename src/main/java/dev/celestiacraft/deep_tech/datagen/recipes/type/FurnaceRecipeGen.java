@@ -17,7 +17,7 @@ public class FurnaceRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	public static void register(Consumer<FinishedRecipe> consumer) {
+	public static void addRecipes(Consumer<FinishedRecipe> consumer) {
 		smelting(consumer);
 		blasting(consumer);
 		smoking(consumer);

@@ -11,13 +11,13 @@ import dev.latvian.mods.kubejs.recipe.component.ItemComponents;
  * 粉碎机配方的链式构建器, 对应 {@code CrushingRecipeBuilder} 的 input/output.
  */
 public class CrushingRecipeJS extends DTRecipeJS {
-	public CrushingRecipeJS input(Object from) {
-		setValue(CurshingSchema.INPUT, ItemComponents.INPUT.read(this, from));
+	public CrushingRecipeJS input(InputItem input) {
+		setValue(CurshingSchema.INPUT, ItemComponents.INPUT.read(this, input));
 		return this;
 	}
 
-	public CrushingRecipeJS output(Object from) {
-		setValue(CurshingSchema.OUTPUT, ItemComponents.OUTPUT.read(this, from));
+	public CrushingRecipeJS output(OutputItem output) {
+		setValue(CurshingSchema.OUTPUT, ItemComponents.OUTPUT.read(this, output));
 		return this;
 	}
 

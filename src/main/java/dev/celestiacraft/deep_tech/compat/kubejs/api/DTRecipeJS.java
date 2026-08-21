@@ -11,10 +11,18 @@ import dev.latvian.mods.kubejs.recipe.component.ArrayRecipeComponent;
 /**
  * DeepTech 配方的 KubeJS 基类, 提供与 Java 侧构建器一致的追加式输入/输出方法.
  * <p>
- * 所有输入/输出键都是可选的, 因此脚本可以先写 {@code event.recipes.deep_tech.xxx()}
- * 再逐个链式追加, 而不需要一次性把数组作为构造参数传入.
+ * 脚本先写 {@code event.recipes.deep_tech.xxx()} 再逐个链式追加, 所以这里不保留
+ * 位置参数构造器; 必填字段校验统一放在各自的 {@code serialize()} 中.
  */
 public abstract class DTRecipeJS extends RecipeJS {
+	/**
+	 * 链式构建的值在构造之后才逐个设置, 基类的空值检查会在这里误报;
+	 * 因此跳过基类校验, 由 {@link #serialize()} 在写出时统一校验必填字段.
+	 */
+	@Override
+	public void afterLoaded() {
+	}
+
 	protected RecipeJS addItem(RecipeKey<InputItem[]> key, Object from) {
 		ArrayRecipeComponent<InputItem> array = cast(key);
 		InputItem value = array.component().read(this, from);
@@ -47,7 +55,7 @@ public abstract class DTRecipeJS extends RecipeJS {
 		return this;
 	}
 
-	private static <T> ArrayRecipeComponent<T> cast(RecipeKey<T[]> key) {
+	protected static <T> ArrayRecipeComponent<T> cast(RecipeKey<T[]> key) {
 		return (ArrayRecipeComponent<T>) key.component;
 	}
 }

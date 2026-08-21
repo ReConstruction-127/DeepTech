@@ -11,7 +11,6 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 
 public class HarvestCategory {
@@ -21,7 +20,6 @@ public class HarvestCategory {
 
 		return SimpleJeiCategory.builder(DTJeiRecipeType.HARVEST, helper)
 				.setTitle(MachineBlocks.SCULK_COLLECTOR.get().getName())
-				// 这个setSize()是必须的
 				.setSize(128, 40)
 				.setIcon(MachineBlocks.SCULK_COLLECTOR.asStack())
 				.setRecipe((builder, recipe, group) -> {
@@ -41,7 +39,6 @@ public class HarvestCategory {
 
 					DTTextures.PROGRESS_COLLECTOR.render(graphics, 39, 15);
 					DTTextures.ICON_COLLECTOR.render(graphics, 92, 4);
-
 				})
 				.build();
 	}

@@ -8,11 +8,6 @@ import dev.latvian.mods.kubejs.recipe.component.ItemComponents;
 import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 
-/**
- * 粉碎机配方: 所有键可选, 脚本可先写 {@code crushing()} 再链式追加 input/output.
- * <p>
- * input / result 运行时校验.
- */
 public interface CurshingSchema {
 	RecipeKey<OutputItem> OUTPUT = ItemComponents.OUTPUT.key("result")
 			.defaultOptional();
@@ -32,5 +27,5 @@ public interface CurshingSchema {
 			INPUT,
 			ENERGY_COST,
 			TIME
-	);
+	).constructor();
 }

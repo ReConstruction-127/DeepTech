@@ -11,16 +11,10 @@ import dev.latvian.mods.kubejs.recipe.component.ItemComponents;
 import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 
-/**
- * 组装机配方: 所有键可选, 脚本可先写 {@code assembling()} 再链式追加.
- * <p>
- * item_inputs / item_outputs 必填(运行时校验), fluid_inputs / fluid_outputs / catalyst 可选,
- * 最多 16 物品输入 + 4 物品输出, 2 流体输入 + 1 流体输出.
- */
 public interface AssemblingSchema {
-	RecipeKey<InputItem[]> ITEM_INPUTS = ItemComponents.INPUT_ARRAY.key("item_inputs")
-			.defaultOptional();
 	RecipeKey<OutputItem[]> ITEM_OUTPUTS = ItemComponents.OUTPUT_ARRAY.key("item_outputs")
+			.defaultOptional();
+	RecipeKey<InputItem[]> ITEM_INPUTS = ItemComponents.INPUT_ARRAY.key("item_inputs")
 			.defaultOptional();
 	RecipeKey<InputFluid[]> FLUID_INPUTS = FluidComponents.INPUT_ARRAY.key("fluid_inputs")
 			.optional(new InputFluid[0]).preferred("fluidInputs");
@@ -45,5 +39,5 @@ public interface AssemblingSchema {
 			CATALYST,
 			ENERGY_COST,
 			TIME
-	);
+	).constructor();
 }

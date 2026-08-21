@@ -2,7 +2,6 @@ package dev.celestiacraft.deep_tech.datagen.recipes.type;
 
 import com.simibubi.create.AllBlocks;
 import com.simibubi.create.Create;
-import dev.celestiacraft.deep_tech.common.register.DTBlocks;
 import dev.celestiacraft.deep_tech.common.register.DTMaterials;
 import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
 import dev.celestiacraft.deep_tech.common.register.block.FrameBlocks;
@@ -24,7 +23,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	public static void register(Consumer<FinishedRecipe> consumer) {
+	public static void addRecipes(Consumer<FinishedRecipe> consumer) {
 		addShapedRecipe(consumer);
 		addCompatRecipe(consumer);
 	}

@@ -8,15 +8,10 @@ import dev.latvian.mods.kubejs.recipe.component.ItemComponents;
 import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 
-/**
- * 处理器配方: 所有键可选, 脚本可先写 {@code processing()} 再链式追加.
- * <p>
- * item_inputs / item_outputs 必填(运行时校验), 最多 2 物品输入 + 2 物品输出.
- */
 public interface ProcessorSchema {
-	RecipeKey<InputItem[]> ITEM_INPUTS = ItemComponents.INPUT_ARRAY.key("item_inputs")
-			.defaultOptional();
 	RecipeKey<OutputItem[]> ITEM_OUTPUTS = ItemComponents.OUTPUT_ARRAY.key("item_outputs")
+			.defaultOptional();
+	RecipeKey<InputItem[]> ITEM_INPUTS = ItemComponents.INPUT_ARRAY.key("item_inputs")
 			.defaultOptional();
 	RecipeKey<Integer> ENERGY_COST = NumberComponent.INT.key("energy_cost")
 			.optional(50)
@@ -32,5 +27,5 @@ public interface ProcessorSchema {
 			ITEM_INPUTS,
 			ENERGY_COST,
 			TIME
-	);
+	).constructor();
 }

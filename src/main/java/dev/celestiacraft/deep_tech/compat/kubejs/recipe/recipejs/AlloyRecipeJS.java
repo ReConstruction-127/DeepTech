@@ -11,13 +11,13 @@ import dev.latvian.mods.kubejs.recipe.component.ItemComponents;
  * 合金炉配方的链式构建器, 对应 {@code AlloyRecipeBuilder} 的 input/output.
  */
 public class AlloyRecipeJS extends DTRecipeJS {
-	public AlloyRecipeJS input(Object from) {
-		addItem(AlloySchema.INPUTS, from);
+	public AlloyRecipeJS input(InputItem input) {
+		addItem(AlloySchema.INPUTS, input);
 		return this;
 	}
 
-	public AlloyRecipeJS output(Object from) {
-		setValue(AlloySchema.OUTPUT, ItemComponents.OUTPUT.read(this, from));
+	public AlloyRecipeJS output(OutputItem output) {
+		setValue(AlloySchema.OUTPUT, ItemComponents.OUTPUT.read(this, output));
 		return this;
 	}
 

@@ -15,7 +15,7 @@ public class CultivationRecipeGen extends DTRecipeProvider {
 		super(output);
 	}
 
-	public static void register(Consumer<FinishedRecipe> consumer) {
+	public static void addRecipes(Consumer<FinishedRecipe> consumer) {
 		// 幽匿碎块 + 幽匿培养液 + 液体经验 -> 致密幽匿碎块 + 水
 		CultivationRecipeBuilder.builder()
 				.itemInput(MaterialItems.SCULK_CHUNK)

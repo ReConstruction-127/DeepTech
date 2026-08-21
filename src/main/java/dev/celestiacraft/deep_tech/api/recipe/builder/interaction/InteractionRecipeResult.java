@@ -49,13 +49,13 @@ public class InteractionRecipeResult implements FinishedRecipe {
 
 		if (extraEffect != null) {
 			JsonObject extraObj = new JsonObject();
-			extraObj.addProperty("chance", extraEffect.chance);
-			extraObj.addProperty("to_block", ForgeRegistries.BLOCKS.getKey(extraEffect.toState.getBlock()).toString());
+			extraObj.addProperty("chance", extraEffect.getChance());
+			extraObj.addProperty("to_block", ForgeRegistries.BLOCKS.getKey(extraEffect.getState().getBlock()).toString());
 
-			if (!extraEffect.extraDrops.isEmpty()) {
+			if (!extraEffect.getExtraDrops().isEmpty()) {
 				JsonArray dropsArray = new JsonArray();
 
-				for (ItemStack drop : extraEffect.extraDrops) {
+				for (ItemStack drop : extraEffect.getExtraDrops()) {
 					JsonObject dropObj = new JsonObject();
 					dropObj.addProperty("item", ForgeRegistries.ITEMS.getKey(drop.getItem()).toString());
 					if (drop.getCount() != 1) dropObj.addProperty("count", drop.getCount());

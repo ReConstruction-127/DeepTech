@@ -11,16 +11,10 @@ import dev.latvian.mods.kubejs.recipe.component.ItemComponents;
 import dev.latvian.mods.kubejs.recipe.component.NumberComponent;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 
-/**
- * 幽匿培育室配方: 所有键可选, 脚本可先写 {@code cultivation()} 再链式追加.
- * <p>
- * 至少一个输入(物品或流体)与一个输出(物品或流体, 运行时校验);
- * 最多 2 物品/流体输入 + 4 物品/2 流体输出.
- */
 public interface CultivationSchema {
-	RecipeKey<InputItem[]> ITEM_INPUTS = ItemComponents.INPUT_ARRAY.key("item_inputs")
-			.defaultOptional();
 	RecipeKey<OutputItem[]> ITEM_OUTPUTS = ItemComponents.OUTPUT_ARRAY.key("item_outputs")
+			.defaultOptional();
+	RecipeKey<InputItem[]> ITEM_INPUTS = ItemComponents.INPUT_ARRAY.key("item_inputs")
 			.defaultOptional();
 	RecipeKey<InputFluid[]> FLUID_INPUTS = FluidComponents.INPUT_ARRAY.key("fluid_inputs")
 			.optional(new InputFluid[0])
@@ -47,5 +41,5 @@ public interface CultivationSchema {
 			FLUID_INPUTS,
 			ITEM_OUTPUT_CHANCE,
 			ENERGY_COST, TIME
-	);
+	).constructor();
 }

@@ -1,5 +1,7 @@
 package dev.celestiacraft.deep_tech.api.recipe.builder.harvest;
 
+import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestOutput;
+import lombok.Getter;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
@@ -21,9 +23,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class HarvestRecipeBuilder implements RecipeBuilder {
+	@Getter
 	private final List<HarvestOutput> outputs = new ArrayList<>();
-	private Block inputBlock;
-	private TagKey<Block> inputTag;
+	@Getter
+	private @Nullable Block inputBlock;
+	@Getter
+	private @Nullable TagKey<Block> inputTag;
 
 	private final Advancement.Builder advancement = Advancement.Builder.advancement();
 
@@ -34,25 +39,15 @@ public class HarvestRecipeBuilder implements RecipeBuilder {
 		return new HarvestRecipeBuilder();
 	}
 
-	public static class HarvestOutput {
-		public final ItemStack stack;
-		public final double chance;
-
-		HarvestOutput(ItemStack stack, double chance) {
-			this.stack = stack;
-			this.chance = chance;
-		}
-	}
-
 	public HarvestRecipeBuilder input(Block block) {
-		this.inputBlock = block;
-		this.inputTag = null;
+		inputBlock = block;
+		inputTag = null;
 		return this;
 	}
 
 	public HarvestRecipeBuilder input(TagKey<Block> blockTag) {
-		this.inputTag = blockTag;
-		this.inputBlock = null;
+		inputTag = blockTag;
+		inputBlock = null;
 		return this;
 	}
 
@@ -72,18 +67,6 @@ public class HarvestRecipeBuilder implements RecipeBuilder {
 	public HarvestRecipeBuilder result(ItemStack stack, double chance) {
 		outputs.add(new HarvestOutput(stack.copy(), chance));
 		return this;
-	}
-
-	public List<HarvestOutput> getOutputs() {
-		return outputs;
-	}
-
-	public Block getInputBlock() {
-		return inputBlock;
-	}
-
-	public TagKey<Block> getInputTag() {
-		return inputTag;
 	}
 
 	@Override

@@ -1,7 +1,9 @@
 package dev.celestiacraft.deep_tech.common.recipe.harvest;
 
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -36,6 +38,10 @@ public class HarvestInput {
 		return new HarvestInput(null, blockTag);
 	}
 
+	public static HarvestInput ofTagId(ResourceLocation blockTag) {
+		return new HarvestInput(null, BlockTags.create(blockTag));
+	}
+
 	/** 判断一个方块状态是否匹配本输入 */
 	public boolean matches(BlockState state, Level level) {
 		if (block != null) {
@@ -60,23 +66,33 @@ public class HarvestInput {
 
 	/** 用于 JEI 显示: 方块输入转为物品列表 */
 	public Ingredient toJeiIngredient(Level level) {
+		if (level == null) {
+			return Ingredient.EMPTY;
+		}
+
+		RegistryAccess access = level.registryAccess();
+
 		if (block != null) {
 			return Ingredient.of(block);
 		}
 		if (blockTag != null) {
 			List<ItemStack> stacks = new ArrayList<>();
-			level.registryAccess().registryOrThrow(Registries.BLOCK).getTag(blockTag)
-					.ifPresent(holders -> holders.forEach(holder -> stacks.add(new ItemStack(holder.value()))));
+			access.registryOrThrow(Registries.BLOCK).getTag(blockTag)
+					.ifPresent((holders) -> {
+						holders.forEach((holder) -> {
+							stacks.add(new ItemStack(holder.value()));
+						});
+					});
 			return stacks.isEmpty() ? Ingredient.EMPTY : Ingredient.of(stacks.toArray(new ItemStack[0]));
 		}
 		return Ingredient.EMPTY;
 	}
 
 	/** 用于 JEI 显示: 所有可能产出的堆叠 */
-	public static List<ItemStack> toJeiOutputs(List<HarvestResult> results) {
+	public static List<ItemStack> toJeiOutputs(List<HarvestOutput> results) {
 		List<ItemStack> stacks = new ArrayList<>();
-		for (HarvestResult result : results) {
-			stacks.add(result.stack.copy());
+		for (HarvestOutput result : results) {
+			stacks.add(result.getStack().copy());
 		}
 		return stacks;
 	}

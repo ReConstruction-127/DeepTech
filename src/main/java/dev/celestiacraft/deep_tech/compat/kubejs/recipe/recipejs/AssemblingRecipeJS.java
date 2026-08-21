@@ -2,6 +2,8 @@ package dev.celestiacraft.deep_tech.compat.kubejs.recipe.recipejs;
 
 import dev.celestiacraft.deep_tech.compat.kubejs.recipe.schema.AssemblingSchema;
 import dev.celestiacraft.deep_tech.compat.kubejs.api.DTRecipeJS;
+import dev.latvian.mods.kubejs.fluid.InputFluid;
+import dev.latvian.mods.kubejs.fluid.OutputFluid;
 import dev.latvian.mods.kubejs.item.InputItem;
 import dev.latvian.mods.kubejs.item.OutputItem;
 import dev.latvian.mods.kubejs.recipe.RecipeExceptionJS;
@@ -11,23 +13,23 @@ import dev.latvian.mods.kubejs.recipe.RecipeExceptionJS;
  * catalyst/itemOutput/fluidOutput.
  */
 public class AssemblingRecipeJS extends DTRecipeJS {
-	public AssemblingRecipeJS itemInput(Object from) {
-		addItem(AssemblingSchema.ITEM_INPUTS, from);
+	public AssemblingRecipeJS itemInput(InputItem input) {
+		addItem(AssemblingSchema.ITEM_INPUTS, input);
 		return this;
 	}
 
-	public AssemblingRecipeJS fluidInput(Object from) {
-		addFluidInput(AssemblingSchema.FLUID_INPUTS, from);
+	public AssemblingRecipeJS fluidInput(InputFluid input) {
+		addFluidInput(AssemblingSchema.FLUID_INPUTS, input);
 		return this;
 	}
 
-	public AssemblingRecipeJS itemOutput(Object from) {
-		addItemOutput(AssemblingSchema.ITEM_OUTPUTS, from);
+	public AssemblingRecipeJS itemOutput(OutputItem output) {
+		addItemOutput(AssemblingSchema.ITEM_OUTPUTS, output);
 		return this;
 	}
 
-	public AssemblingRecipeJS fluidOutput(Object from) {
-		addFluidOutput(AssemblingSchema.FLUID_OUTPUTS, from);
+	public AssemblingRecipeJS fluidOutput(OutputFluid output) {
+		addFluidOutput(AssemblingSchema.FLUID_OUTPUTS, output);
 		return this;
 	}
 

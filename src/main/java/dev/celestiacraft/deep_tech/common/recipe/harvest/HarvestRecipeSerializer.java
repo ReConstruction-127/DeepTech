@@ -20,11 +20,11 @@ import java.util.List;
 
 public class HarvestRecipeSerializer implements RecipeSerializer<HarvestRecipe> {
 	@Override
-	public @NotNull HarvestRecipe fromJson(@NotNull ResourceLocation id, JsonObject json) {
+	public @NotNull HarvestRecipe fromJson(@NotNull ResourceLocation id, @NotNull JsonObject json) {
 		JsonObject inputJson = GsonHelper.getAsJsonObject(json, "input");
 		HarvestInput input = parseInput(inputJson);
 
-		List<HarvestResult> results = new ArrayList<>();
+		List<HarvestOutput> results = new ArrayList<>();
 		JsonArray array = GsonHelper.getAsJsonArray(json, "results");
 		for (JsonElement element : array) {
 			JsonObject resultJson = element.getAsJsonObject();
@@ -33,7 +33,7 @@ public class HarvestRecipeSerializer implements RecipeSerializer<HarvestRecipe> 
 			if (chance <= 0.0 || chance > 1.0) {
 				throw new JsonSyntaxException("Invalid chance: " + chance);
 			}
-			results.add(new HarvestResult(stack, chance));
+			results.add(new HarvestOutput(stack, chance));
 		}
 		if (results.isEmpty()) {
 			throw new JsonSyntaxException("Harvest recipe must have at least one result: " + id);
@@ -76,9 +76,9 @@ public class HarvestRecipeSerializer implements RecipeSerializer<HarvestRecipe> 
 			input = HarvestInput.of(ForgeRegistries.BLOCKS.getValue(ResourceLocation.tryParse(inputId)));
 		}
 		int size = buf.readVarInt();
-		List<HarvestResult> results = new ArrayList<>(size);
+		List<HarvestOutput> results = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
-			results.add(new HarvestResult(buf.readItem(), buf.readDouble()));
+			results.add(new HarvestOutput(buf.readItem(), buf.readDouble()));
 		}
 		return new HarvestRecipe(id, input, results);
 	}
@@ -88,9 +88,9 @@ public class HarvestRecipeSerializer implements RecipeSerializer<HarvestRecipe> 
 		buf.writeBoolean(recipe.getInput().isTag());
 		buf.writeUtf(recipe.getInput().serializeId());
 		buf.writeVarInt(recipe.getResults().size());
-		for (HarvestResult result : recipe.getResults()) {
-			buf.writeItem(result.stack);
-			buf.writeDouble(result.chance);
+		for (HarvestOutput result : recipe.getResults()) {
+			buf.writeItem(result.getStack());
+			buf.writeDouble(result.getChance());
 		}
 	}
 }
