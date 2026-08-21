@@ -8,6 +8,7 @@ import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
@@ -15,7 +16,7 @@ import net.minecraftforge.client.model.generators.ConfiguredModel;
 
 public class EnergyCellBlock extends MachineBlock<EnergyCellBlockEntity> {
 	public EnergyCellBlock(Properties properties) {
-		super(properties.noOcclusion());
+		super(properties.sound(SoundType.DEEPSLATE_BRICKS));
 		registerDefaultState(stateDefinition.any());
 	}
 

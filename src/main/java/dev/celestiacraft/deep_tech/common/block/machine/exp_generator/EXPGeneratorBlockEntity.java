@@ -125,7 +125,7 @@ public class EXPGeneratorBlockEntity extends MachineBlockEntity<EXPGeneratorBloc
 				});
 
 		boolean generatedPower = false;
-		if (entity.getEnergy() < entity.getMachineMaxEnergy()) {
+		if (entity.getEnergy() < entity.getMachineMaxEnergy() / 2) {
 			int mbPerTick = EXPGeneratorConfig.MB_PER_TICK.get();
 			FluidStack drainStack = entity.getFluidHandler().drainTank(experienceTank, mbPerTick, IFluidHandler.FluidAction.SIMULATE, false);
 

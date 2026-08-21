@@ -6,12 +6,14 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlock;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 
 public class SculkFurnaceBlock extends MachineBlock<SculkFurnaceBlockEntity> {
 	public SculkFurnaceBlock(Properties properties) {
-		super(properties);
+		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+				.noOcclusion());
 	}
 
 	@Override

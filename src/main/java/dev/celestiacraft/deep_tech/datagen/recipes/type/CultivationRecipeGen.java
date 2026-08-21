@@ -25,7 +25,7 @@ public class CultivationRecipeGen extends DTRecipeProvider {
 				.fluidOutput(Fluids.WATER, 10)
 				.energyCost(20)
 				.processingTime(100)
-				.itemOutputChance(1)
+				.itemOutputChance(5)
 				.save(consumer, save("cultivation/dense_sculk_chunk"));
 
 
@@ -35,7 +35,7 @@ public class CultivationRecipeGen extends DTRecipeProvider {
 				.fluidOutput(DTFluids.SCULK_INDUCTION_FLUID.getSource(), 50)
 				.energyCost(20)
 				.processingTime(100)
-				.itemOutputChance(1)
+				.itemOutputChance(0)
 				.save(consumer, save("cultivation/induction_fluid"));
 
 
@@ -46,7 +46,7 @@ public class CultivationRecipeGen extends DTRecipeProvider {
 				.fluidOutput(DTFluids.SCULK_CULTURE.getSource(), 20)
 				.energyCost(20)
 				.processingTime(100)
-				.itemOutputChance(1)
+				.itemOutputChance(0)
 				.save(consumer, save("cultivation/sculk_culture"));
 
 

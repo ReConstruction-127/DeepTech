@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class SNCenterBlock extends BasicEntityBlock<SNCenterBlockEntity> {
 	public SNCenterBlock(BlockBehaviour.Properties properties) {
-		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+		super(properties.sound(SoundType.NETHERITE_BLOCK)
 				.strength(5.0F, 5.0F)
 				.requiresCorrectToolForDrops());
 	}

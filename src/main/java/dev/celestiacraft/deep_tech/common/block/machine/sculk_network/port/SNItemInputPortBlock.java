@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class SNItemInputPortBlock extends SNPortBlock<SNItemInputPortBlockEntity> {
 	public SNItemInputPortBlock(Properties properties) {
-		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+		super(properties.sound(SoundType.SCULK_CATALYST)
 				.noOcclusion()
 				.strength(5.0F, 5.0F)
 				.requiresCorrectToolForDrops());

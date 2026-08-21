@@ -23,12 +23,17 @@ import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -259,20 +264,46 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 	}
 
 	private void explodeCenter(ServerLevel level, BlockPos pos, String reason) {
-		// 触发等级 2 爆炸(不破坏地形？可以用原版爆炸, 也可只移除方块并产生粒子)
-		// 为了达到“等级2的爆炸”效果, 我们使用原版爆炸并保留破坏
-		level.explode(
-				null,
-				pos.getX(),
-				pos.getY(),
-				pos.getZ(),
-				1.0f,
-				Level.ExplosionInteraction.TNT
-		);
+		// 1. 获取方块状态（确保该位置有方块）
+		BlockState state = level.getBlockState(pos);
+		if (!state.isAir()) {
+			// 2. 将方块掉落为物品实体（生成在方块中心）
+			ItemStack dropStack = new ItemStack(state.getBlock()); // 直接获取方块物品
+			// 如果您希望保留方块的所有附加数据（如NBT），可使用 state.getBlock().getCloneItemStack(...) 或 Block.getDrops
+			// 这里简化处理，仅掉落方块本身
+			double x = pos.getX() + 0.5D;
+			double y = pos.getY() + 0.5D;
+			double z = pos.getZ() + 0.5D;
+			ItemEntity itemEntity = new ItemEntity(level, x, y, z, dropStack);
+			// 可添加随机初速度模拟爆炸飞散（可选）
+			itemEntity.setDeltaMovement(
+					(level.random.nextDouble() - 0.5D) * 0.5D,
+					level.random.nextDouble() * 0.5D,
+					(level.random.nextDouble() - 0.5D) * 0.5D
+			);
+			level.addFreshEntity(itemEntity);
+		}
 
-		// 注意: 爆炸会移除该位置的方块, 同时触发事件, BE 会自动失效
-		// 但可能因为爆炸延迟, 我们需要额外确保方块被移除
-		// 不过爆炸本身会处理, 所以不额外操作
+		// 3. 移除方块（设置为空气）
+		level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3); // 3: 更新邻居并同步客户端
+
+		// 4. 生成爆炸粒子特效（模拟 TNT 爆炸视觉效果）
+		Vec3 center = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+
+		// 主爆炸核心（一个大爆炸粒子）
+		level.sendParticles(ParticleTypes.EXPLOSION, center.x, center.y, center.z, 1, 0.0, 0.0, 0.0, 0.0);
+
+		// 浓烟（多个大烟雾粒子）
+		level.sendParticles(ParticleTypes.LARGE_SMOKE, center.x, center.y, center.z, 15, 0.8, 0.8, 0.8, 0.1);
+
+		// 火焰粒子（火花）
+		level.sendParticles(ParticleTypes.FLAME, center.x, center.y, center.z, 30, 1.2, 1.2, 1.2, 0.15);
+
+		// 小烟雾/爆裂（POOF）
+		level.sendParticles(ParticleTypes.POOF, center.x, center.y, center.z, 10, 0.6, 0.6, 0.6, 0.05);
+
+		// 5. 播放爆炸音效（与破坏版本一致）
+		level.playSound(null, pos, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F);
 	}
 
 	/**

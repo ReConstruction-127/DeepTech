@@ -14,7 +14,7 @@ import net.minecraftforge.fluids.FluidStack;
 // 正确: 接 Properties 参数并传递给父类
 public class SNFluidOutputPortBlock extends SNPortBlock<SNFluidOutputPortBlockEntity> {
 	public SNFluidOutputPortBlock(Properties properties) {
-		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+		super(properties.sound(SoundType.SCULK_CATALYST)
 				.noOcclusion()
 				.strength(5.0F, 5.0F)
 				.requiresCorrectToolForDrops());

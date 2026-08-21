@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlock<T> {
 	public MachineBlock(Properties properties) {
-		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
+		super(properties
 				.strength(5.0F, 5.0F)
 				.requiresCorrectToolForDrops());
 	}

@@ -7,8 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class SNFluidReservoirBlock extends MachineBlock<SNFluidReservoirBlockEntity> {
 	public SNFluidReservoirBlock(Properties properties) {
-		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
-				.noOcclusion()
+		super(properties.sound(SoundType.NETHERITE_BLOCK)
 				.strength(5.0F, 5.0F)
 				.requiresCorrectToolForDrops());
 	}

@@ -9,13 +9,14 @@ import dev.celestiacraft.libs.api.register.block.BasicBlock;
 import dev.celestiacraft.libs.api.register.block.BlockFacing;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 
 public class SculkCollectorBlock extends MachineBlock<SculkCollectorBlockEntity> {
 	public SculkCollectorBlock(Properties properties) {
-		super(properties);
+		super(properties.sound(SoundType.NETHERITE_BLOCK));
 	}
 
 	@Override

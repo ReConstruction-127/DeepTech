@@ -1,6 +1,8 @@
 package dev.celestiacraft.deep_tech.datagen.tags;
 
 import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
+import dev.celestiacraft.deep_tech.tags.DeepTechItemTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
@@ -18,5 +20,7 @@ public class DTItemTagsProvider extends ItemTagsProvider {
 
 	@Override
 	protected void addTags(HolderLookup.@NotNull Provider provider) {
+		tag(DeepTechItemTags.WRENCH)
+				.add(ToolItems.WRENCH.get());
 	}
 }
