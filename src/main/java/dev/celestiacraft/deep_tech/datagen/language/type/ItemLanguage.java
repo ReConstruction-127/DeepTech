@@ -49,5 +49,15 @@ public class ItemLanguage extends LanguageGenerate {
 				"Advanced Sculk Control Circuit",
 				"高级幽匿控制电路"
 		);
+		addItemLanguage(
+				"alkaloid_powder",
+				"Alkaloid Powder",
+				"植物碱粉末"
+		);
+		addItemLanguage(
+				"sculk_steel",
+				"Sculk Steel",
+				"幽钢"
+		);
 	}
 }
