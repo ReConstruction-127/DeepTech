@@ -335,7 +335,7 @@ public class SNAccessorBlockEntity extends BasicBlockEntity implements IUIHolder
 		group.setBackground(new ResourceTexture(DeepTech.loadGui("accessor")));
 
 		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.SN_ACCESSOR.get().getName());
-		title.setColor(0xFF5D5F60);
+		title.setColor(0xFF034150);
 		group.addWidget(title);
 
 		// 物品列表(9×3,可滚动 + 搜索过滤)

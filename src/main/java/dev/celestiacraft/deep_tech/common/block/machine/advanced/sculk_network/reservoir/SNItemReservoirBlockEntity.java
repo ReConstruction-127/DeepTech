@@ -43,7 +43,7 @@ public class SNItemReservoirBlockEntity extends BasicBlockEntity implements IUIH
 		main.setBackground(new ResourceTexture(DeepTech.loadGui("item_reservoir")));
 
 		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.SN_ITEM_RESERVOIR.get().getName());
-		title.setColor(0xFF5D5F60);
+		title.setColor(0xFF97CCD6);
 		main.addWidget(title);
 
 		// 储存器槽位(6行×9列)

@@ -29,21 +29,6 @@ public class GuiLanguage extends LanguageGenerate {
 				"Energy Cell",
 				"能量单元"
 		);
-		addBlockLanguage(
-				"sculk_network_center",
-				"Sculk Network Center",
-				"幽匿网络中枢"
-		);
-		addBlockLanguage(
-				"sculk_network_item_reservoir",
-				"Sculk Network Item Reservoir",
-				"幽匿网络物品储库"
-		);
-		addBlockLanguage(
-				"sculk_network_fluid_reservoir",
-				"Sculk Network Fluid Reservoir",
-				"幽匿网络流体储库"
-		);
 		addGuiLang(
 				"accessor_item_count",
 				"Count: %s",

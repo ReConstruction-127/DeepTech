@@ -303,7 +303,7 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		level.sendParticles(ParticleTypes.POOF, center.x, center.y, center.z, 10, 0.6, 0.6, 0.6, 0.05);
 
 		// 5. 播放爆炸音效(与破坏版本一致)
-		level.playSound(null, pos, SoundEvents.GENERIC_EXPLODE, SoundSource.BLOCKS, 1.0F, 1.0F);
+		level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, 1.0F);
 	}
 
 	/**

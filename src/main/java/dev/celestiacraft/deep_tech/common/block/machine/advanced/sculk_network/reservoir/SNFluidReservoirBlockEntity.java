@@ -118,7 +118,7 @@ public class SNFluidReservoirBlockEntity extends BasicBlockEntity implements IUI
 		group.setBackground(new ResourceTexture(DeepTech.loadGui("fluid_reservoir")));
 
 		LabelWidget title = new LabelWidget(8, 8, MachineBlocks.SN_FLUID_RESERVOIR.get().getName());
-		title.setColor(0xFF5D5F60);
+		title.setColor(0xFF106376);
 		group.addWidget(title);
 
 		// 9 个 8B 储罐:比例填充式流体槽,支持拿着桶点击槽位灌入/抽取.
