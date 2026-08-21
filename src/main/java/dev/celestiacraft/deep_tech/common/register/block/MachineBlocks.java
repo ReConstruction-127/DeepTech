@@ -1,8 +1,9 @@
 package dev.celestiacraft.deep_tech.common.register.block;
 
 import com.tterrag.registrate.util.entry.BlockEntry;
-import dev.celestiacraft.deep_tech.DeepTech;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
+import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.api.block.SNPortBlock;
 import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.alloy_furnace.AlloyFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.crusher.CrusherBlock;
@@ -109,7 +110,7 @@ public class MachineBlocks {
 				.register();
 
 		SN_CENTER = DeepTech.REGISTRATE.block("sculk_network_center", SNCenterBlock::new)
-				.blockstate(NonNullBiConsumer.noop())
+				.blockstate(SNPortBlock.simple("block/sculk_network/center"))
 				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))
@@ -119,7 +120,7 @@ public class MachineBlocks {
 				.register();
 
 		SN_ITEM_RESERVOIR = DeepTech.REGISTRATE.block("sculk_network_item_reservoir", SNItemReservoirBlock::new)
-				.blockstate(NonNullBiConsumer.noop())
+				.blockstate(SNPortBlock.simple("block/sculk_network/item_reservoir"))
 				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))
@@ -129,7 +130,7 @@ public class MachineBlocks {
 				.register();
 
 		SN_ITEM_INPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_item_input_port", SNItemInputPortBlock::new)
-				.blockstate(NonNullBiConsumer.noop())
+				.blockstate(SNPortBlock.port("item_input"))
 				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))
@@ -139,7 +140,7 @@ public class MachineBlocks {
 				.register();
 
 		SN_ITEM_OUTPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_item_output_port", SNItemOutputPortBlock::new)
-				.blockstate(NonNullBiConsumer.noop())
+				.blockstate(SNPortBlock.port("item_output"))
 				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))
@@ -149,7 +150,7 @@ public class MachineBlocks {
 				.register();
 
 		SN_FLUID_RESERVOIR = DeepTech.REGISTRATE.block("sculk_network_fluid_reservoir", SNFluidReservoirBlock::new)
-				.blockstate(NonNullBiConsumer.noop())
+				.blockstate(SNPortBlock.simple("block/sculk_network/fluid_reservoir"))
 				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))
@@ -159,7 +160,7 @@ public class MachineBlocks {
 				.register();
 
 		SN_FLUID_INPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_fluid_input_port", SNFluidInputPortBlock::new)
-				.blockstate(NonNullBiConsumer.noop())
+				.blockstate(SNPortBlock.port("fluid_input"))
 				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))
@@ -169,7 +170,7 @@ public class MachineBlocks {
 				.register();
 
 		SN_FLUID_OUTPUT_PORT = DeepTech.REGISTRATE.block("sculk_network_fluid_output_port", SNFluidOutputPortBlock::new)
-				.blockstate(NonNullBiConsumer.noop())
+				.blockstate(SNPortBlock.port("fluid_output"))
 				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))
@@ -179,7 +180,7 @@ public class MachineBlocks {
 				.register();
 
 		SN_ACCESSOR = DeepTech.REGISTRATE.block("sculk_network_accessor", SNAccessorBlock::new)
-				.blockstate(NonNullBiConsumer.noop())
+				.blockstate(SNPortBlock.simple("block/sculk_network/accessor"))
 				.tag(DeepTechBlockTags.MACHINES)
 				.item()
 				.tab(DTCreativeTabs.getTabKey("machine"))

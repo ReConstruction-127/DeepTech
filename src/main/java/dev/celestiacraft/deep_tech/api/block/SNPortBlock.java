@@ -1,12 +1,17 @@
 package dev.celestiacraft.deep_tech.api.block;
 
+import com.tterrag.registrate.providers.DataGenContext;
+import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
+import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import dev.celestiacraft.libs.api.register.block.BasicEntityBlock;
 import dev.celestiacraft.libs.api.register.block.BlockFacing;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -17,6 +22,9 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.client.model.generators.BlockModelProvider;
+import net.minecraftforge.client.model.generators.ConfiguredModel;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +36,8 @@ import org.jetbrains.annotations.NotNull;
 public abstract class SNPortBlock<T extends BlockEntity> extends BasicEntityBlock<T> {
 	// 碰撞箱与地毯一致:16x16 底板上 1 格高
 	private static final VoxelShape PORT_SHAPE = Shapes.box(0.0, 0.0, 0.0, 1.0, 1.0 / 16.0, 1.0);
+
+	private static final String ROOT = "block/sculk_network/";
 
 	public SNPortBlock(BlockBehaviour.Properties properties) {
 		super(properties.sound(SoundType.SCULK_CATALYST)
@@ -78,5 +88,46 @@ public abstract class SNPortBlock<T extends BlockEntity> extends BasicEntityBloc
 			}
 		}
 		return FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
+	}
+
+	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> simple(String model) {
+		return (context, provider) -> {
+			BlockModelProvider models = provider.models();
+			ModelFile file = models.getExistingFile(provider.modLoc(model));
+			provider.simpleBlock(context.get(), file);
+		};
+	}
+
+	public static <T extends Block> NonNullBiConsumer<DataGenContext<Block, T>, RegistrateBlockstateProvider> port(String io) {
+		return (context, provider) -> {
+			ConfiguredModel.Builder<?> builder = ConfiguredModel.builder();
+			BlockModelProvider models = provider.models();
+
+			ModelFile side = models.getExistingFile(provider.modLoc(ROOT + "port_" + io));
+			ModelFile up = models.getExistingFile(provider.modLoc(ROOT + "port_up_" + io));
+			ModelFile down = models.getExistingFile(provider.modLoc(ROOT + "port_down_" + io));
+
+			provider.getVariantBuilder(context.get())
+					.forAllStates((state) -> {
+						Direction facing = state.getValue(BlockStateProperties.FACING);
+						return switch (facing) {
+							case UP -> builder.modelFile(up)
+									.build();
+							case DOWN -> builder.modelFile(down)
+									.build();
+							case EAST -> builder.modelFile(side)
+									.rotationY(90)
+									.build();
+							case SOUTH -> builder.modelFile(side)
+									.rotationY(180)
+									.build();
+							case WEST -> builder.modelFile(side)
+									.rotationY(270)
+									.build();
+							default -> builder.modelFile(side)
+									.build();
+						};
+					});
+		};
 	}
 }

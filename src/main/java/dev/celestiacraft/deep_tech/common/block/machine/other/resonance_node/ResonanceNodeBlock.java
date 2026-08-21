@@ -41,10 +41,21 @@ public class ResonanceNodeBlock extends MachineBlock<ResonanceNodeBlockEntity> {
 		return false;
 	}
 
+	private static boolean isFullBlock(BlockState state, BlockGetter level, BlockPos pos) {
+		return state.isCollisionShapeFullBlock(level, pos);
+	}
+
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		Direction clickedFace = context.getClickedFace();
-		return defaultBlockState().setValue(FACING, clickedFace);
+		Direction facing = context.getClickedFace();
+		BlockPos attachedPos = context.getClickedPos().relative(facing.getOpposite());
+		BlockState attachedState = context.getLevel().getBlockState(attachedPos);
+
+		if (!isFullBlock(attachedState, context.getLevel(), attachedPos)) {
+			return null;
+		}
+
+		return defaultBlockState().setValue(FACING, facing);
 	}
 
 	@Override
