@@ -2,11 +2,10 @@ package dev.celestiacraft.deep_tech.api.client.texture;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.celestiacraft.deep_tech.DeepTech;
-import net.createmod.catnip.gui.element.ScreenElement;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
-public class Guis implements ScreenElement {
+public class Guis {
 	public final ResourceLocation location;
 	public final int width;
 	public final int height;
@@ -29,7 +28,6 @@ public class Guis implements ScreenElement {
 		RenderSystem.setShaderTexture(0, location);
 	}
 
-	@Override
 	public void render(GuiGraphics graphics, int x, int y) {
 		graphics.blit(location, x, y, startX, startY, width, height);
 	}
