@@ -31,9 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlock<T> {
 	public MachineBlock(Properties properties) {
-		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
-				.strength(5.0F, 5.0F)
-				.requiresCorrectToolForDrops());
+		super(properties.requiresCorrectToolForDrops());
 	}
 
 	@Override
@@ -134,10 +132,12 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 	}
 
 	protected static BlockBehaviour.Properties basicProperties(BlockBehaviour.Properties properties) {
-		return properties.sound(SoundType.DEEPSLATE_BRICKS);
+		return properties.sound(SoundType.DEEPSLATE_BRICKS)
+				.strength(5.0F, 5.0F);
 	}
 
 	protected static BlockBehaviour.Properties advancedProperties(BlockBehaviour.Properties properties) {
-		return properties.sound(SoundType.NETHERITE_BLOCK);
+		return properties.sound(SoundType.NETHERITE_BLOCK)
+				.strength(5.0F, 5.0F);
 	}
 }
