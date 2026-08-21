@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network;
+package dev.celestiacraft.deep_tech.api.block;
 
 import dev.celestiacraft.libs.api.register.block.BasicEntityBlock;
 import dev.celestiacraft.libs.api.register.block.BlockFacing;

@@ -1,6 +1,6 @@
 package dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port;
 
-import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.SNPortBlock;
+import dev.celestiacraft.deep_tech.api.block.SNPortBlock;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.libs.api.interaction.context.UseContext;
 import net.minecraft.network.chat.Component;
