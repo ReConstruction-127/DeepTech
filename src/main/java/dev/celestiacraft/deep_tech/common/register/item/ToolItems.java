@@ -11,8 +11,6 @@ public class ToolItems {
 	public static final ItemEntry<WrenchItem> WRENCH;
 
 	static {
-		DTCreativeTabs.getTab("tool");
-
 		WRENCH = DeepTech.REGISTRATE.item("wrench", WrenchItem::new)
 				.model(ItemModelGen.handheld("item/tool/wrench"))
 				.tab(DTCreativeTabs.getTabKey("tool"))

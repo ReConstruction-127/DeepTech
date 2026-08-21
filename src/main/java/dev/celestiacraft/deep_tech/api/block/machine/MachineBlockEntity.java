@@ -87,7 +87,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 
 	// 在 MachineBlockEntity 中添加这个方法
 	public void sync() {
-		if (level != null && !level.isClientSide) {
+		if (level != null && !level.isClientSide()) {
 			setChanged();
 			// 强制发送 BlockEntity 数据包, 不依赖 BlockState 变化
 			if (level instanceof ServerLevel serverLevel) {
@@ -201,7 +201,7 @@ public abstract class MachineBlockEntity<T extends MachineBlockEntity> extends B
 	@Override
 	public void onLoad() {
 		super.onLoad();
-		if (level != null && !level.isClientSide) {
+		if (level != null && !level.isClientSide()) {
 			sync();
 		}
 	}

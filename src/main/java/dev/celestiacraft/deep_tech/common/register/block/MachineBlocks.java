@@ -4,24 +4,24 @@ import com.tterrag.registrate.util.entry.BlockEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
-import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.collector.SculkCollectorBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.energy_cell.EnergyCellBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.exp_generator.EXPGeneratorBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.resonance_node.ResonanceNodeBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.accessor.SNAccessorBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.center.SNCenterBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidInputPortBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidOutputPortBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemInputPortBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNFluidReservoirBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.reservoir.SNItemReservoirBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_nursery.SculkNurseryBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.processor.ProcessorBlock;
-import dev.celestiacraft.deep_tech.common.block.machine.assembler.AssemblerBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.basic.alloy_furnace.AlloyFurnaceBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.basic.crusher.CrusherBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.collector.SculkCollectorBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.other.energy_cell.EnergyCellBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.basic.exp_generator.EXPGeneratorBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.basic.furnace.SculkFurnaceBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.other.resonance_node.ResonanceNodeBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.accessor.SNAccessorBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.center.SNCenterBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNFluidInputPortBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNFluidOutputPortBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNItemInputPortBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNItemOutputPortBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.reservoir.SNFluidReservoirBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.reservoir.SNItemReservoirBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_nursery.SculkNurseryBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.processor.ProcessorBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.assembler.AssemblerBlock;
 import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 import dev.celestiacraft.deep_tech.tags.DeepTechBlockTags;
 import dev.celestiacraft.deep_tech.tags.DeepTechItemTags;
@@ -48,8 +48,6 @@ public class MachineBlocks {
 	public static final BlockEntry<SNFluidOutputPortBlock> SN_FLUID_OUTPUT_PORT;
 
 	static {
-		DTCreativeTabs.getTab("machine");
-
 		CRUSHER = DeepTech.REGISTRATE.block("crusher", CrusherBlock::new)
 				.blockstate(CrusherBlock.genBlockState())
 				.tag(DeepTechBlockTags.MACHINES)

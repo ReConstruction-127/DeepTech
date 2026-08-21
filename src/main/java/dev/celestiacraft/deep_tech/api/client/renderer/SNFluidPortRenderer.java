@@ -1,8 +1,8 @@
 package dev.celestiacraft.deep_tech.api.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidInputPortBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNFluidOutputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNFluidInputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNFluidOutputPortBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -38,8 +38,8 @@ public class SNFluidPortRenderer<T extends BlockEntity> implements BlockEntityRe
 
 		// 将流体转换成物品(桶), 用于渲染
 		ItemStack filterItem = FluidUtil.getFilledBucket(filterFluid);
-		// 注意: 如果流体没有桶装形态, getFilledBucket 可能返回空, 此时需要回退方案. 
-		// 可以使用 FluidHelper 或直接渲染流体材质, 但为了简化, 我们先假设流体有桶. 
+		// 注意: 如果流体没有桶装形态, getFilledBucket 可能返回空, 此时需要回退方案.
+		// 可以使用 FluidHelper 或直接渲染流体材质, 但为了简化, 我们先假设流体有桶.
 		if (filterItem.isEmpty()) {
 			// 如果拿不到桶, 可以尝试用 FluidStack 的渲染, 但比较复杂, 这里简单跳过
 			return;

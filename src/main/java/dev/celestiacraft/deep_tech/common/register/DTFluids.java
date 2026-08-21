@@ -16,12 +16,11 @@ public class DTFluids {
 	public static final FluidEntry<ForgeFlowingFluid.Flowing> SCULK_INDUCTION_FLUID;
 
 	static {
-		DTCreativeTabs.getTab("material");
-
 		LIQUID_EXPERIENCE = DTFluidBuilder.of("liquid_experience")
 				.flowing(DTFluidTextures.EXPERIENCE.getFlowing())
 				.still(DTFluidTextures.EXPERIENCE.getStill())
 				.bucket()
+				.tab(DTCreativeTabs.getTabKey("material"))
 				.model(DTFluidTexture.forgeFluidBucket("liquid_experience"))
 				.build()
 				.tag(DeepTechFluidTags.EXPERIENCE)
@@ -34,6 +33,7 @@ public class DTFluids {
 					return new SculkCultureLiquidBlock(supplier, properties);
 				})
 				.bucket()
+				.tab(DTCreativeTabs.getTabKey("material"))
 				.model(DTFluidTexture.forgeFluidBucket("sculk_culture"))
 				.build()
 				.register();
@@ -42,6 +42,7 @@ public class DTFluids {
 				.flowing(DTFluidTextures.INDUCTION.getFlowing())
 				.still(DTFluidTextures.INDUCTION.getStill())
 				.bucket()
+				.tab(DTCreativeTabs.getTabKey("material"))
 				.model(DTFluidTexture.forgeFluidBucket("sculk_induction_fluid"))
 				.build()
 				.register();

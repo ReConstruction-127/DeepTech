@@ -23,7 +23,7 @@ public class SculkCultureFluid {
 	}
 
 	public static void tickFluid(Level level, BlockPos pos) {
-		if (level.isClientSide) {
+		if (level.isClientSide()) {
 			return;
 		}
 		List<LivingEntity> entities = level.getEntitiesOfClass(LivingEntity.class, new AABB(pos));

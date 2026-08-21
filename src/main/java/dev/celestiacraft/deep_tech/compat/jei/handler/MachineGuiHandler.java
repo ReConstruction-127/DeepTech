@@ -1,12 +1,12 @@
 package dev.celestiacraft.deep_tech.compat.jei.handler;
 
 import com.lowdragmc.lowdraglib.gui.modular.ModularUIGuiContainer;
-import dev.celestiacraft.deep_tech.common.block.machine.alloy_furnace.AlloyFurnaceBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.assembler.AssemblerBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.crusher.CrusherBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.furnace.SculkFurnaceBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.processor.ProcessorBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_nursery.SculkNurseryBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.basic.alloy_furnace.AlloyFurnaceBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.assembler.AssemblerBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.basic.crusher.CrusherBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.basic.furnace.SculkFurnaceBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.processor.ProcessorBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_nursery.SculkNurseryBlockEntity;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.gui.handlers.IGuiClickableArea;

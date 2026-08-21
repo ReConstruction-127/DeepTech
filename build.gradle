@@ -181,11 +181,10 @@ dependencies {
 	// LDLib
 	implementation fg.deobf("com.lowdragmc.ldlib:ldlib-forge-1.20.1:1.0.50")
 
-	// TEST ONLY CC&A
+	// TEST ONLY
 	runtimeOnly fg.deobf("curse.maven:createaddition-439890:6306951")
-
-	// TEST ONLY Mekanism
-	runtimeOnly fg.deobf("maven.modrinth:mekanism:10.4.12.68")
+	runtimeOnly fg.deobf("curse.maven:mekanism-268560:6552911")
+	runtimeOnly fg.deobf("curse.maven:configured-457570:5180900")
 
 	// Create + Flywheel + Registrate
 	implementation fg.deobf("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") { transitive = false }

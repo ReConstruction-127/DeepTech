@@ -20,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.client.model.generators.BlockModelBuilder;
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlock<T> {
 	public MachineBlock(Properties properties) {
-		super(properties
+		super(properties.sound(SoundType.DEEPSLATE_BRICKS)
 				.strength(5.0F, 5.0F)
 				.requiresCorrectToolForDrops());
 	}
@@ -130,5 +131,13 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 							.rotationY(BasicBlock.getYRotFromFacing(direction))
 							.build();
 				});
+	}
+
+	protected static BlockBehaviour.Properties basicProperties(BlockBehaviour.Properties properties) {
+		return properties.sound(SoundType.DEEPSLATE_BRICKS);
+	}
+
+	protected static BlockBehaviour.Properties advancedProperties(BlockBehaviour.Properties properties) {
+		return properties.sound(SoundType.NETHERITE_BLOCK);
 	}
 }

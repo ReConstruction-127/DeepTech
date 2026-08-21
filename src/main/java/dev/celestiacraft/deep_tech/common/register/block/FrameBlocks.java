@@ -11,8 +11,6 @@ public class FrameBlocks {
 	public static final BlockEntry<FrameBlock> REINFORCED_MACHINE_FRAME;
 
 	static {
-		DTCreativeTabs.getTab("machine");
-
 		MACHINE_FRAME = addFrame("machine", MiningLevel.WOODEN);
 		REINFORCED_MACHINE_FRAME = addFrame("reinforced_machine", MiningLevel.IRON);
 	}

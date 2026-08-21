@@ -1,5 +1,6 @@
 package dev.celestiacraft.deep_tech.api.client;
 
+import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.client.renderer.SNFluidPortRenderer;
 import dev.celestiacraft.deep_tech.api.client.renderer.SNItemPortRenderer;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
@@ -8,9 +9,8 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = "deep_tech", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = DeepTech.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEventHandler {
-
 	@SubscribeEvent
 	public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
 		// 注册输入端口渲染器

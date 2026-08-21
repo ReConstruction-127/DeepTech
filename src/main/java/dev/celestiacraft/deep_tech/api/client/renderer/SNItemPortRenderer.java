@@ -1,8 +1,8 @@
 package dev.celestiacraft.deep_tech.api.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemInputPortBlockEntity;
-import dev.celestiacraft.deep_tech.common.block.machine.sculk_network.port.SNItemOutputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNItemInputPortBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNItemOutputPortBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
