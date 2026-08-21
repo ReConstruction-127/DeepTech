@@ -1,8 +1,8 @@
 package dev.celestiacraft.deep_tech.api.client;
 
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.client.renderer.SNFluidPortRenderer;
-import dev.celestiacraft.deep_tech.api.client.renderer.SNItemPortRenderer;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.renderer.SNFluidPortRenderer;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.renderer.SNItemPortRenderer;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;

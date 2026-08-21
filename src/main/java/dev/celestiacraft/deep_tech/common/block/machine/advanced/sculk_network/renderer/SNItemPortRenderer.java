@@ -1,6 +1,7 @@
-package dev.celestiacraft.deep_tech.api.client.renderer;
+package dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNItemInputPortBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNItemOutputPortBlockEntity;
 import net.minecraft.client.Minecraft;
@@ -15,28 +16,35 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class SNItemPortRenderer<T extends BlockEntity> implements BlockEntityRenderer<T> {
-
 	public SNItemPortRenderer(BlockEntityRendererProvider.Context context) {
 		// 可以在这里获取一些渲染资源, 但本例不需要
 	}
 
 	@Override
-	public void render(T be, float partialTick, PoseStack poseStack,
-	                   MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-
+	public void render(
+			@NotNull T blockEntity,
+			float partialTick,
+			@NotNull PoseStack poseStack,
+			@NotNull MultiBufferSource bufferSource,
+			int packedLight,
+			int packedOverlay
+	) {
 		// ----- 1. 获取过滤物品 -----
 		ItemStack filter = ItemStack.EMPTY;
-		if (be instanceof SNItemInputPortBlockEntity input) {
+		if (blockEntity instanceof SNItemInputPortBlockEntity input) {
 			filter = input.getFilter();
-		} else if (be instanceof SNItemOutputPortBlockEntity output) {
+		} else if (blockEntity instanceof SNItemOutputPortBlockEntity output) {
 			filter = output.getFilter();
 		}
-		if (filter.isEmpty()) return;
+		if (filter.isEmpty()) {
+			return;
+		}
 
 		// ----- 2. 获取方块朝向(六面) -----
-		BlockState state = be.getBlockState();
+		BlockState state = blockEntity.getBlockState();
 		if (!state.hasProperty(BlockStateProperties.FACING)) return;
 		Direction facing = state.getValue(BlockStateProperties.FACING);
 
@@ -53,19 +61,18 @@ public class SNItemPortRenderer<T extends BlockEntity> implements BlockEntityRen
 		if (facing.getAxis().isHorizontal()) {
 			float rotation = switch (facing) {
 				case NORTH -> 180;
-				case SOUTH -> 0;
 				case WEST -> 90;
 				case EAST -> -90;
 				default -> 0;
 			};
-			poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rotation));
+			poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
 		} else if (facing == Direction.UP) {
 			// 朝上:物品平放在顶面
-			poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-90));
+			poseStack.mulPose(Axis.XP.rotationDegrees(-90));
 		} else {
 			// 朝下:物品平放在底面并翻转
-			poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(-90));
-			poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180));
+			poseStack.mulPose(Axis.XP.rotationDegrees(-90));
+			poseStack.mulPose(Axis.YP.rotationDegrees(180));
 		}
 
 		// ----- 5. 缩放 (4x4像素 ≈ 0.25倍) -----
@@ -80,7 +87,7 @@ public class SNItemPortRenderer<T extends BlockEntity> implements BlockEntityRen
 				OverlayTexture.NO_OVERLAY,
 				poseStack,
 				bufferSource,
-				be.getLevel(),
+				blockEntity.getLevel(),
 				0
 		);
 
