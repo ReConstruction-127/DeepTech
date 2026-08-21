@@ -64,5 +64,55 @@ public class BlockLanguage extends LanguageGenerate {
 				"Assembler",
 				"组装机"
 		);
+		addBlockLanguage(
+				"sculk_network_center",
+				"Sculk Network Center",
+				"幽匿网络中枢"
+		);
+		addBlockLanguage(
+				"sculk_network_item_reservoir",
+				"Sculk Network Item Reservoir",
+				"幽匿网络物品储库"
+		);
+		addBlockLanguage(
+				"sculk_network_fluid_reservoir",
+				"Sculk Network Fluid Reservoir",
+				"幽匿网络流体储库"
+		);
+		addBlockLanguage(
+				"sculk_network_item_input_port",
+				"Sculk Network Item Input Port",
+				"幽匿网络物品输入端口"
+		);
+		addBlockLanguage(
+				"sculk_network_item_output_port",
+				"Sculk Network Item Output Port",
+				"幽匿网络物品输出端口"
+		);
+		addBlockLanguage(
+				"sculk_network_fluid_input_port",
+				"Sculk Network Fluid Input Port",
+				"幽匿网络流体输入端口"
+		);
+		addBlockLanguage(
+				"sculk_network_fluid_output_port",
+				"Sculk Network Fluid Output Port",
+				"幽匿网络流体输出端口"
+		);
+		addBlockLanguage(
+				"sculk_network_accessor",
+				"Sculk Network Accessor",
+				"幽匿网络访问器"
+		);
+		addBlockLanguage(
+				"sculk_network_block",
+				"Sculk Network Block",
+				"幽匿网络方块"
+		);
+		addBlockLanguage(
+				"sculk_network_vein",
+				"Sculk Network Vein",
+				"幽匿网络脉络"
+		);
 	}
 }
