@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.effect;
+package dev.celestiacraft.deep_tech.common.effect.infection;
 
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.register.DTEffects;

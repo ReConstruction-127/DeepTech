@@ -2,7 +2,7 @@ package dev.celestiacraft.deep_tech.common.register;
 
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.common.effect.InfectionEffect;
+import dev.celestiacraft.deep_tech.common.effect.infection.InfectionEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 
 public class DTEffects {

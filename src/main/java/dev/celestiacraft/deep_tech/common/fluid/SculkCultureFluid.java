@@ -1,7 +1,7 @@
 package dev.celestiacraft.deep_tech.common.fluid;
 
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.common.effect.InfectionEffect;
+import dev.celestiacraft.deep_tech.common.effect.infection.InfectionEffect;
 import dev.celestiacraft.deep_tech.common.register.DTEffects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
