@@ -17,7 +17,7 @@ public class BasicBlocks {
 				.blockstate(SNPortBlock.simple("block/sculk_network/cable_block"))
 				.item()
 				.model(NonNullBiConsumer.noop())
-				.tab(DTCreativeTabs.getTabKey("machine"))
+				.tab(DTCreativeTabs.MACHINE.getKey())
 				.build()
 				.register();
 
@@ -25,7 +25,7 @@ public class BasicBlocks {
 				.blockstate(SNPortBlock.simple("block/sculk_network/vein"))
 				.item()
 				.model(NonNullBiConsumer.noop())
-				.tab(DTCreativeTabs.getTabKey("machine"))
+				.tab(DTCreativeTabs.MACHINE.getKey())
 				.build()
 				.register();
 	}

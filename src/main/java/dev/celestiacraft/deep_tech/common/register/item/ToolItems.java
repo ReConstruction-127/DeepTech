@@ -13,7 +13,7 @@ public class ToolItems {
 	static {
 		WRENCH = DeepTech.REGISTRATE.item("wrench", WrenchItem::new)
 				.model(ItemModelGen.handheld("item/tool/wrench"))
-				.tab(DTCreativeTabs.getTabKey("tool"))
+				.tab(DTCreativeTabs.TOOL.getKey())
 				.tag(DeepTechItemTags.WRENCH)
 				.register();
 	}
