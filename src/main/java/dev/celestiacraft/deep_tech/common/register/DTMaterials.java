@@ -11,11 +11,11 @@ public class DTMaterials {
 	public static final DTMaterial
 			COPPER,
 			IRON,
-			GOLD;
+			GOLD,
+			SCULK_ALLOY,
+			SCULK_STEEL;
 
 	static {
-		DTCreativeTabs.getTab("material");
-
 		COPPER = addMaterial("copper")
 				.nugget()
 				.dust()
@@ -26,6 +26,11 @@ public class DTMaterials {
 		GOLD = addMaterial("gold")
 				.dust()
 				.plate();
+		SCULK_ALLOY = addMaterial("sculk_alloy")
+				.ingot()
+				.plate();
+		SCULK_STEEL = addMaterial("sculk_steel")
+				.ingot();
 	}
 
 	private static DTMaterial addMaterial(String id) {

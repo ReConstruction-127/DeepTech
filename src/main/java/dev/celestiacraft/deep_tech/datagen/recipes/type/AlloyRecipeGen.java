@@ -5,6 +5,7 @@ import com.simibubi.create.AllItems;
 import com.simibubi.create.Create;
 import com.simibubi.create.foundation.data.recipe.CommonMetal;
 import dev.celestiacraft.deep_tech.api.recipe.builder.alloy.AlloyRecipeBuilder;
+import dev.celestiacraft.deep_tech.common.register.DTMaterials;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
 import net.minecraft.data.PackOutput;
@@ -36,7 +37,7 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 		AlloyRecipeBuilder.builder()
 				.input(Tags.Items.INGOTS_COPPER)
 				.input(MaterialItems.SCULK_CHUNK)
-				.output(MaterialItems.SCULK_ALLOY)
+				.output(DTMaterials.SCULK_ALLOY.getIngot())
 				.energyCost(100)
 				.processingTime(20 * 20)
 				.save(consumer, save("alloy/sculk_alloy/copper"));
@@ -44,7 +45,7 @@ public class AlloyRecipeGen extends DTRecipeProvider {
 		AlloyRecipeBuilder.builder()
 				.input(Tags.Items.INGOTS_IRON)
 				.input(MaterialItems.SCULK_CHUNK)
-				.output(MaterialItems.SCULK_STEEL)
+				.output(DTMaterials.SCULK_STEEL.getIngot())
 				.energyCost(100)
 				.processingTime(20 * 20)
 				.save(consumer, save("alloy/sculk_alloy/iron"));

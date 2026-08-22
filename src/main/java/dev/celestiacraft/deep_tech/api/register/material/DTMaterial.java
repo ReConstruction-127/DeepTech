@@ -58,7 +58,7 @@ public class DTMaterial {
 
 		return DeepTech.REGISTRATE.item(registryName, BasicItem::new)
 				.model(ItemModelGen.generated(part.getModelPath(id)))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.tag(TagsBuilder.item(part.getTagFolder()).forge())
 				.tag(TagsBuilder.item(part.getMaterialTag(id)).forge())
 				.register();

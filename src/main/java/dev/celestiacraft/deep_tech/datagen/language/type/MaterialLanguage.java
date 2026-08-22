@@ -7,5 +7,7 @@ public class MaterialLanguage extends LanguageGenerate {
 		addMaterialLang("copper", "Copper", "铜");
 		addMaterialLang("iron", "Iron", "铁");
 		addMaterialLang("gold", "Gold", "金");
+		addMaterialLang("sculk_alloy", "Sculk Alloy", "幽匿合金");
+		addMaterialLang("sculk_steel", "Sculk Steel", "幽钢");
 	}
 }

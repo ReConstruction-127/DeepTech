@@ -12,29 +12,18 @@ import dev.celestiacraft.deep_tech.common.recipe.processor.ProcessorRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
-import dev.celestiacraft.deep_tech.compat.jei.category.AlloyCategory;
-import dev.celestiacraft.deep_tech.compat.jei.category.AssemblerCategory;
-import dev.celestiacraft.deep_tech.compat.jei.category.CrushingCategory;
-import dev.celestiacraft.deep_tech.compat.jei.category.CultivationCategory;
-import dev.celestiacraft.deep_tech.compat.jei.category.HarvestCategory;
-import dev.celestiacraft.deep_tech.compat.jei.category.InteractionCategory;
-import dev.celestiacraft.deep_tech.compat.jei.category.ProcessorCategory;
+import dev.celestiacraft.deep_tech.compat.jei.category.*;
 import dev.celestiacraft.deep_tech.compat.jei.handler.MachineGuiHandler;
 import dev.celestiacraft.libs.compat.jei.api.ingredient.JeiIngredientTypes;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.registration.IGuiHandlerRegistration;
-import mezz.jei.api.registration.IModIngredientRegistration;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
-import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -123,12 +112,6 @@ public class DeepTechJEIPlugin implements IModPlugin {
 		registration.addRecipeCatalyst(
 				MachineBlocks.ASSEMBLER.get(),
 				DTJeiRecipeType.ASSEMBLING
-		);
-
-		// 交互配方使用扳手作为催化剂
-		registration.addRecipeCatalyst(
-				Blocks.REINFORCED_DEEPSLATE,
-				DTJeiRecipeType.INTERACTION
 		);
 	}
 

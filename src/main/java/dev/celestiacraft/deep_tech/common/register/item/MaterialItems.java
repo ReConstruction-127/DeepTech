@@ -7,25 +7,15 @@ import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 import dev.celestiacraft.libs.api.register.item.BasicItem;
 
 public class MaterialItems {
-	public static ItemEntry<BasicItem> SCULK_ALLOY;
 	public static ItemEntry<BasicItem> SCULK_CHUNK;
 	public static ItemEntry<BasicItem> SCULK_BONE;
 	public static ItemEntry<BasicItem> SCULK_BONEMEAL;
 	public static ItemEntry<BasicItem> SCULK_CIRCUIT;
 	public static ItemEntry<BasicItem> DENSE_SCULK_CHUNK;
-	public static ItemEntry<BasicItem> SCULK_ALLOY_PLATE;
 	public static ItemEntry<BasicItem> ADVANCED_SCULK_CONTROL_CIRCUIT;
 	public static ItemEntry<BasicItem> ALKALOID_POWDER;
-	public static ItemEntry<BasicItem> SCULK_STEEL;
 
 	static {
-		DTCreativeTabs.getTab("material");
-
-		SCULK_ALLOY = DeepTech.REGISTRATE.item("sculk_alloy", BasicItem::new)
-				.model(ItemModelGen.generated("item/sculk_alloy"))
-				.tab(DTCreativeTabs.MATERIAL.getKey())
-				.register();
-
 		SCULK_CHUNK = DeepTech.REGISTRATE.item("sculk_chunk", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_chunk"))
 				.tab(DTCreativeTabs.MATERIAL.getKey())
@@ -51,11 +41,6 @@ public class MaterialItems {
 				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
-		SCULK_ALLOY_PLATE = DeepTech.REGISTRATE.item("sculk_alloy_plate", BasicItem::new)
-				.model(ItemModelGen.generated("item/sculk_alloy_plate"))
-				.tab(DTCreativeTabs.MATERIAL.getKey())
-				.register();
-
 		ADVANCED_SCULK_CONTROL_CIRCUIT = DeepTech.REGISTRATE.item("advanced_sculk_control_circuit", BasicItem::new)
 				.model(ItemModelGen.generated("item/advanced_sculk_control_circuit"))
 				.tab(DTCreativeTabs.MATERIAL.getKey())
@@ -63,11 +48,6 @@ public class MaterialItems {
 
 		ALKALOID_POWDER = DeepTech.REGISTRATE.item("alkaloid_powder", BasicItem::new)
 				.model(ItemModelGen.generated("item/alkaloid_powder"))
-				.tab(DTCreativeTabs.MATERIAL.getKey())
-				.register();
-
-		SCULK_STEEL = DeepTech.REGISTRATE.item("sculk_steel", BasicItem::new)
-				.model(ItemModelGen.generated("item/sculk_steel"))
 				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 	}

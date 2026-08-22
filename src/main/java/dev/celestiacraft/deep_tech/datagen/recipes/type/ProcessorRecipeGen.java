@@ -2,7 +2,6 @@ package dev.celestiacraft.deep_tech.datagen.recipes.type;
 
 import dev.celestiacraft.deep_tech.api.recipe.builder.processor.ProcessorRecipeBuilder;
 import dev.celestiacraft.deep_tech.common.register.DTMaterials;
-import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -38,8 +37,8 @@ public class ProcessorRecipeGen extends DTRecipeProvider {
 				.save(consumer, save("processing/gold_plate"));
 
 		ProcessorRecipeBuilder.builder()
-				.itemInput(MaterialItems.SCULK_ALLOY)
-				.itemOutput(MaterialItems.SCULK_ALLOY_PLATE)
+				.itemInput(DTMaterials.SCULK_ALLOY.getIngot())
+				.itemOutput(DTMaterials.SCULK_ALLOY.getPlate())
 				.energyCost(20)
 				.processingTime(20 * 5)
 				.save(consumer, save("processing/sculk_plate"));

@@ -10,11 +10,6 @@ public class ItemLanguage extends LanguageGenerate {
 				"扳手"
 		);
 		addItemLanguage(
-				"sculk_alloy",
-				"Sculk Alloy",
-				"幽匿合金"
-		);
-		addItemLanguage(
 				"sculk_chunk",
 				"Sculk Chunk",
 				"幽匿碎块"
@@ -40,11 +35,6 @@ public class ItemLanguage extends LanguageGenerate {
 				"致密幽匿碎块"
 		);
 		addItemLanguage(
-				"sculk_alloy_plate",
-				"Sculk Alloy Plate",
-				"幽匿合金板"
-		);
-		addItemLanguage(
 				"advanced_sculk_control_circuit",
 				"Advanced Sculk Control Circuit",
 				"高级幽匿控制电路"
@@ -53,11 +43,6 @@ public class ItemLanguage extends LanguageGenerate {
 				"alkaloid_powder",
 				"Alkaloid Powder",
 				"植物碱粉末"
-		);
-		addItemLanguage(
-				"sculk_steel",
-				"Sculk Steel",
-				"幽钢"
 		);
 	}
 }

@@ -23,7 +23,7 @@ public class AssemblingRecipeGen extends DTRecipeProvider {
 				.itemInput(Items.ECHO_SHARD, 1)
 				.itemInput(MaterialItems.DENSE_SCULK_CHUNK, 4)
 				.itemInput(Items.REDSTONE, 4)
-				.itemInput(MaterialItems.SCULK_ALLOY_PLATE, 1)
+				.itemInput(DTMaterials.SCULK_ALLOY.getPlate(), 1)
 				.itemInput(MaterialItems.SCULK_BONE, 1)
 				.fluidInput(DTFluids.SCULK_CULTURE.getSource(), 10)
 				.catalyst(MaterialItems.SCULK_CIRCUIT)
