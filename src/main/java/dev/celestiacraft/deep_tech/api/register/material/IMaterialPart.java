@@ -1,10 +1,10 @@
 package dev.celestiacraft.deep_tech.api.register.material;
 
 public interface IMaterialPart {
-	IMaterialPart INGOT = addPart("ingot", "ingots");
-	IMaterialPart NUGGET = addPart("nugget", "nuggets");
-	IMaterialPart PLATE = addPart("plate", "plates");
-	IMaterialPart DUST = addPart("dust", "dusts");
+	IMaterialPart INGOT = addPart("ingot");
+	IMaterialPart NUGGET = addPart("nugget");
+	IMaterialPart PLATE = addPart("plate");
+	IMaterialPart DUST = addPart("dust");
 	IMaterialPart RAW_MATERIAL = addPart("raw", "raw_materials");
 
 	String getPath();
@@ -21,5 +21,9 @@ public interface IMaterialPart {
 
 	static IMaterialPart addPart(String name, String folder) {
 		return new SimpleMaterialPart(name, folder);
+	}
+
+	static IMaterialPart addPart(String name) {
+		return addPart(name, name + "s");
 	}
 }
