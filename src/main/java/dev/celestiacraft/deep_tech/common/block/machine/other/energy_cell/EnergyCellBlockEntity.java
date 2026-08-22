@@ -1,6 +1,6 @@
 package dev.celestiacraft.deep_tech.common.block.machine.other.energy_cell;
 
-import dev.celestiacraft.deep_tech.config.common.machine.EnergyCellConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.other.EnergyCellConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;

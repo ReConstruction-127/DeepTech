@@ -1,7 +1,16 @@
 package dev.celestiacraft.deep_tech.config;
 
-import dev.celestiacraft.deep_tech.config.common.machine.*;
-import dev.celestiacraft.deep_tech.datagen.language.LanguageGenerate;
+import dev.celestiacraft.deep_tech.api.client.lang.ConfigLang;
+import dev.celestiacraft.deep_tech.config.common.OtherConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.AssemblerConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.ProcessorConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.SculkCollectorConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.SculkNurseryConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.basic.AlloyFurnaceConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.basic.CrusherConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.basic.EXPGeneratorConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.basic.SculkFurnaceConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.other.EnergyCellConfig;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class CommonConfig {
@@ -18,8 +27,10 @@ public class CommonConfig {
 	public static final ProcessorConfig PROCESSOR;
 	public static final AssemblerConfig ASSEMBLER;
 
+	public static final OtherConfig OTHER;
+
 	static {
-		BUILDER.comment(LanguageGenerate.configEnglish("general.comment"))
+		BUILDER.comment(ConfigLang.addConfigKey("general.comment"))
 				.push("general");
 
 		CRUSHER = new CrusherConfig(BUILDER);
@@ -31,6 +42,8 @@ public class CommonConfig {
 		SCULK_NURSERY = new SculkNurseryConfig(BUILDER);
 		PROCESSOR = new ProcessorConfig(BUILDER);
 		ASSEMBLER = new AssemblerConfig(BUILDER);
+
+		OTHER = new OtherConfig(BUILDER);
 
 		SPEC = BUILDER.build();
 		BUILDER.pop();

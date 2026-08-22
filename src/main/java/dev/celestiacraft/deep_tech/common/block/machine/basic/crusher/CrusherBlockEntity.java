@@ -14,7 +14,7 @@ import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.CrusherConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.basic.CrusherConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

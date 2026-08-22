@@ -18,7 +18,7 @@ import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.cultivation.CultivationRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.SculkNurseryConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.SculkNurseryConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;

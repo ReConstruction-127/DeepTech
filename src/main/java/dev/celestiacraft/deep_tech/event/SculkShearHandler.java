@@ -8,13 +8,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Random;
 
 @Mod.EventBusSubscriber(modid = DeepTech.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -27,25 +31,19 @@ public class SculkShearHandler {
 		Player player = event.getPlayer();
 		Level level = (Level) event.getLevel();
 		BlockPos pos = event.getPos();
+		ItemStack stack = player.getMainHandItem();
 
-		boolean isSculk = state.is(Blocks.SCULK)
-				|| state.is(Blocks.SCULK_CATALYST)
-				|| state.is(Blocks.SCULK_SHRIEKER)
-				|| state.is(Blocks.SCULK_SENSOR)
-				|| state.is(Blocks.SCULK_VEIN);
-		if (!isSculk) {
+		if (!isSculkBlock(state)) {
 			return;
 		}
 
-		// 2. 必须手持剪刀
-		ItemStack mainHand = player.getMainHandItem();
-		if (!mainHand.is(Items.SHEARS)) {
+		if (!stack.is(Tags.Items.SHEARS)) {
 			return;
 		}
 
 		event.setCanceled(true);
 
-		level.removeBlock(pos, false);
+		level.destroyBlock(pos, false);
 
 		if (state.is(Blocks.SCULK)) {
 			// 幽匿块 → 1-4 个幽匿碎块
@@ -66,12 +64,39 @@ public class SculkShearHandler {
 			spawnItem(level, pos, new ItemStack(Blocks.SCULK_VEIN));
 		}
 
-		// 6. 消耗剪刀耐久(1点)
-		mainHand.hurtAndBreak(1, player, (entity) -> {
+		stack.hurtAndBreak(1, player, (entity) -> {
 			entity.broadcastBreakEvent(player.getUsedItemHand());
 		});
 
 		DeepTech.LOGGER.debug("Sheared {} at {}, dropped items", state.getBlock(), pos);
+	}
+
+	@SubscribeEvent
+	public static void onBlockMining(PlayerEvent.BreakSpeed event) {
+		BlockState state = event.getState();
+		Player player = event.getEntity();
+		ItemStack stack = player.getMainHandItem();
+
+		if (!isSculkBlock(state)) {
+			return;
+		}
+
+		// 挖掘速度提升10倍
+		if (isSculkBlock(state) && (stack.is(Tags.Items.SHEARS))) {
+			event.setNewSpeed(event.getOriginalSpeed() * 10.0F);
+		}
+	}
+
+	private static boolean isSculkBlock(BlockState state) {
+		List<Block> sculks = List.of(
+				Blocks.SCULK,
+				Blocks.SCULK_CATALYST,
+				Blocks.SCULK_SHRIEKER,
+				Blocks.SCULK_SENSOR,
+				Blocks.SCULK_VEIN
+		);
+
+		return sculks.stream().anyMatch(state::is);
 	}
 
 	private static void spawnItem(Level level, BlockPos pos, ItemStack stack) {

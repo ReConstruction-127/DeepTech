@@ -12,7 +12,7 @@ import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.VerticalProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.SculkFurnaceConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.basic.SculkFurnaceConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

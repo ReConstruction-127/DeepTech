@@ -14,7 +14,7 @@ import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.common.block.machine.other.energy_cell.capability.InputOnlyEnergyStorage;
 import dev.celestiacraft.deep_tech.common.block.machine.other.energy_cell.capability.OutputOnlyEnergyStorage;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.EnergyCellConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.other.EnergyCellConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;

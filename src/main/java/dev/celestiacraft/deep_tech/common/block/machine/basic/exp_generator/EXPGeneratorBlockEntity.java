@@ -14,7 +14,7 @@ import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.ProportionalTankWidget;
 import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.EXPGeneratorConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.basic.EXPGeneratorConfig;
 import dev.celestiacraft.deep_tech.tags.DeepTechFluidTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

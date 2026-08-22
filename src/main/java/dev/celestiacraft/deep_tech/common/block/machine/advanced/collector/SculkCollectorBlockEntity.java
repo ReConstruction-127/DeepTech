@@ -16,7 +16,7 @@ import dev.celestiacraft.deep_tech.common.inventory.SimpleMachineInventory;
 import dev.celestiacraft.deep_tech.common.recipe.harvest.HarvestRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.SculkCollectorConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.SculkCollectorConfig;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

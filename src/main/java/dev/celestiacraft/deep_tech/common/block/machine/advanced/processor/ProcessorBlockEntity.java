@@ -14,7 +14,7 @@ import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.recipe.processor.ProcessorRecipe;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.ProcessorConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.ProcessorConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

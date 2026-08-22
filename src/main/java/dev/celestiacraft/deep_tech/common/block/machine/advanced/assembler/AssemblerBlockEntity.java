@@ -19,7 +19,7 @@ import dev.celestiacraft.deep_tech.common.recipe.assembling.AssemblingRecipe;
 import dev.celestiacraft.deep_tech.common.recipe.cultivation.CultivationFluidInput;
 import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.AssemblerConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.AssemblerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
