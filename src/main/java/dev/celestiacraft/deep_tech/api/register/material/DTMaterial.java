@@ -6,12 +6,14 @@ import dev.celestiacraft.deep_tech.api.client.model.ItemModelGen;
 import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 import dev.celestiacraft.libs.api.register.item.BasicItem;
 import dev.celestiacraft.libs.tags.TagsBuilder;
+import lombok.Getter;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+@Getter
 public class DTMaterial {
 	private final String id;
 
