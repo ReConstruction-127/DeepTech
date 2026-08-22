@@ -21,16 +21,16 @@ public interface InteractionSchema {
 			.add(BlockComponent.BLOCK.key("to_block"))
 			.add(ItemComponents.OUTPUT_ARRAY.key("drops").optional(new OutputItem[0]));
 
-	RecipeKey<InputItem> TRIGGER = ItemComponents.INPUT.key("trigger")
-			.defaultOptional();
-	RecipeKey<Block> TARGET = BlockComponent.BLOCK.key("target")
-			.defaultOptional();
+	RecipeKey<InputItem> TRIGGER = ItemComponents.INPUT.key("trigger_item")
+			.defaultOptional()
+			.preferred("trigger");
+	RecipeKey<Block> TARGET = BlockComponent.BLOCK.key("target_block")
+			.defaultOptional()
+			.preferred("target");
 	RecipeKey<OutputItem[]> RESULTS = ItemComponents.OUTPUT_ARRAY.key("results")
 			.defaultOptional();
 	RecipeKey<RecipeComponentBuilderMap> EXTRA_EFFECT = EXTRA_EFFECT_COMPONENT.key("extra_effect")
-			.defaultOptional()
-			.preferred("extraEffect")
-			.noBuilders();
+			.defaultOptional();
 	RecipeKey<Boolean> CONSUME_TRIGGER = BooleanComponent.BOOLEAN.key("consume_trigger")
 			.optional(false)
 			.preferred("consumeTrigger");

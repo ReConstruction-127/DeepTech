@@ -17,7 +17,7 @@ public interface HarvestSchema {
 
 	RecipeKey<RecipeComponentBuilderMap> INPUT = INPUT_COMPONENT.key("input")
 			.defaultOptional()
-			.noBuilders();
+			.preferred("harvestInput");
 	RecipeKey<OutputItem[]> RESULTS = ItemComponents.OUTPUT_ARRAY.key("results")
 			.defaultOptional();
 

@@ -23,52 +23,52 @@ public class MaterialItems {
 
 		SCULK_ALLOY = DeepTech.REGISTRATE.item("sculk_alloy", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_alloy"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		SCULK_CHUNK = DeepTech.REGISTRATE.item("sculk_chunk", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_chunk"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		SCULK_BONE = DeepTech.REGISTRATE.item("sculk_bone", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_bone"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		SCULK_BONEMEAL = DeepTech.REGISTRATE.item("sculk_bonemeal", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_bonemeal"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		SCULK_CIRCUIT = DeepTech.REGISTRATE.item("sculk_circuit", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_circuit"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		DENSE_SCULK_CHUNK = DeepTech.REGISTRATE.item("dense_sculk_chunk", BasicItem::new)
 				.model(ItemModelGen.generated("item/dense_sculk_chunk"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		SCULK_ALLOY_PLATE = DeepTech.REGISTRATE.item("sculk_alloy_plate", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_alloy_plate"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		ADVANCED_SCULK_CONTROL_CIRCUIT = DeepTech.REGISTRATE.item("advanced_sculk_control_circuit", BasicItem::new)
 				.model(ItemModelGen.generated("item/advanced_sculk_control_circuit"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		ALKALOID_POWDER = DeepTech.REGISTRATE.item("alkaloid_powder", BasicItem::new)
 				.model(ItemModelGen.generated("item/alkaloid_powder"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 
 		SCULK_STEEL = DeepTech.REGISTRATE.item("sculk_steel", BasicItem::new)
 				.model(ItemModelGen.generated("item/sculk_steel"))
-				.tab(DTCreativeTabs.getTabKey("material"))
+				.tab(DTCreativeTabs.MATERIAL.getKey())
 				.register();
 	}
 

@@ -21,7 +21,7 @@ public class FrameBlocks {
 				.transform(FrameBlock.miniProperties(level))
 				.blockstate(FrameBlock.genBlockState(name))
 				.item()
-				.tab(DTCreativeTabs.getTabKey("machine"))
+				.tab(DTCreativeTabs.MACHINE.getKey())
 				.model(FrameBlock.item(name))
 				.build()
 				.register();
