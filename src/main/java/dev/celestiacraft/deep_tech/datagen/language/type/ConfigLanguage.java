@@ -2,13 +2,8 @@ package dev.celestiacraft.deep_tech.datagen.language.type;
 
 import dev.celestiacraft.deep_tech.datagen.language.LanguageGenerate;
 
-/**
- * 配置注释文本(运行时使用,不写入语言文件)。
- * Forge 配置注释无法 i18n,无论游戏语言如何,TOML 注释始终为英文。
- */
 public class ConfigLanguage extends LanguageGenerate {
 	public static void addLang() {
-		// 通用
 		addConfigLang(
 				"module.general",
 				"General",
@@ -17,10 +12,22 @@ public class ConfigLanguage extends LanguageGenerate {
 		addConfigLang(
 				"general.comment",
 				"All settings below will only take effect after restarting the server or client.",
-				"以下所有设置将在重启服务器或客户端后生效。"
+				"以下所有设置将在重启服务器或客户端后生效"
 		);
 
-		// 粉碎机
+		addCrusher();
+		addSculkFurnace();
+		addExpGenerator();
+		addAlloyFurnace();
+		addEnergyCell();
+		addSculkCollector();
+		addSculkNursery();
+		addProcessor();
+		addAssembler();
+		addOther();
+	}
+
+	private static void addCrusher() {
 		addConfigLang(
 				"module.crusher",
 				"Crusher",
@@ -36,8 +43,9 @@ public class ConfigLanguage extends LanguageGenerate {
 				"Crusher's max energy receive",
 				"粉碎机最大能量接收速率 (FE/t)"
 		);
+	}
 
-		// 幽匿电炉
+	private static void addSculkFurnace() {
 		addConfigLang(
 				"module.sculk_furnace",
 				"Sculk Furnace",
@@ -53,8 +61,9 @@ public class ConfigLanguage extends LanguageGenerate {
 				"Sculk Furnace's max energy receive",
 				"幽匿电炉最大能量接收速率 (FE/t)"
 		);
+	}
 
-		// 经验发电机
+	private static void addExpGenerator() {
 		addConfigLang(
 				"module.exp_generator",
 				"Exp Generator",
@@ -95,8 +104,9 @@ public class ConfigLanguage extends LanguageGenerate {
 				"FE produced per mB of liquid XP",
 				"每 mB 液态经验产生的 FE"
 		);
+	}
 
-		// 合金炉
+	private static void addAlloyFurnace() {
 		addConfigLang(
 				"module.alloy_furnace",
 				"Alloy Furnace",
@@ -112,8 +122,9 @@ public class ConfigLanguage extends LanguageGenerate {
 				"Alloy Furnace's max energy receive",
 				"合金炉最大能量接收速率 (FE/t)"
 		);
+	}
 
-		// 能量单元
+	private static void addEnergyCell() {
 		addConfigLang(
 				"module.energy_cell",
 				"Energy Cell",
@@ -139,8 +150,9 @@ public class ConfigLanguage extends LanguageGenerate {
 				"Max item charging rate per tick (FE/t)",
 				"每 tick 最大向物品充电量 (FE/t)"
 		);
+	}
 
-		// 幽匿采集器
+	private static void addSculkCollector() {
 		addConfigLang(
 				"module.sculk_collector",
 				"Sculk Collector",
@@ -166,8 +178,9 @@ public class ConfigLanguage extends LanguageGenerate {
 				"Sculk Collector's harvest speed, blocks per tick",
 				"幽匿采集器收获速度 (方块/tick)"
 		);
+	}
 
-		// 幽匿培育室
+	private static void addSculkNursery() {
 		addConfigLang(
 				"module.sculk_nursery",
 				"Sculk Nursery",
@@ -188,8 +201,9 @@ public class ConfigLanguage extends LanguageGenerate {
 				"Sculk Nursery's per-tank fluid capacity (mB)",
 				"幽匿培育室每个储罐容量 (mB)"
 		);
+	}
 
-		// 加工机
+	private static void addProcessor() {
 		addConfigLang(
 				"module.processor",
 				"Processor",
@@ -205,8 +219,9 @@ public class ConfigLanguage extends LanguageGenerate {
 				"Processor's max energy receive",
 				"加工机最大能量接收速率 (FE/t)"
 		);
+	}
 
-		// 组装机
+	private static void addAssembler() {
 		addConfigLang(
 				"module.assembler",
 				"Assembler",
@@ -226,6 +241,18 @@ public class ConfigLanguage extends LanguageGenerate {
 				"assembler.fluid_capacity",
 				"Assembler's fluid tank capacity (mB)",
 				"组装机液体储罐容量 (mB)"
+		);
+	}
+	private static void addOther() {
+		addConfigLang(
+				"module.other",
+				"Other",
+				"其他"
+		);
+		addConfigLang(
+				"other.enable_sculk_shearing",
+				"Enable sculk shearing with shears",
+				"启用剪刀剪切幽匿方块"
 		);
 	}
 }

@@ -15,17 +15,17 @@ public class SculkNurseryConfig extends ConfigModule {
 
 	@Override
 	protected void addConfigs() {
-		MAX_ENERGY = builder.translation(ConfigLang.addConfigKey("sculk_nursery.max_energy_stored"))
+		MAX_ENERGY = builder.translation(ConfigLang.addConfigTranslationKey("sculk_nursery.max_energy_stored"))
 				.comment("type: int")
 				.comment("default: 50000")
 				.defineInRange("sculk_nursery_max_energy_stored", 50000, 1, Integer.MAX_VALUE);
 
-		MAX_RECEIVE = builder.translation(ConfigLang.addConfigKey("sculk_nursery.max_energy_receive"))
+		MAX_RECEIVE = builder.translation(ConfigLang.addConfigTranslationKey("sculk_nursery.max_energy_receive"))
 				.comment("type: int")
 				.comment("default: 1000")
 				.defineInRange("sculk_nursery_max_energy_receive", 1000, 1, Integer.MAX_VALUE);
 
-		FLUID_CAPACITY = builder.translation(ConfigLang.addConfigKey("sculk_nursery.fluid_capacity"))
+		FLUID_CAPACITY = builder.translation(ConfigLang.addConfigTranslationKey("sculk_nursery.fluid_capacity"))
 				.comment("type: int")
 				.comment("default: 8000")
 				.defineInRange("sculk_nursery_fluid_capacity", 8000, 100, Integer.MAX_VALUE);

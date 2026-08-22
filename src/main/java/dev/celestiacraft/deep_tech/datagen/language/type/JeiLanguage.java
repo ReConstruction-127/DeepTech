@@ -4,6 +4,8 @@ import dev.celestiacraft.deep_tech.datagen.language.LanguageGenerate;
 
 public class JeiLanguage extends LanguageGenerate {
 	public static void addLang() {
+		addCategory();
+
 		addCustomLang(
 				"jei.deep_tech.energy_cost",
 				"⚡ %s FE / tick",
@@ -23,6 +25,14 @@ public class JeiLanguage extends LanguageGenerate {
 				"jei.deep_tech.catalyst_no_consume",
 				"(does not consume)",
 				"(不消耗)"
+		);
+	}
+
+	private static void addCategory() {
+		addJeiCategoryLang(
+				"interaction_crafting",
+				"Interaction Crafting",
+				"交互合成"
 		);
 	}
 }

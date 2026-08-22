@@ -10,10 +10,8 @@ import java.util.Map;
 
 public class LanguageGenerate {
 	public static final List<List<String>> TRANSLATION_LIST = new ArrayList<>();
-
-	/** 配置注释文本:key -> {英文, 中文},运行时供 ForgeConfigSpec 注释使用 */
-	private static final Map<String, String[]> CONFIG_LANG = new LinkedHashMap<>();
-	private static boolean configLangRegistered = false;
+	public static final Map<String, String[]> CONFIG_LANG = new LinkedHashMap<>();
+	public static boolean configLangRegistered = false;
 
 	public static void register() {
 		ItemLanguage.addLang();
@@ -23,6 +21,7 @@ public class LanguageGenerate {
 		OtherLanguage.addLang();
 		MaterialLanguage.addLang();
 		JeiLanguage.addLang();
+		registerConfigLang();
 	}
 
 	public static void registerConfigLang() {
@@ -35,6 +34,7 @@ public class LanguageGenerate {
 
 	protected static void addConfigLang(String key, String english, String chinese) {
 		CONFIG_LANG.put(key, new String[]{english, chinese});
+		addCustomLang(String.format("config.%s.%s", DeepTech.MODID, key), english, chinese);
 	}
 
 	protected static void addLanguage(String type, String key, String english, String chinese) {

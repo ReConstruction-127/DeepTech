@@ -16,22 +16,22 @@ public class EnergyCellConfig extends ConfigModule {
 
 	@Override
 	protected void addConfigs() {
-		MAX_ENERGY = builder.translation(ConfigLang.addConfigKey("energy_cell.max_energy_stored"))
+		MAX_ENERGY = builder.translation(ConfigLang.addConfigTranslationKey("energy_cell.max_energy_stored"))
 				.comment("type: int")
 				.comment("default: 1000000")
 				.defineInRange("energy_cell_max_energy_stored", 1000000, 1, Integer.MAX_VALUE);
 
-		MAX_RECEIVE = builder.translation(ConfigLang.addConfigKey("energy_cell.max_energy_receive"))
+		MAX_RECEIVE = builder.translation(ConfigLang.addConfigTranslationKey("energy_cell.max_energy_receive"))
 				.comment("type: int")
 				.comment("default: 2147483647")
 				.defineInRange("energy_cell_max_energy_receive", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
 
-		MAX_EXTRACT = builder.translation(ConfigLang.addConfigKey("energy_cell.max_extract"))
+		MAX_EXTRACT = builder.translation(ConfigLang.addConfigTranslationKey("energy_cell.max_extract"))
 				.comment("type: int")
 				.comment("default: 2147483647")
 				.defineInRange("energy_cell_max_extract", Integer.MAX_VALUE, 10, Integer.MAX_VALUE);
 
-		MAX_CHARGE = builder.translation(ConfigLang.addConfigKey("energy_cell.max_charge"))
+		MAX_CHARGE = builder.translation(ConfigLang.addConfigTranslationKey("energy_cell.max_charge"))
 				.comment("default: 2147483647")
 				.defineInRange("energy_cell_max_charge", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
 	}

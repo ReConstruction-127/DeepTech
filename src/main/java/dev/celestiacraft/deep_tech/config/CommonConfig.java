@@ -30,19 +30,30 @@ public class CommonConfig {
 	public static final OtherConfig OTHER;
 
 	static {
-		BUILDER.comment(ConfigLang.addConfigKey("general.comment"))
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.general"))
+				.comment(ConfigLang.addConfigKey("general.comment"))
 				.push("general");
 
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.crusher"));
 		CRUSHER = new CrusherConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.sculk_furnace"));
 		SCULK_FURNACE = new SculkFurnaceConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.exp_generator"));
 		EXP_GENERATOR = new EXPGeneratorConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.energy_cell"));
 		ENERGY_CELL = new EnergyCellConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.alloy_furnace"));
 		ALLOY_FURNACE = new AlloyFurnaceConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.sculk_collector"));
 		SCULK_COLLECTOR = new SculkCollectorConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.sculk_nursery"));
 		SCULK_NURSERY = new SculkNurseryConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.processor"));
 		PROCESSOR = new ProcessorConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.assembler"));
 		ASSEMBLER = new AssemblerConfig(BUILDER);
 
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.other"));
 		OTHER = new OtherConfig(BUILDER);
 
 		SPEC = BUILDER.build();

@@ -14,12 +14,12 @@ public class SculkFurnaceConfig extends ConfigModule {
 
 	@Override
 	protected void addConfigs() {
-		MAX_ENERGY = builder.translation(ConfigLang.addConfigKey("sculk_furnace.max_energy_stored"))
+		MAX_ENERGY = builder.translation(ConfigLang.addConfigTranslationKey("sculk_furnace.max_energy_stored"))
 				.comment("type: int")
 				.comment("default: 10000")
 				.defineInRange("sculk_furnace_max_energy_stored", 10000, 1, Integer.MAX_VALUE);
 
-		MAX_RECEIVE = builder.translation(ConfigLang.addConfigKey("sculk_furnace.max_energy_receive"))
+		MAX_RECEIVE = builder.translation(ConfigLang.addConfigTranslationKey("sculk_furnace.max_energy_receive"))
 				.comment("type: int")
 				.comment("default: 100")
 				.defineInRange("sculk_furnace_max_energy_receive", 1000, 1, Integer.MAX_VALUE);

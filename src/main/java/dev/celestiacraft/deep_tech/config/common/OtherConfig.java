@@ -13,13 +13,13 @@ public class OtherConfig extends ConfigModule {
 
 	@Override
 	protected void addConfigs() {
-		ENABLE_SCULK_SHEARING = builder.translation(otherConfig("other.enable_sculk_shearing"))
+		ENABLE_SCULK_SHEARING = builder.translation(otherConfig("enable_sculk_shearing"))
 				.comment("type: boolean")
 				.comment("default: true")
 				.define("enable_sculk_shearing", true);
 	}
 
 	private String otherConfig(String key) {
-		return ConfigLang.addConfigKey("other." + key);
+		return ConfigLang.addConfigTranslationKey("other." + key);
 	}
 }

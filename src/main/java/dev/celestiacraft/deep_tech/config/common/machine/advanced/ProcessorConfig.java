@@ -14,12 +14,12 @@ public class ProcessorConfig extends ConfigModule {
 
 	@Override
 	protected void addConfigs() {
-		MAX_ENERGY = builder.translation(ConfigLang.addConfigKey("processor.max_energy_stored"))
+		MAX_ENERGY = builder.translation(ConfigLang.addConfigTranslationKey("processor.max_energy_stored"))
 				.comment("type: int")
 				.comment("default: 50000")
 				.defineInRange("processor_max_energy_stored", 50000, 1, Integer.MAX_VALUE);
 
-		MAX_RECEIVE = builder.translation(ConfigLang.addConfigKey("processor.max_energy_receive"))
+		MAX_RECEIVE = builder.translation(ConfigLang.addConfigTranslationKey("processor.max_energy_receive"))
 				.comment("type: int")
 				.comment("default: 1000")
 				.defineInRange("processor_max_energy_receive", 1000, 1, Integer.MAX_VALUE);
