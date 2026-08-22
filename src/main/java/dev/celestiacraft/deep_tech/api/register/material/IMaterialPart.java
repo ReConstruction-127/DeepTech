@@ -7,7 +7,7 @@ public interface IMaterialPart {
 	IMaterialPart DUST = addPart("dust");
 	IMaterialPart RAW_MATERIAL = addPart("raw", "raw_materials");
 
-	String getPath();
+	String getName();
 
 	String getTagFolder();
 
@@ -16,7 +16,7 @@ public interface IMaterialPart {
 	}
 
 	default String getModelPath(String material) {
-		return String.format("item/material/%s/%s", getPath(), material);
+		return String.format("item/material/%s/%s", getName(), material);
 	}
 
 	static IMaterialPart addPart(String name, String folder) {

@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SimpleMaterialPart implements IMaterialPart {
-	private final String path;
+	private final String name;
 	private final String tagFolder;
 }

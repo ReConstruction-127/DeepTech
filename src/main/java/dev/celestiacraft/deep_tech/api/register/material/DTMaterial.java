@@ -54,7 +54,7 @@ public class DTMaterial {
 	}
 
 	private ItemEntry<BasicItem> registerPart(IMaterialPart part) {
-		String registryName = String.format("%s_%s", id, part.getPath());
+		String registryName = String.format("%s_%s", id, part.getName());
 
 		return DeepTech.REGISTRATE.item(registryName, BasicItem::new)
 				.model(ItemModelGen.generated(part.getModelPath(id)))
