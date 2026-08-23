@@ -4,7 +4,6 @@ import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.other.resonance_node.capability.ResonanceNodeEnergyStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -15,21 +14,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ResonanceNodeBlockEntity extends MachineBlockEntity<ResonanceNodeBlockEntity> {
+
+	/** 节点范围半径(格), 与 {@link ResonanceNodeEnergyStorage} 范围一致 */
+	public static final int LINK_RANGE = 16;
+
 	private LazyOptional<IEnergyStorage> nodeEnergyCap;
-	private final ResonanceNodeClientHelper clientHelper;
 
 	public ResonanceNodeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 		nodeEnergyCap = LazyOptional.of(() -> new ResonanceNodeEnergyStorage(this));
-		clientHelper = new ResonanceNodeClientHelper(this);
-	}
-
-	@Override
-	public void clientTick(Level level, BlockPos pos, BlockState state, ResonanceNodeBlockEntity entity) {
-		if (!isLevelNotNull() || !level.isClientSide()) {
-			return;
-		}
-		clientHelper.tick(level);
 	}
 
 	@Override

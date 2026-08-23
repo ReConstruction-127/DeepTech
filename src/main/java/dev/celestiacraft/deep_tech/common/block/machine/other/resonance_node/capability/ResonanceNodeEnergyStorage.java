@@ -18,7 +18,7 @@ import java.util.List;
 
 public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 	private final ResonanceNodeBlockEntity entity;
-	private static final int RANGE = 16;
+	private static final int RANGE = ResonanceNodeBlockEntity.LINK_RANGE;
 	private List<BlockPos> cachedNodes = new ArrayList<>();
 	private int scanCooldown = 0;
 

@@ -17,12 +17,10 @@ import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.r
 import dev.celestiacraft.deep_tech.common.register.block.BasicBlocks;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.center.capability.SNCenterEnergyStorage;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
 import dev.celestiacraft.libs.api.register.block.BasicBlockEntity;
 import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -51,15 +49,9 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
 public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.BlockEntityUI, ITickableBlockEntity<SNCenterBlockEntity> {
 	private int energyStored = 0;
@@ -68,7 +60,6 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 	private boolean isMaster = false;
 	private int scanCooldown = 0;
 	private static final int SCAN_INTERVAL = 20;
-	private Set<BlockPos> currentScanResult = new HashSet<>();
 	private final List<BlockPos> foundReservoirs = new ArrayList<>();
 	private final List<BlockPos> foundItemInputPorts = new ArrayList<>();
 	private final List<BlockPos> foundItemOutputPorts = new ArrayList<>();  // 新增
@@ -100,10 +91,6 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 			performScan((ServerLevel) level, pos);
 		}
 
-		if (!isRemoved()) {
-			spawnNetworkParticles((ServerLevel) level);
-		}
-
 		tickCounter++;
 		if (tickCounter % TRANSFER_INTERVAL == 0) {
 			transferItemsFromInputPorts((ServerLevel) level);
@@ -122,8 +109,6 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		energyStored -= SCAN_COST;
 		markDirty();
 
-		// 保存旧结果
-		currentScanResult = new HashSet<>();
 		foundReservoirs.clear();
 		foundItemInputPorts.clear();
 		foundItemOutputPorts.clear();
@@ -133,93 +118,44 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 		foundCableBlocks.clear();
 		foundCableVeins.clear();
 
-		// BFS 队列
-		Queue<BlockPos> queue = new ArrayDeque<>();
-		Map<BlockPos, Integer> distanceMap = new HashMap<>();
-
-		queue.add(center);
-		distanceMap.put(center, 0);
-		currentScanResult.add(center);
-
-		// 记录扫描到的中枢(包括自身)
+		// 记录扫描到的中枢(包括自身), 用于后续冲突检测
 		List<BlockPos> centersFound = new ArrayList<>();
 
-		while (!queue.isEmpty()) {
-			BlockPos current = queue.poll();
-			int distance = distanceMap.get(current);
-
-			// 检查当前方块是否为中枢(用于后续冲突检测)
-			if (level.getBlockState(current).getBlock().equals(MachineBlocks.SN_CENTER.get())) {
+		SNHelper.collectNetwork(level, center, (current, blockAt) -> {
+			if (blockAt == MachineBlocks.SN_CENTER.get()) {
 				// 只记录有效的中枢(即未被破坏的)
-				BlockEntity be = level.getBlockEntity(current);
-				if (be instanceof SNCenterBlockEntity) {
-					centersFound.add(current);
+				if (level.getBlockEntity(current) instanceof SNCenterBlockEntity) {
+					centersFound.add(current.immutable());
 				}
+			} else if (blockAt == MachineBlocks.SN_ITEM_RESERVOIR.get()) {
+				foundReservoirs.add(current.immutable());
+			} else if (blockAt == MachineBlocks.SN_ITEM_INPUT_PORT.get()) {
+				foundItemInputPorts.add(current.immutable());
+			} else if (blockAt == MachineBlocks.SN_ITEM_OUTPUT_PORT.get()) {
+				foundItemOutputPorts.add(current.immutable());
+			} else if (blockAt == MachineBlocks.SN_FLUID_RESERVOIR.get()) {
+				foundFluidReservoirs.add(current.immutable());
+			} else if (blockAt == MachineBlocks.SN_FLUID_INPUT_PORT.get()) {
+				foundFluidInputPorts.add(current.immutable());
+			} else if (blockAt == MachineBlocks.SN_FLUID_OUTPUT_PORT.get()) {
+				foundFluidOutputPorts.add(current.immutable());
+			} else if (blockAt == BasicBlocks.SCULK_NETWORK_BLOCK.get()) {
+				foundCableBlocks.add(current.immutable());
+			} else if (blockAt == BasicBlocks.SCULK_NETWORK_VEIN.get()) {
+				foundCableVeins.add(current.immutable());
 			}
-
-			// 收集网络组件(物品贮存器 / 物品输入端口)
-			Block blockAt = level.getBlockState(current).getBlock();
-			if (blockAt == MachineBlocks.SN_ITEM_RESERVOIR.get()) {
-				foundReservoirs.add(current);
-			}
-			if (blockAt == MachineBlocks.SN_ITEM_INPUT_PORT.get()) {
-				foundItemInputPorts.add(current);
-			}
-			if (blockAt == MachineBlocks.SN_ITEM_OUTPUT_PORT.get()) {   // 新增
-				foundItemOutputPorts.add(current);
-			}
-			if (blockAt == MachineBlocks.SN_FLUID_RESERVOIR.get()) {
-				foundFluidReservoirs.add(current);
-			}
-			if (blockAt == MachineBlocks.SN_FLUID_INPUT_PORT.get()) {
-				foundFluidInputPorts.add(current);
-			}
-			if (blockAt == MachineBlocks.SN_FLUID_OUTPUT_PORT.get()) {
-				foundFluidOutputPorts.add(current);
-			}
-			if (blockAt == BasicBlocks.SCULK_NETWORK_BLOCK.get()) {
-				foundCableBlocks.add(current);
-			}
-			if (blockAt == BasicBlocks.SCULK_NETWORK_VEIN.get()) {
-				foundCableVeins.add(current);
-			}
-
-			if (distance >= 16) {
-				continue;
-			}
-
-			for (Direction direction : Direction.values()) {
-				BlockPos neighbor = current.relative(direction);
-				if (distanceMap.containsKey(neighbor)) {
-					continue;
-				}
-				if (isNetworkComponent(level, neighbor)) {
-					distanceMap.put(neighbor, distance + 1);
-					queue.add(neighbor);
-					currentScanResult.add(neighbor);
-				}
-			}
-		}
+		});
 
 		// 组件按到中枢的距离由近到远排序
-		foundReservoirs.sort(Comparator.comparingDouble((pos) -> {
+		Comparator<BlockPos> byDistance = Comparator.comparingDouble((pos) -> {
 			return pos.distSqr(center);
-		}));
-		foundItemInputPorts.sort(Comparator.comparingDouble((pos) -> {
-			return pos.distSqr(center);
-		}));
-		foundItemOutputPorts.sort(Comparator.comparingDouble((pos) -> {
-			return pos.distSqr(center);
-		}));
-		foundFluidReservoirs.sort(Comparator.comparingDouble((pos) -> {
-			return pos.distSqr(center);
-		}));
-		foundFluidInputPorts.sort(Comparator.comparingDouble((pos) -> {
-			return pos.distSqr(center);
-		}));
-		foundFluidOutputPorts.sort(Comparator.comparingDouble((pos) -> {
-			return pos.distSqr(center);
-		}));
+		});
+		foundReservoirs.sort(byDistance);
+		foundItemInputPorts.sort(byDistance);
+		foundItemOutputPorts.sort(byDistance);
+		foundFluidReservoirs.sort(byDistance);
+		foundFluidInputPorts.sort(byDistance);
+		foundFluidOutputPorts.sort(byDistance);
 
 		List<BlockPos> masterCenters = new ArrayList<>();
 		for (BlockPos pos : centersFound) {
@@ -600,52 +536,6 @@ public class SNCenterBlockEntity extends BasicBlockEntity implements IUIHolder.B
 				}
 			}
 		}
-	}
-
-	private boolean isNetworkComponent(ServerLevel level, BlockPos pos) {
-		return SNHelper.isNetworkComponent(level, pos);
-	}
-
-	/**
-	 * 网络扫描粒子:仅附近玩家手持扳手时,在每个扫描到的方块上生成青色 dust 粒子
-	 */
-	private void spawnNetworkParticles(ServerLevel level) {
-		if (currentScanResult.isEmpty()) {
-			return;
-		}
-		if (!hasNearbyPlayerHoldingWrench(level)) {
-			return;
-		}
-
-		DustParticleOptions dust = new DustParticleOptions(new org.joml.Vector3f(0.0f, 0.9f, 1.0f), 1.0f);
-		for (BlockPos pos : currentScanResult) {
-			Vec3 center = Vec3.atCenterOf(pos);
-			level.sendParticles(
-					dust,
-					center.x,
-					center.y + 0.5,
-					center.z,
-					1,
-					0.1,
-					0.1,
-					0.1,
-					0.0
-			);
-		}
-	}
-
-	/** 32 格内是否有玩家手持扳手(主手或副手) */
-	private boolean hasNearbyPlayerHoldingWrench(ServerLevel level) {
-		for (Player player : level.players()) {
-			if (player.distanceToSqr(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()) > 32 * 32) {
-				continue;
-			}
-			if (player.getMainHandItem().getItem() == ToolItems.WRENCH.get()
-					|| player.getOffhandItem().getItem() == ToolItems.WRENCH.get()) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private IEnergyStorage getEnergyCapability() {
