@@ -3,6 +3,7 @@ package dev.celestiacraft.deep_tech.common.effect.infection;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.common.register.DTEffects;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -17,7 +18,8 @@ public class InfectionEvents {
 
 	@SubscribeEvent
 	public static void onDeath(LivingDeathEvent event) {
-		var entity = event.getEntity();
+		LivingEntity entity = event.getEntity();
+
 		if (entity.level().isClientSide || !entity.hasEffect(DTEffects.INFECTION.get())) {
 			return;
 		}
@@ -26,9 +28,9 @@ public class InfectionEvents {
 		// 死亡点向上找一个可放置位置(通常就是脚下)
 		BlockPos catalystPos = null;
 		for (int i = 0; i < 4; i++) {
-			BlockPos p = entity.blockPosition().above(i);
-			if (level.getBlockState(p).canBeReplaced()) {
-				catalystPos = p;
+			BlockPos pos = entity.blockPosition().above(i);
+			if (level.getBlockState(pos).canBeReplaced()) {
+				catalystPos = pos;
 				break;
 			}
 		}
