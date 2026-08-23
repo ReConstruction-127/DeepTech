@@ -25,6 +25,55 @@ public class ConfigLanguage extends LanguageGenerate {
 		addProcessor();
 		addAssembler();
 		addOther();
+		addRender();
+	}
+
+	private static void addRender() {
+		addConfigLang(
+				"module.render",
+				"Render",
+				"渲染"
+		);
+		addConfigLang(
+				"render.comment",
+				"Client only visual settings.",
+				"仅客户端生效的视觉设置"
+		);
+		addConfigLang(
+				"module.machine_link",
+				"Machine Link",
+				"机器连接"
+		);
+		addConfigLang(
+				"machine_link.enabled",
+				"Show machine link lasers while holding a wrench",
+				"手持扳手时显示机器连接激光"
+		);
+		addConfigLang(
+				"machine_link.scan_range",
+				"Machine scan range around the player (blocks)",
+				"以玩家为中心的机器扫描范围 (格)"
+		);
+		addConfigLang(
+				"machine_link.max_links",
+				"Max laser lines rendered at once",
+				"同时渲染的激光线条数量上限"
+		);
+		addConfigLang(
+				"machine_link.beam_width",
+				"Laser line width (blocks)",
+				"激光线条宽度 (格)"
+		);
+		addConfigLang(
+				"machine_link.opacity",
+				"Laser opacity",
+				"激光不透明度"
+		);
+		addConfigLang(
+				"machine_link.show_through_blocks",
+				"Show a faint laser outline through blocks",
+				"透过方块显示微弱的激光轮廓"
+		);
 	}
 
 	private static void addCrusher() {

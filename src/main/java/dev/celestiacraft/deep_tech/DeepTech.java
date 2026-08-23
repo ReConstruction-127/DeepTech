@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech;
 
 import dev.celestiacraft.deep_tech.common.register.*;
+import dev.celestiacraft.deep_tech.config.ClientConfig;
 import dev.celestiacraft.deep_tech.config.CommonConfig;
 import dev.celestiacraft.libs.register.NebulaRegistrate;
 import net.minecraft.resources.ResourceLocation;
@@ -50,5 +51,6 @@ public class DeepTech {
 
 	private static void registerConfig(FMLJavaModLoadingContext context) {
 		context.registerConfig(ModConfig.Type.COMMON, CommonConfig.SPEC, "nebula/deep_tech/common.toml");
+		context.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, "nebula/deep_tech/client.toml");
 	}
 }

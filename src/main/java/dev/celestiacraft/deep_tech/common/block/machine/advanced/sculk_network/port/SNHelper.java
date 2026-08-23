@@ -6,6 +6,7 @@ import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
@@ -14,8 +15,42 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 public class SNHelper {
+
+	public static final int NETWORK_RANGE = 16;
+	private static final Direction[] DIRECTIONS = Direction.values();
+
+	public static Set<BlockPos> collectNetwork(Level level, BlockPos start, @Nullable BiConsumer<BlockPos, Block> visitor) {
+		Set<BlockPos> visited = new HashSet<>();
+		Queue<BlockPos> queue = new ArrayDeque<>();
+		queue.add(start);
+		visited.add(start);
+
+		int distance = 0;
+		while (!queue.isEmpty()) {
+			int layerSize = queue.size();
+			for (int index = 0; index < layerSize; index++) {
+				BlockPos current = queue.poll();
+				if (visitor != null) {
+					visitor.accept(current, level.getBlockState(current).getBlock());
+				}
+				if (distance >= NETWORK_RANGE) {
+					continue;
+				}
+				for (Direction direction : DIRECTIONS) {
+					BlockPos neighbor = current.relative(direction);
+					if (!visited.contains(neighbor) && isNetworkComponent(level, neighbor)) {
+						visited.add(neighbor);
+						queue.add(neighbor);
+					}
+				}
+			}
+			distance++;
+		}
+		return visited;
+	}
 
 	/**
 	 * 从任意网络组件出发, 沿脉络/组件查找最近的中枢.
