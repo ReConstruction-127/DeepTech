@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.client.link;
+package dev.celestiacraft.deep_tech.client.link;
 
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.center.SNCenterBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.port.SNHelper;
@@ -27,7 +27,6 @@ import java.util.Queue;
 import java.util.Set;
 
 public class MachineLinkScanner {
-
 	private static final double BOUNDS_PADDING = 0.5D;
 	private static final int RESCAN_INTERVAL = 20;
 	private static final int FADE_TICKS = 4;

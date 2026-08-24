@@ -1,11 +1,10 @@
-package dev.celestiacraft.deep_tech.api.client.render;
+package dev.celestiacraft.deep_tech.common.register;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderType;
 
 public class DTRenderTypes extends RenderType {
-
 	private static final RenderType LASER_OCCLUDED = create(
 			"deep_tech_laser_occluded",
 			DefaultVertexFormat.POSITION_COLOR,

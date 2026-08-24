@@ -1,10 +1,10 @@
-package dev.celestiacraft.deep_tech.api.client.link;
+package dev.celestiacraft.deep_tech.client.link;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.celestiacraft.deep_tech.DeepTech;
-import dev.celestiacraft.deep_tech.api.client.render.DTRenderTypes;
-import dev.celestiacraft.deep_tech.api.client.render.LaserRenderer;
+import dev.celestiacraft.deep_tech.common.register.DTRenderTypes;
+import dev.celestiacraft.deep_tech.client.render.LaserRenderer;
 import dev.celestiacraft.deep_tech.config.client.MachineLinkConfig;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -24,7 +24,6 @@ import org.joml.Vector3f;
 
 @Mod.EventBusSubscriber(modid = DeepTech.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class MachineLinkOverlay {
-
 	private static final float GLOW_WIDTH_SCALE = 2.6F;
 	private static final float GLOW_ALPHA_SCALE = 0.28F;
 	private static final float OCCLUDED_ALPHA_SCALE = 0.18F;

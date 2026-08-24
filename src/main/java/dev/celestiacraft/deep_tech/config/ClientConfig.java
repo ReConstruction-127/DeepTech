@@ -5,7 +5,6 @@ import dev.celestiacraft.deep_tech.config.client.MachineLinkConfig;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ClientConfig {
-
 	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 	public static final ForgeConfigSpec SPEC;
 	public static final MachineLinkConfig MACHINE_LINK;
