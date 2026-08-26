@@ -131,16 +131,22 @@ public class LaserRenderer {
 			float endSin = Mth.sin(endAngle) * radius;
 
 			vertex(consumer, pose, atX, atY, atZ, center);
-			vertex(consumer, pose,
+			vertex(
+					consumer,
+					pose,
 					atX + right.x * startCos + up.x * startSin,
 					atY + right.y * startCos + up.y * startSin,
 					atZ + right.z * startCos + up.z * startSin,
-					edge);
-			vertex(consumer, pose,
+					edge
+			);
+			vertex(
+					consumer,
+					pose,
 					atX + right.x * endCos + up.x * endSin,
 					atY + right.y * endCos + up.y * endSin,
 					atZ + right.z * endCos + up.z * endSin,
-					edge);
+					edge
+			);
 			vertex(consumer, pose, atX, atY, atZ, center);
 		}
 	}
