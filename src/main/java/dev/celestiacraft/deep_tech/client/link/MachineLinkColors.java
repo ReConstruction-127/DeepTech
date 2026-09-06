@@ -27,6 +27,7 @@ public class MachineLinkColors {
 
 	private static Map<Block, Integer> buildComponentColors() {
 		Map<Block, Integer> colors = new IdentityHashMap<>();
+
 		colors.put(MachineBlocks.SN_ITEM_INPUT_PORT.get(), ITEM_INPUT_PORT);
 		colors.put(MachineBlocks.SN_ITEM_OUTPUT_PORT.get(), ITEM_OUTPUT_PORT);
 		colors.put(MachineBlocks.SN_FLUID_INPUT_PORT.get(), FLUID_INPUT_PORT);
@@ -34,6 +35,7 @@ public class MachineLinkColors {
 		colors.put(MachineBlocks.SN_ITEM_RESERVOIR.get(), ITEM_RESERVOIR);
 		colors.put(MachineBlocks.SN_FLUID_RESERVOIR.get(), FLUID_RESERVOIR);
 		colors.put(MachineBlocks.SN_ACCESSOR.get(), ACCESSOR);
+
 		return colors;
 	}
 }

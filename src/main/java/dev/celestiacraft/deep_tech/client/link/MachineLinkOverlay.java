@@ -149,7 +149,7 @@ public class MachineLinkOverlay {
 	}
 
 	private static float nodeBreath(long gameTime, float partialTick) {
-		float progress = ((float) (gameTime % NODE_PULSE_TICKS) + partialTick) / NODE_PULSE_TICKS;
+		float progress = ((gameTime % NODE_PULSE_TICKS) + partialTick) / NODE_PULSE_TICKS;
 		return 1.0F - NODE_PULSE_AMPLITUDE + NODE_PULSE_AMPLITUDE * Mth.cos(progress * Mth.TWO_PI);
 	}
 }
