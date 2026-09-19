@@ -8,6 +8,7 @@ import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
 import dev.celestiacraft.deep_tech.datagen.tags.DTBlockTagsProvider;
 import dev.celestiacraft.deep_tech.datagen.tags.DTFluidTagsProvider;
 import dev.celestiacraft.deep_tech.datagen.tags.DTItemTagsProvider;
+import dev.celestiacraft.libs.compat.ICheckModLoaded;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
@@ -22,6 +23,8 @@ import java.util.concurrent.CompletableFuture;
 public class DataGenerators {
 	@SubscribeEvent
 	public static void onDatagen(GatherDataEvent event) {
+		stopKubeJsBackgroundThread();
+
 		DataGenerator generator = event.getGenerator();
 		PackOutput output = generator.getPackOutput();
 		ExistingFileHelper helper = event.getExistingFileHelper();
@@ -44,5 +47,18 @@ public class DataGenerators {
 		generator.addProvider(server, fluidTags);
 
 		generator.addProvider(server, new DTRecipeProvider(output));
+	}
+
+	/** KubeJS 在 datagen 时会误启一个非守护后台线程, 导致 runData 永不结束 */
+	private static void stopKubeJsBackgroundThread() {
+		if (!ICheckModLoaded.hasKubeJS()) {
+			return;
+		}
+		try {
+			Class.forName("dev.latvian.mods.kubejs.util.KubeJSBackgroundThread")
+					.getField("running")
+					.setBoolean(null, false);
+		} catch (Throwable ignored) {
+		}
 	}
 }
