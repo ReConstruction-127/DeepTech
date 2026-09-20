@@ -26,66 +26,66 @@ public class FurnaceRecipeGen extends DTRecipeProvider {
 
 	private static void smelting(Consumer<FinishedRecipe> consumer) {
 		SimpleCookingRecipeBuilder.smelting(
-						Ingredient.of(DTMaterials.IRON.getDust().get()),
+						Ingredient.of(DTMaterials.IRON.getDust()),
 						RecipeCategory.MISC,
 						Items.IRON_INGOT,
 						0.7F,
 						200
 				)
-				.unlockedBy("has_iron_dust", has(DTMaterials.IRON.getDust().get()))
+				.unlockedBy("has_iron_dust", has(DTMaterials.IRON.getDust()))
 				.save(consumer, save("smelting/iron_ingot_from_dust"));
 
 		SimpleCookingRecipeBuilder.smelting(
-						Ingredient.of(DTMaterials.COPPER.getDust().get()),
+						Ingredient.of(DTMaterials.COPPER.getDust()),
 						RecipeCategory.MISC,
 						Items.COPPER_INGOT,
 						0.7F,
 						200
 				)
-				.unlockedBy("has_copper_dust", has(DTMaterials.COPPER.getDust().get()))
+				.unlockedBy("has_copper_dust", has(DTMaterials.COPPER.getDust()))
 				.save(consumer, save("smelting/copper_ingot_from_dust"));
 
 		SimpleCookingRecipeBuilder.smelting(
-						Ingredient.of(DTMaterials.GOLD.getDust().get()),
+						Ingredient.of(DTMaterials.GOLD.getDust()),
 						RecipeCategory.MISC,
 						Items.GOLD_INGOT,
 						0.7F,
 						200
 				)
-				.unlockedBy("has_gold_dust", has(DTMaterials.GOLD.getDust().get()))
+				.unlockedBy("has_gold_dust", has(DTMaterials.GOLD.getDust()))
 				.save(consumer, save("smelting/gold_ingot_from_dust"));
 
 	}
 
 	private static void blasting(Consumer<FinishedRecipe> consumer) {
 		SimpleCookingRecipeBuilder.blasting(
-						Ingredient.of(DTMaterials.COPPER.getDust().get()),
+						Ingredient.of(DTMaterials.COPPER.getDust()),
 						RecipeCategory.MISC,
 						Items.COPPER_INGOT,
 						0.7F,
 						100
 				)
-				.unlockedBy("has_copper_dust", has(DTMaterials.COPPER.getDust().get()))
+				.unlockedBy("has_copper_dust", has(DTMaterials.COPPER.getDust()))
 				.save(consumer, save("blasting/copper_ingot_from_dust"));
 
 		SimpleCookingRecipeBuilder.blasting(
-						Ingredient.of(DTMaterials.IRON.getDust().get()),
+						Ingredient.of(DTMaterials.IRON.getDust()),
 						RecipeCategory.MISC,
 						Items.IRON_INGOT,
 						0.7F,
 						100
 				)
-				.unlockedBy("has_iron_dust", has(DTMaterials.IRON.getDust().get()))
+				.unlockedBy("has_iron_dust", has(DTMaterials.IRON.getDust()))
 				.save(consumer, save("blasting/iron_ingot_from_dust"));
 
 		SimpleCookingRecipeBuilder.blasting(
-						Ingredient.of(DTMaterials.GOLD.getDust().get()),
+						Ingredient.of(DTMaterials.GOLD.getDust()),
 						RecipeCategory.MISC,
 						Items.GOLD_INGOT,
 						0.7F,
 						100
 				)
-				.unlockedBy("has_gold_dust", has(DTMaterials.GOLD.getDust().get()))
+				.unlockedBy("has_gold_dust", has(DTMaterials.GOLD.getDust()))
 				.save(consumer, save("blasting/gold_ingot_from_dust"));
 	}
 
