@@ -5,7 +5,6 @@ import dev.celestiacraft.libs.config.api.ConfigModule;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class MachineLinkConfig extends ConfigModule {
-
 	public static ForgeConfigSpec.BooleanValue ENABLED;
 	public static ForgeConfigSpec.IntValue SCAN_RANGE;
 	public static ForgeConfigSpec.IntValue MAX_LINKS;

@@ -44,7 +44,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern("BCB")
 				.pattern(" D ")
 				.define('A', MaterialItems.SCULK_CIRCUIT)
-				.define('B', DTMaterials.IRON.getPlate().get())
+				.define('B', DTMaterials.IRON.getPlate())
 				.define('C', FrameBlocks.MACHINE_FRAME)
 				.define('D', Items.PISTON)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -110,7 +110,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.define('A', MaterialItems.SCULK_BONE)
 				.define('B', Items.REDSTONE)
 				.define('C', MaterialItems.SCULK_CHUNK)
-				.define('D', DTMaterials.GOLD.getPlate().get())
+				.define('D', DTMaterials.GOLD.getPlate())
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/basic_circuit"));
 

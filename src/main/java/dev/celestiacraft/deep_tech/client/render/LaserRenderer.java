@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.api.client.render;
+package dev.celestiacraft.deep_tech.client.render;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.util.FastColor;
@@ -7,7 +7,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class LaserRenderer {
-
 	private static final float SEGMENTS_PER_BLOCK = 2.0F;
 	private static final int MIN_SEGMENTS = 2;
 	private static final int MAX_SEGMENTS = 48;
@@ -19,7 +18,7 @@ public class LaserRenderer {
 	private static final double EPSILON = 1.0E-6D;
 
 	public static float pulsePhase(long gameTime, float partialTick) {
-		return ((float) (gameTime % PULSE_CYCLE_TICKS) + partialTick) / 20.0F * PULSE_RATE;
+		return ((gameTime % PULSE_CYCLE_TICKS) + partialTick) / 20.0F * PULSE_RATE;
 	}
 
 	public static void beam(
@@ -132,16 +131,22 @@ public class LaserRenderer {
 			float endSin = Mth.sin(endAngle) * radius;
 
 			vertex(consumer, pose, atX, atY, atZ, center);
-			vertex(consumer, pose,
+			vertex(
+					consumer,
+					pose,
 					atX + right.x * startCos + up.x * startSin,
 					atY + right.y * startCos + up.y * startSin,
 					atZ + right.z * startCos + up.z * startSin,
-					edge);
-			vertex(consumer, pose,
+					edge
+			);
+			vertex(
+					consumer,
+					pose,
 					atX + right.x * endCos + up.x * endSin,
 					atY + right.y * endCos + up.y * endSin,
 					atZ + right.z * endCos + up.z * endSin,
-					edge);
+					edge
+			);
 			vertex(consumer, pose, atX, atY, atZ, center);
 		}
 	}

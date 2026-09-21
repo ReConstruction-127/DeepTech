@@ -111,10 +111,30 @@ public class LanguageGenerate {
 	}
 
 	protected static void addMaterialLang(String key, String english, String chinese) {
+		// 物品: 与 Nebula Libs 材料系统生成的 ID 一一对应
 		addItemLanguage(key + "_ingot", english + " Ingot", chinese + "锭");
 		addItemLanguage(key + "_plate", english + " Plate", chinese + "板");
-		addItemLanguage(key + "_dust", english + " Dust", chinese + "粉");
 		addItemLanguage(key + "_nugget", english + " Nugget", chinese + "粒");
+		addItemLanguage(key + "_dust", english + " Dust", chinese + "粉");
+		addItemLanguage(key + "_rod", english + " Rod", chinese + "杆");
+		addItemLanguage(key + "_gear", english + " Gear", chinese + "齿轮");
+		addItemLanguage(key + "_wire", english + " Wire", chinese + "线材");
+		addItemLanguage(key + "_prism", english + " Prism", chinese + "棱镜");
+
+		// 粗矿
 		addItemLanguage("raw_" + key, "Raw " + english, "粗" + chinese);
+
+		// Mekanism 中间产物
+		addItemLanguage("dirty_" + key + "_dust", "Dirty " + english + " Dust", "脏" + chinese + "粉");
+		addItemLanguage(key + "_clump", english + " Clump", chinese + "团块");
+		addItemLanguage(key + "_shard", english + " Shard", chinese + "碎片");
+		addItemLanguage(key + "_crystal", english + " Crystal", chinese + "晶体");
+
+		// 方块(方块物品的翻译键也是 block.*)
+		addBlockLanguage(key + "_block", english + " Block", chinese + "块");
+		addBlockLanguage("raw_" + key + "_block", "Raw " + english + " Block", "粗" + chinese + "块");
+
+		// 熔融流体 + 桶
+		addFluidLanguage("molten_" + key, "Molten " + english, "熔融" + chinese);
 	}
 }

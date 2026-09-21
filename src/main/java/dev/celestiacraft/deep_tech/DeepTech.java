@@ -38,7 +38,6 @@ public class DeepTech {
 
 		DTBlocks.register();
 		DTItems.register();
-		DTMaterials.register();
 		DTBlockEntities.register();
 		DTRecipes.register();
 		DTFluids.register();
