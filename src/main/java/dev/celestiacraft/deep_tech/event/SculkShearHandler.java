@@ -29,6 +29,10 @@ public class SculkShearHandler {
 	public static void onBlockBreak(BlockEvent.BreakEvent event) {
 		BlockState state = event.getState();
 		Player player = event.getPlayer();
+		if (player.isCreative()) {
+			return;
+		}
+
 		Level level = (Level) event.getLevel();
 		BlockPos pos = event.getPos();
 		ItemStack stack = player.getMainHandItem();

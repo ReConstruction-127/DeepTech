@@ -5,8 +5,8 @@ import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.side.fluid.forge.FluidHelperImpl;
 import com.mojang.blaze3d.vertex.PoseStack;
-import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.accessor.capability.FixedFluidSource;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.accessor.capability.NetworkFluidSink;
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.accessor.capability.NetworkFluidSource;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -23,7 +23,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidActionResult;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.wrapper.PlayerMainInvWrapper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -477,19 +476,12 @@ public class SNAccessorListWidget extends Widget {
 			return;
 		}
 
-		// 1) 格子有流体:先试着把网络流体灌入光标上的容器(装不下的自动还回网络)
 		if (!key.isEmpty()) {
-			FluidStack drained = accessor.drain(new FluidStack(key.getFluid(), key.getAmount()), IFluidHandler.FluidAction.EXECUTE);
-			if (!drained.isEmpty()) {
-				FixedFluidSource source = new FixedFluidSource(drained);
-				FluidActionResult filled = FluidUtil.tryFillContainer(carried, source, Integer.MAX_VALUE, player, true);
-				if (!source.getFluid().isEmpty()) {
-					accessor.fill(source.getFluid(), IFluidHandler.FluidAction.EXECUTE);
-				}
-				if (filled.isSuccess()) {
-					container.setCarried(filled.getResult());
-					return;
-				}
+			NetworkFluidSource source = new NetworkFluidSource(accessor, key);
+			FluidActionResult filled = FluidUtil.tryFillContainer(carried, source, Integer.MAX_VALUE, player, true);
+			if (filled.isSuccess()) {
+				container.setCarried(filled.getResult());
+				return;
 			}
 		}
 

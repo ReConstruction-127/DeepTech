@@ -19,8 +19,9 @@ import java.util.List;
 public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 	private final ResonanceNodeBlockEntity entity;
 	private static final int RANGE = ResonanceNodeBlockEntity.LINK_RANGE;
+	private static final int SCAN_INTERVAL = 20;
 	private List<BlockPos> cachedNodes = new ArrayList<>();
-	private int scanCooldown = 0;
+	private long lastScanTime = -1;
 
 	public ResonanceNodeEnergyStorage(ResonanceNodeBlockEntity entity) {
 		this.entity = entity;
@@ -145,13 +146,15 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 	 * 扫描 16 格范围内的所有节点
 	 */
 	private void scanNetwork() {
-		if (entity.getLevel() == null) {
+		Level level = entity.getLevel();
+		if (level == null) {
 			return;
 		}
-		if (scanCooldown-- > 0) {
+		long time = level.getGameTime();
+		if (lastScanTime != -1 && time >= lastScanTime && time - lastScanTime < SCAN_INTERVAL) {
 			return;
 		}
-		scanCooldown = 20;
+		lastScanTime = time;
 
 		cachedNodes.clear();
 
@@ -170,7 +173,7 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 		)) {
 			if (pos.equals(entity.getBlockPos())) continue;
 
-			BlockEntity be = entity.getLevel().getBlockEntity(pos);
+			BlockEntity be = level.getBlockEntity(pos);
 			if (be instanceof ResonanceNodeBlockEntity) {
 				cachedNodes.add(pos.immutable());
 			}

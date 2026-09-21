@@ -1,23 +1,17 @@
 package dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.accessor.capability;
 
+import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.accessor.SNAccessorBlockEntity;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * 已从网络抽出的流体的固定来源:供 tryFillContainer 模拟/实际灌入.
- * 灌完剩余的仍可通过 {@link #getFluid()} 读回,由调用方归还网络.
- */
-public class FixedFluidSource implements IFluidHandler {
-	private FluidStack fluid;
+public class NetworkFluidSource implements IFluidHandler {
+	private final SNAccessorBlockEntity accessor;
+	private final FluidStack fluid;
 
-	public FixedFluidSource(FluidStack fluid) {
-		this.fluid = fluid;
-	}
-
-	/** 灌入后剩余的流体(调用方应归还网络) */
-	public FluidStack getFluid() {
-		return fluid;
+	public NetworkFluidSource(SNAccessorBlockEntity accessor, FluidStack fluid) {
+		this.accessor = accessor;
+		this.fluid = fluid.copy();
 	}
 
 	@Override
@@ -27,17 +21,17 @@ public class FixedFluidSource implements IFluidHandler {
 
 	@Override
 	public @NotNull FluidStack getFluidInTank(int tank) {
-		return fluid;
+		return drain(Integer.MAX_VALUE, FluidAction.SIMULATE);
 	}
 
 	@Override
 	public int getTankCapacity(int tank) {
-		return fluid.getAmount();
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
 	public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-		return true;
+		return stack.isFluidEqual(fluid);
 	}
 
 	@Override
@@ -50,7 +44,7 @@ public class FixedFluidSource implements IFluidHandler {
 		if (resource.isEmpty() || !resource.isFluidEqual(fluid)) {
 			return FluidStack.EMPTY;
 		}
-		return drain(resource.getAmount(), action);
+		return accessor.drain(resource, action);
 	}
 
 	@Override
@@ -58,11 +52,6 @@ public class FixedFluidSource implements IFluidHandler {
 		if (fluid.isEmpty() || maxDrain <= 0) {
 			return FluidStack.EMPTY;
 		}
-		FluidStack out = fluid.copy();
-		out.setAmount(Math.min(maxDrain, fluid.getAmount()));
-		if (action.execute()) {
-			fluid.shrink(out.getAmount());
-		}
-		return out;
+		return accessor.drain(new FluidStack(fluid, maxDrain), action);
 	}
 }
