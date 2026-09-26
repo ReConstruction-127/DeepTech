@@ -11,13 +11,13 @@ public class ItemLanguage extends LanguageGenerate {
 		);
 		addCustomLang(
 				"tooltip.deep_tech.test_tube.empty",
-				"Empty (Capacity: %s mB)",
-				"空（容量：%s mB）"
+				"Empty 0/%s mB",
+				"空 0/%s mB"
 		);
 		addCustomLang(
 				"tooltip.deep_tech.test_tube.contents",
 				"%s %s mB/%s mB",
-				"%s %smb/%smb"
+				"%s %smB/%smB"
 		);
 		addItemLanguage(
 				"wrench",

@@ -22,10 +22,7 @@ public class ToolItems {
 		TEST_TUBE = DeepTech.REGISTRATE.item("test_tube", TestTubeItem::new)
 				.model((context, provider) -> provider.withExistingParent(context.getName(), provider.mcLoc("item/generated"))
 						.texture("layer0", provider.modLoc("item/tool/test_tube"))
-						.override()
-						.predicate(provider.modLoc("filled"), 1.0F)
-						.model(provider.getExistingFile(provider.modLoc("item/test_tube_filled")))
-						.end())
+						.texture("layer1", provider.modLoc("item/tool/test_tube_overlay")))
 				.tab(DTCreativeTabs.TOOL.getKey())
 				.register();
 	}
