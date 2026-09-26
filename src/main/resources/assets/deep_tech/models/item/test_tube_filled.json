@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "deep_tech:item/tool/test_tube",
+    "layer1": "deep_tech:item/tool/test_tube_overlay"
+  }
+}

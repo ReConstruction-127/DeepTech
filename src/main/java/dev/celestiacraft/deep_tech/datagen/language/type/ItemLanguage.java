@@ -5,6 +5,21 @@ import dev.celestiacraft.deep_tech.datagen.language.LanguageGenerate;
 public class ItemLanguage extends LanguageGenerate {
 	public static void addLang() {
 		addItemLanguage(
+				"test_tube",
+				"Test Tube",
+				"试管"
+		);
+		addCustomLang(
+				"tooltip.deep_tech.test_tube.empty",
+				"Empty (Capacity: %s mB)",
+				"空（容量：%s mB）"
+		);
+		addCustomLang(
+				"tooltip.deep_tech.test_tube.contents",
+				"%s %s mB/%s mB",
+				"%s %smb/%smb"
+		);
+		addItemLanguage(
 				"wrench",
 				"Wrench",
 				"扳手"
