@@ -75,6 +75,36 @@ public class MachineItemSlots {
 		}
 	}
 
+	/**
+	 * 在指定位置单独加一个槽位.
+	 * <p>
+	 * 用于槽位不是"输入一排 + 输出一排"的机器, 比如能量单元(两个槽上下排列).
+	 *
+	 * @param slotIndex    实际槽位下标
+	 * @param position     槽位左上角位置
+	 * @param canTakeItems 玩家能否从槽里取物
+	 * @param canPutItems  玩家能否往槽里放物
+	 * @return 创建出来的槽位 widget, 方便继续配置(底图默认为空, 由 GUI 贴图自己画框)
+	 */
+	public static SlotWidget addSlot(
+			WidgetGroup group,
+			ItemStackHandler handler,
+			int slotIndex,
+			Position position,
+			boolean canTakeItems,
+			boolean canPutItems
+	) {
+		SlotWidget widget = createSlot(
+				new SimpleMachineInventory(handler),
+				slotIndex,
+				position,
+				canTakeItems,
+				canPutItems
+		);
+		group.addWidget(widget);
+		return widget;
+	}
+
 	private static SlotWidget createSlot(
 			SimpleMachineInventory container,
 			int slotIndex,

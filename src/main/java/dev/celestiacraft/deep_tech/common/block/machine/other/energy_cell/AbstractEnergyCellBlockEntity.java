@@ -34,9 +34,16 @@ public abstract class AbstractEnergyCellBlockEntity extends MachineBlockEntity<A
 		super(type, pos, state);
 	}
 
+	/**
+	 * 两个输入槽:
+	 * <ul>
+	 *     <li>下标 0: 给槽里的物品充电(能量单元 -> 物品)</li>
+	 *     <li>下标 1: 给能量单元充电(物品 -> 能量单元)</li>
+	 * </ul>
+	 */
 	@Override
 	public int getItemInputSlotCount() {
-		return 1;
+		return 2;
 	}
 
 	@Override
@@ -95,6 +102,42 @@ public abstract class AbstractEnergyCellBlockEntity extends MachineBlockEntity<A
 		}
 
 		chargeItemInSlot();
+		dischargeItemInSlot();
+	}
+
+	/**
+	 * 把下标 1 槽位里物品的能量抽出来充自己(物品 -> 能量单元).
+	 * <p>
+	 * 速率复用 {@link EnergyCellConfig#MAX_CHARGE}, 和反方向的充电保持一致.
+	 */
+	private void dischargeItemInSlot() {
+		MachineItemHandler handler = getItemHandler();
+		if (handler.getSlots() < 2) {
+			return;
+		}
+
+		int space = getMachineMaxEnergy() - getEnergy();
+		if (space <= 0) {
+			return;
+		}
+
+		ItemStack stack = handler.getStackInSlot(1);
+		if (stack.isEmpty()) {
+			return;
+		}
+
+		stack.getCapability(ForgeCapabilities.ENERGY, null).ifPresent(itemEnergy -> {
+			if (!itemEnergy.canExtract()) {
+				return;
+			}
+
+			int moved = itemEnergy.extractEnergy(Math.min(space, EnergyCellConfig.MAX_CHARGE.get()), false);
+			if (moved > 0) {
+				setEnergy(getEnergy() + moved);
+				setChanged();
+				sync();
+			}
+		});
 	}
 
 	private void chargeItemInSlot() {
@@ -152,12 +195,24 @@ public abstract class AbstractEnergyCellBlockEntity extends MachineBlockEntity<A
 				getMaxEnergyStored()
 		));
 
-		MachineItemSlots.add(
+		// 下标 0: 给物品充电
+		MachineItemSlots.addSlot(
 				group,
-				this,
 				getItemHandler(),
-				new Position(97, 38),
-				null
+				0,
+				new Position(97, 28),
+				true,
+				true
+		);
+
+		// 下标 1: 给能量单元充电, 位置在上一格正下方(贴图还没画这一格的框, 先留空)
+		MachineItemSlots.addSlot(
+				group,
+				getItemHandler(),
+				1,
+				new Position(97, 46),
+				true,
+				true
 		);
 
 		addPlayerInventory(group, player);
