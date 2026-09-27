@@ -11,6 +11,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.advanced.collector.Sculk
 import dev.celestiacraft.deep_tech.common.block.machine.other.energy_cell.EnergyCellBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.exp_generator.EXPGeneratorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.furnace.SculkFurnaceBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.bionic.docking_station.DockingStationBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.other.resonance_node.ResonanceNodeBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.accessor.SNAccessorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.center.SNCenterBlock;
@@ -47,6 +48,7 @@ public class MachineBlocks {
 	public static final BlockEntry<SNFluidReservoirBlock> SN_FLUID_RESERVOIR;
 	public static final BlockEntry<SNFluidInputPortBlock> SN_FLUID_INPUT_PORT;
 	public static final BlockEntry<SNFluidOutputPortBlock> SN_FLUID_OUTPUT_PORT;
+	public static final BlockEntry<DockingStationBlock> DOCKING_STATION;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.block("crusher", CrusherBlock::new)
@@ -226,6 +228,16 @@ public class MachineBlocks {
 				.tab(DTCreativeTabs.MACHINE.getKey())
 				.tag(DeepTechItemTags.MACHINES)
 				.model(ItemModelGen.withModel("block/machine/assembler/on"))
+				.build()
+				.register();
+
+		DOCKING_STATION = DeepTech.REGISTRATE.block("docking_station", DockingStationBlock::new)
+				.blockstate(DockingStationBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tab(DTCreativeTabs.MACHINE.getKey())
+				.tag(DeepTechItemTags.MACHINES)
+				.model(ItemModelGen.withModel("block/machine/docking_station"))
 				.build()
 				.register();
 	}

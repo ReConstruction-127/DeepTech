@@ -100,11 +100,12 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 	}
 
 	private Collection<IGuiClickableArea> assembler(ModularUIGuiContainer screen) {
+		// 和组装机 GUI 里进度条的位置/尺寸一致(AssemblerBlockEntity 里的 ProgressBarWidget)
 		return List.of(IGuiClickableArea.createBasic(
-				148,
-				59,
-				14,
-				22,
+				133,
+				71,
+				16,
+				16,
 				DTJeiRecipeType.ASSEMBLING
 		));
 	}

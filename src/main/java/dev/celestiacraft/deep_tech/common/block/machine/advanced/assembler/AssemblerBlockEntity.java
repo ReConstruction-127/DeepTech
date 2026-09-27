@@ -166,16 +166,23 @@ public class AssemblerBlockEntity extends MachineBlockEntity<AssemblerBlockEntit
 		return getItemInputSlotCount() + 1 + index;
 	}
 
+	/**
+	 * 自动化(管道/漏斗等)能放进来的槽位: 只有 16 个输入槽.
+	 * <p>
+	 * 催化剂槽是给玩家手动放的(不消耗), 所以不开放给自动化; 玩家在 GUI 里照样能取放,
+	 * 因为 GUI 用的是 {@link SimpleMachineInventory}, 它有意绕过这两个策略.
+	 */
 	@Override
 	public boolean canInsertItem(int slot, ItemStack stack) {
-		// 输入槽 + 催化剂槽可放入, 输出槽不可放入
-		return slot >= 0 && slot <= CATALYST_SLOT;
+		return slot >= 0 && slot < getItemInputSlotCount();
 	}
 
+	/**
+	 * 自动化能抽走的槽位: 只有 4 个输出槽. 输入槽和催化剂槽都不允许自动化抽取.
+	 */
 	@Override
 	public boolean canExtractItem(int slot, ItemStack stack) {
-		// 催化剂槽 + 输出槽可取出, 输入槽不可取出
-		return slot == CATALYST_SLOT || (slot >= getItemOutputSlotIndex(0) && slot < getMaxMachineSlot());
+		return slot >= getItemOutputSlotIndex(0) && slot < getMaxMachineSlot();
 	}
 
 	// ---------------- Capability(独立类) ----------------
@@ -427,9 +434,9 @@ public class AssemblerBlockEntity extends MachineBlockEntity<AssemblerBlockEntit
 		// 催化剂槽 (不消耗, 可放可取)
 		group.addWidget(createSlot(container, CATALYST_SLOT, 150, 25, true, true));
 
-		// 4 物品输出槽 (2x2)
+		// 4 物品输出槽 (2x2): 贴图里这两行的框线在 y=61/79, 比输入槽网格第 3/4 行低 1px
 		int[] outputX = {150, 168};
-		int[] outputY = {60, 78};
+		int[] outputY = {61, 79};
 		for (int i = 0; i < getItemOutputSlotCount(); i++) {
 			group.addWidget(createSlot(
 					container,

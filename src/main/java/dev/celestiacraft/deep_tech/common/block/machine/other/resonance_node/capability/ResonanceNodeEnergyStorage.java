@@ -22,6 +22,12 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 	private static final int SCAN_INTERVAL = 20;
 	private List<BlockPos> cachedNodes = new ArrayList<>();
 	private long lastScanTime = -1;
+	/**
+	 * 重入保护: 网络存储会去问"我贴着的方块"要 storage, 如果那个方块又把请求转回来
+	 * (比如中间隔着扩展坞), receiveEnergy 就会调用自己, 直接栈溢出(实测过).
+	 * 一次调用没结束前不再接受新的调用.
+	 */
+	private boolean working;
 
 	public ResonanceNodeEnergyStorage(ResonanceNodeBlockEntity entity) {
 		this.entity = entity;
@@ -29,70 +35,88 @@ public class ResonanceNodeEnergyStorage implements IEnergyStorage {
 
 	@Override
 	public int receiveEnergy(int maxReceive, boolean simulate) {
-		if (maxReceive <= 0 || entity.getLevel() == null) {
+		if (maxReceive <= 0 || entity.getLevel() == null || working) {
 			return 0;
 		}
 
-		scanNetwork();
+		working = true;
 
-		int totalReceived = 0;
-		for (BlockPos nodePos : cachedNodes) {
-			if (totalReceived >= maxReceive) break;
+		try {
+			scanNetwork();
 
-			BlockEntity nodeBe = entity.getLevel().getBlockEntity(nodePos);
-			if (nodeBe == null || nodeBe == entity) {
-				continue;
+			int totalReceived = 0;
+			for (BlockPos nodePos : cachedNodes) {
+				if (totalReceived >= maxReceive) break;
+
+				BlockEntity nodeBe = entity.getLevel().getBlockEntity(nodePos);
+				if (nodeBe == null || nodeBe == entity) {
+					continue;
+				}
+
+				IEnergyStorage storage = getBaseEnergyStorage(nodePos);
+				if (storage != null && storage.canReceive()) {
+					int remaining = maxReceive - totalReceived;
+					int received = storage.receiveEnergy(remaining, simulate);
+					totalReceived += received;
+				}
 			}
-
-			IEnergyStorage storage = getBaseEnergyStorage(nodePos);
-			if (storage != null && storage.canReceive()) {
-				int remaining = maxReceive - totalReceived;
-				int received = storage.receiveEnergy(remaining, simulate);
-				totalReceived += received;
-			}
+			return totalReceived;
+		} finally {
+			working = false;
 		}
-		return totalReceived;
 	}
 
 	@Override
 	public int extractEnergy(int maxExtract, boolean simulate) {
-		if (maxExtract <= 0 || entity.getLevel() == null) return 0;
+		if (maxExtract <= 0 || entity.getLevel() == null || working) return 0;
 
-		scanNetwork();
+		working = true;
 
-		int totalExtracted = 0;
-		for (BlockPos nodePos : cachedNodes) {
-			if (totalExtracted >= maxExtract) break;
+		try {
+			scanNetwork();
 
-			BlockEntity nodeBe = entity.getLevel().getBlockEntity(nodePos);
-			if (nodeBe == null || nodeBe == entity) continue;
+			int totalExtracted = 0;
+			for (BlockPos nodePos : cachedNodes) {
+				if (totalExtracted >= maxExtract) break;
 
-			IEnergyStorage storage = getBaseEnergyStorage(nodePos);
-			if (storage != null && storage.canExtract()) {
-				int remaining = maxExtract - totalExtracted;
-				int extracted = storage.extractEnergy(remaining, simulate);
-				totalExtracted += extracted;
+				BlockEntity nodeBe = entity.getLevel().getBlockEntity(nodePos);
+				if (nodeBe == null || nodeBe == entity) continue;
+
+				IEnergyStorage storage = getBaseEnergyStorage(nodePos);
+				if (storage != null && storage.canExtract()) {
+					int remaining = maxExtract - totalExtracted;
+					int extracted = storage.extractEnergy(remaining, simulate);
+					totalExtracted += extracted;
+				}
 			}
+			return totalExtracted;
+		} finally {
+			working = false;
 		}
-		return totalExtracted;
 	}
 
 	@Override
 	public int getEnergyStored() {
-		if (entity.getLevel() == null) {
+		if (entity.getLevel() == null || working) {
 			return 0;
 		}
 
-		scanNetwork();
+		working = true;
 
-		int total = 0;
-		for (BlockPos nodePos : cachedNodes) {
-			IEnergyStorage storage = getBaseEnergyStorage(nodePos);
-			if (storage != null) {
-				total += storage.getEnergyStored();
+		try {
+			scanNetwork();
+
+			int total = 0;
+			for (BlockPos nodePos : cachedNodes) {
+				IEnergyStorage storage = getBaseEnergyStorage(nodePos);
+				if (storage != null) {
+					total += storage.getEnergyStored();
+				}
 			}
+			return total;
+		} finally {
+			working = false;
 		}
-		return total;
 	}
 
 	@Override

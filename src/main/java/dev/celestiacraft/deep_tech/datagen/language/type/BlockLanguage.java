@@ -114,5 +114,10 @@ public class BlockLanguage extends LanguageGenerate {
 				"Sculk Network Vein",
 				"幽匿网络脉络"
 		);
+		addBlockLanguage(
+				"docking_station",
+				"Docking Station",
+				"扩展坞"
+		);
 	}
 }

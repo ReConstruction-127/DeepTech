@@ -27,6 +27,7 @@ import net.minecraftforge.client.model.generators.BlockModelBuilder;
 import net.minecraftforge.client.model.generators.BlockModelProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlock<T> {
@@ -79,15 +80,32 @@ public abstract class MachineBlock<T extends BlockEntity> extends BasicEntityBlo
 		return InteractionResult.PASS;
 	}
 
+	/**
+	 * 破坏时把机器<b>自己槽位</b>里的东西掉出来.
+	 * <p>
+	 * 是 {@link MachineBlockEntity} 的机器优先取它自己的 {@code getItemHandler()}:
+	 * 扩展坞、幽匿网络端口这类会把邻居/网络的能力代理出去, 用 {@code getCapability(ITEM_HANDLER)}
+	 * 遍历等于把别人容器里的东西复制一份出来(实测会刷物品, 而且该查询的 side 是 null,
+	 * 对这些机器正好落在"转给别的方块"那一支上).
+	 * <p>
+	 * 幽匿网络储库这类自带存储、但不是 MachineBlockEntity 的方块实体, 它暴露的能力就是自己的存储,
+	 * 继续走能力(否则拆掉会把里面的东西直接吞掉).
+	 */
 	protected void dropInventory(T entity, Level level, BlockPos pos) {
-		entity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent((handler) -> {
-			for (int i = 0; i < handler.getSlots(); i++) {
-				ItemStack stack = handler.getStackInSlot(i);
-				if (!stack.isEmpty()) {
-					Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack.copy());
-				}
+		IItemHandler handler = entity instanceof MachineBlockEntity<?> machine
+				? machine.getItemHandler()
+				: entity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+
+		if (handler == null) {
+			return;
+		}
+
+		for (int i = 0; i < handler.getSlots(); i++) {
+			ItemStack stack = handler.getStackInSlot(i);
+			if (!stack.isEmpty()) {
+				Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack.copy());
 			}
-		});
+		}
 	}
 
 	public static <B extends BasicBlock> NonNullBiConsumer<DataGenContext<Block, B>, RegistrateBlockstateProvider> genBlockState(String machineName) {

@@ -9,10 +9,12 @@ import dev.celestiacraft.deep_tech.common.register.DTCreativeTabs;
 public class FrameBlocks {
 	public static final BlockEntry<FrameBlock> MACHINE_FRAME;
 	public static final BlockEntry<FrameBlock> REINFORCED_MACHINE_FRAME;
+	public static final BlockEntry<FrameBlock> BIONIC_MACHINE_FRAME;
 
 	static {
 		MACHINE_FRAME = addFrame("machine", MiningLevel.WOODEN);
-		REINFORCED_MACHINE_FRAME = addFrame("reinforced_machine", MiningLevel.IRON);
+		REINFORCED_MACHINE_FRAME = addFrame("reinforced_machine", MiningLevel.STONE);
+		BIONIC_MACHINE_FRAME = addFrame("reinforced_machine", MiningLevel.IRON);
 	}
 
 	private static BlockEntry<FrameBlock> addFrame(String name, MiningLevel level) {

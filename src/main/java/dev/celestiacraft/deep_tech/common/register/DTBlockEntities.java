@@ -20,6 +20,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_network.r
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_nursery.SculkNurseryBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.processor.ProcessorBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.assembler.AssemblerBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.bionic.docking_station.DockingStationBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 
 public class DTBlockEntities {
@@ -42,6 +43,7 @@ public class DTBlockEntities {
 	public static final BlockEntityEntry<SculkNurseryBlockEntity> SCULK_NURSERY;
 	public static final BlockEntityEntry<ProcessorBlockEntity> PROCESSOR;
 	public static final BlockEntityEntry<AssemblerBlockEntity> ASSEMBLER;
+	public static final BlockEntityEntry<DockingStationBlockEntity> DOCKING_STATION;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
@@ -85,6 +87,10 @@ public class DTBlockEntities {
 
 		ASSEMBLER = DeepTech.REGISTRATE.blockEntity("assembler", AssemblerBlockEntity::new)
 				.validBlock(MachineBlocks.ASSEMBLER)
+				.register();
+
+		DOCKING_STATION = DeepTech.REGISTRATE.blockEntity("docking_station", DockingStationBlockEntity::new)
+				.validBlock(MachineBlocks.DOCKING_STATION)
 				.register();
 
 		SN_CENTER = DeepTech.REGISTRATE.blockEntity("sculk_network_center", SNCenterBlockEntity::new)
