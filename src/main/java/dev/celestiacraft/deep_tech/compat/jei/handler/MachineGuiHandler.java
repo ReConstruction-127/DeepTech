@@ -5,6 +5,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.basic.alloy_furnace.Allo
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.assembler.AssemblerBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.crusher.CrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.furnace.SculkFurnaceBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_sculk_furnace.AdvancedSculkFurnaceBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.processor.ProcessorBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_nursery.SculkNurseryBlockEntity;
 import dev.celestiacraft.deep_tech.compat.jei.api.DTJeiRecipeType;
@@ -27,6 +28,7 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 		register(CrusherBlockEntity.class, this::crusher);
 		register(AlloyFurnaceBlockEntity.class, this::alloyFurnace);
 		register(SculkFurnaceBlockEntity.class, this::sculkFurnace);
+		register(AdvancedSculkFurnaceBlockEntity.class, this::advancedSculkFurnace);
 		register(SculkNurseryBlockEntity.class, this::sculkNursery);
 		register(ProcessorBlockEntity.class, this::processor);
 		register(AssemblerBlockEntity.class, this::assembler);
@@ -68,6 +70,21 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 	}
 
 	private Collection<IGuiClickableArea> sculkFurnace(ModularUIGuiContainer screen) {
+		return List.of(IGuiClickableArea.createBasic(
+				68,
+				40,
+				14,
+				14,
+				RecipeTypes.SMELTING,
+				RecipeTypes.BLASTING,
+				RecipeTypes.SMOKING
+		));
+	}
+
+	/**
+	 * 高级幽匿电炉的进度条和普通电炉在同一个位置(它暂时借用普通电炉的 GUI), 配方类型也一样.
+	 */
+	private Collection<IGuiClickableArea> advancedSculkFurnace(ModularUIGuiContainer screen) {
 		return List.of(IGuiClickableArea.createBasic(
 				68,
 				40,

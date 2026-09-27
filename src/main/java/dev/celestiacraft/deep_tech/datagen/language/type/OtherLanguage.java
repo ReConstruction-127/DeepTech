@@ -45,5 +45,10 @@ public class OtherLanguage extends LanguageGenerate {
 				"Max Energy Extract: %s",
 				"最大能量输出: %s FE / Tick"
 		);
+		addCustomLang(
+				"tooltip.jade.deep_tech.info.speed_plugin",
+				"Speed Plugin: x%s",
+				"加速插件: x%s"
+		);
 	}
 }

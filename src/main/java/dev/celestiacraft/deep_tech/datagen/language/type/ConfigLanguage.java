@@ -24,6 +24,7 @@ public class ConfigLanguage extends LanguageGenerate {
 		addSculkNursery();
 		addProcessor();
 		addAssembler();
+		addAdvancedSculkFurnace();
 		addOther();
 		addRender();
 	}
@@ -292,6 +293,39 @@ public class ConfigLanguage extends LanguageGenerate {
 				"组装机液体储罐容量 (mB)"
 		);
 	}
+	private static void addAdvancedSculkFurnace() {
+		addConfigLang(
+				"module.advanced_sculk_furnace",
+				"Advanced Sculk Furnace",
+				"高级幽匿电炉"
+		);
+		addConfigLang(
+				"advanced_sculk_furnace.max_energy_stored",
+				"Advanced Sculk Furnace's max energy stored",
+				"高级幽匿电炉最大能量存储 (FE)"
+		);
+		addConfigLang(
+				"advanced_sculk_furnace.max_energy_receive",
+				"Advanced Sculk Furnace's max energy receive",
+				"高级幽匿电炉最大能量接收速率 (FE/t)"
+		);
+		addConfigLang(
+				"advanced_sculk_furnace.energy_per_tick",
+				"Energy consumed per tick while working",
+				"工作时每 tick 消耗的能量 (FE/t)"
+		);
+		addConfigLang(
+				"advanced_sculk_furnace.process_time",
+				"Base time in ticks to smelt one item (before the speed multiplier)",
+				"熔炼一个物品的基准时间 (tick, 未乘速度倍率)"
+		);
+		addConfigLang(
+				"advanced_sculk_furnace.speed_multiplier",
+				"How many times faster than the sculk furnace",
+				"相对普通幽匿电炉的速度倍率"
+		);
+	}
+
 	private static void addOther() {
 		addConfigLang(
 				"module.other",

@@ -4,6 +4,7 @@ import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlock;
+import dev.celestiacraft.deep_tech.api.block.machine.plugin.ISpeedPluginSource;
 import dev.celestiacraft.deep_tech.common.register.DTBlockEntities;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
 import dev.celestiacraft.libs.api.register.block.BlockFacing;
@@ -31,11 +32,13 @@ import java.util.Set;
  * <ul>
  *     <li>红石: 从其余面收到的信号会转发给正对着的方块, 相当于给它接了一根红石线;</li>
  *     <li>能力: 正对着的方块的物品/流体/能量能力会暴露在扩展坞其余面上,
- *     见 {@link DockingStationBlockEntity#getCapability}.</li>
+ *     见 {@link DockingStationBlockEntity#getCapability};</li>
+ *     <li>加速插件: 贴在扩展坞其余面上的加速插件会算到正对着的机器头上,
+ *     见 {@link #getSpeedPluginCount}.</li>
  * </ul>
  * 没有激活状态, 也没有 GUI. 参考实现: 共振节点。
  */
-public class DockingStationBlock extends MachineBlock<DockingStationBlockEntity> {
+public class DockingStationBlock extends MachineBlock<DockingStationBlockEntity> implements ISpeedPluginSource {
 	public DockingStationBlock(Properties properties) {
 		super(advancedProperties(properties));
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
@@ -127,6 +130,46 @@ public class DockingStationBlock extends MachineBlock<DockingStationBlockEntity>
 	@Override
 	public Class<DockingStationBlockEntity> getBlockEntityClass() {
 		return DockingStationBlockEntity.class;
+	}
+
+	// ------------------------------------------------------------------
+	// 加速插件转发
+	// ------------------------------------------------------------------
+
+	/**
+	 * 贴在扩展坞其余面(除了正对着机器的那一面)上的加速插件, 算到正对着的机器头上.
+	 * <p>
+	 * 机器扫自己邻居找插件时会问到扩展坞, 这里就把自己这边的插件数量报上去,
+	 * 所以"机器 - 扩展坞 - 加速插件"这样摆, 机器一样能吃到加速.
+	 * <p>
+	 * {@code visited} 和红石转发是同一套思路: 扩展坞对着扩展坞时, 同一个位置在一次查询里只进一次,
+	 * 免得互相问个没完.
+	 */
+	@Override
+	public int getSpeedPluginCount(@NotNull Level level, @NotNull BlockPos pos, @NotNull Set<BlockPos> visited) {
+		if (!visited.add(pos.immutable())) {
+			return 0;
+		}
+
+		try {
+			Direction facing = level.getBlockState(pos).getValue(FACING);
+			int count = 0;
+
+			for (Direction direction : Direction.values()) {
+				if (direction == facing) {
+					continue;
+				}
+
+				BlockPos neighbor = pos.relative(direction);
+				if (level.getBlockState(neighbor).getBlock() instanceof ISpeedPluginSource source) {
+					count += source.getSpeedPluginCount(level, neighbor, visited);
+				}
+			}
+
+			return count;
+		} finally {
+			visited.remove(pos.immutable());
+		}
 	}
 
 	// ------------------------------------------------------------------

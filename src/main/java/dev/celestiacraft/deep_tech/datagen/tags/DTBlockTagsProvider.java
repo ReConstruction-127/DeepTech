@@ -1,6 +1,7 @@
 package dev.celestiacraft.deep_tech.datagen.tags;
 
 import dev.celestiacraft.deep_tech.DeepTech;
+import dev.celestiacraft.deep_tech.common.register.block.PluginBlocks;
 import dev.celestiacraft.deep_tech.tags.DeepTechBlockTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -21,6 +22,7 @@ public class DTBlockTagsProvider extends BlockTagsProvider {
 	protected void addTags(HolderLookup.@NotNull Provider provider) {
 		tag(DeepTechBlockTags.WRENCH_PICKUP)
 				.addTag(DeepTechBlockTags.MACHINES)
+				.add(PluginBlocks.SPEED_PLUGIN.get())
 				.add(Blocks.CRAFTING_TABLE)
 				.add(Blocks.FURNACE)
 				.add(Blocks.BLAST_FURNACE)

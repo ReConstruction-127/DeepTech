@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.compat.jade.machine;
 
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlock;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.bionic.BionicMachineBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.compat.jade.api.DTJadeType;
 import dev.celestiacraft.deep_tech.compat.jade.api.IJadeUtils;
@@ -50,6 +51,18 @@ public class MachineBasicInfo implements IBlockComponentProvider, IJadeUtils {
 					addTranKey("tooltip.jade.%s.info.max_extract"),
 					maxExtract
 			).withStyle(ChatFormatting.GOLD));
+		}
+
+		// 仿生机器: 旁边插了加速插件就把倍率显示出来, 没插件就不显示
+		if (machine instanceof BionicMachineBlockEntity<?> bionic) {
+			int speedPlugin = bionic.getSpeedPluginMultiplier();
+
+			if (speedPlugin > 1) {
+				tooltip.add(Component.translatable(
+						addTranKey("tooltip.jade.%s.info.speed_plugin"),
+						speedPlugin
+				).withStyle(ChatFormatting.LIGHT_PURPLE));
+			}
 		}
 	}
 

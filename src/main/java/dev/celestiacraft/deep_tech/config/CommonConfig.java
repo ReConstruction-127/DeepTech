@@ -2,6 +2,7 @@ package dev.celestiacraft.deep_tech.config;
 
 import dev.celestiacraft.deep_tech.api.client.lang.ConfigLang;
 import dev.celestiacraft.deep_tech.config.common.OtherConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.AdvancedSculkFurnaceConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.AssemblerConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.ProcessorConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.SculkCollectorConfig;
@@ -26,6 +27,7 @@ public class CommonConfig {
 	public static final SculkNurseryConfig SCULK_NURSERY;
 	public static final ProcessorConfig PROCESSOR;
 	public static final AssemblerConfig ASSEMBLER;
+	public static final AdvancedSculkFurnaceConfig ADVANCED_SCULK_FURNACE;
 
 	public static final OtherConfig OTHER;
 
@@ -52,6 +54,8 @@ public class CommonConfig {
 		PROCESSOR = new ProcessorConfig(BUILDER);
 		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.assembler"));
 		ASSEMBLER = new AssemblerConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.advanced_sculk_furnace"));
+		ADVANCED_SCULK_FURNACE = new AdvancedSculkFurnaceConfig(BUILDER);
 
 		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.other"));
 		OTHER = new OtherConfig(BUILDER);

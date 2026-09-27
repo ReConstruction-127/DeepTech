@@ -119,5 +119,15 @@ public class BlockLanguage extends LanguageGenerate {
 				"Docking Station",
 				"扩展坞"
 		);
+		addBlockLanguage(
+				"advanced_sculk_furnace",
+				"Advanced Sculk Furnace",
+				"高级幽匿电炉"
+		);
+		addBlockLanguage(
+				"speed_plugin",
+				"Speed Plugin",
+				"加速插件"
+		);
 	}
 }
