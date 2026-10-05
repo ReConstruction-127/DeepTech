@@ -1,4 +1,4 @@
-package dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_sculk_furnace;
+package dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_crusher;
 
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
@@ -8,48 +8,45 @@ import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
-import dev.celestiacraft.deep_tech.api.gui.widget.VerticalProgressBarWidget;
+import dev.celestiacraft.deep_tech.api.gui.widget.ProgressBarWidget;
 import dev.celestiacraft.deep_tech.common.block.machine.bionic.ParallelBionicMachineBlockEntity;
+import dev.celestiacraft.deep_tech.common.recipe.crushing.CrushingRecipe;
+import dev.celestiacraft.deep_tech.common.register.DTRecipes;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
-import dev.celestiacraft.deep_tech.config.common.machine.advanced.AdvancedSculkFurnaceConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.AdvancedCrusherConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 高级幽匿电炉: 普通幽匿电炉的升级版. 相比普通电炉:
+ * 高级粉碎机: 普通粉碎机的升级版. 相比普通粉碎机:
  * <ul>
  *     <li>速度是普通的 {@code speed_multiplier} 倍(默认 2 倍);</li>
- *     <li>两个输入槽并行: 两个槽各放一个沙子, 一轮就是 2 个玻璃; 两个沙子堆在一个槽里, 一轮还是一个;</li>
- *     <li>有更多的输出槽和更大的能量缓存;</li>
- *     <li>把可熔炼的方块放在机器顶面, 等处理时间走完就会把那个方块消耗掉, 产物进输出槽;</li>
+ *     <li>两个输入槽并行: 两个槽各放一个矿石, 一轮就是 2 份产物; 两个堆在一个槽里, 一轮还是一份;</li>
+ *     <li>输出槽变两个, 能量缓存更大;</li>
+ *     <li>把可粉碎的方块放在机器顶面, 等处理时间走完就会把那个方块消耗掉, 产物进输出槽;</li>
  *     <li>旁边贴加速插件还能再快, 见 {@link ParallelBionicMachineBlockEntity}.</li>
  * </ul>
- * 配方直接复用原版熔炼({@link RecipeType#SMELTING}), 所以外面放个箱子/漏斗就能用,
- * 也可以被其他模组的"方块形式升级插件"当成普通熔炉来用.
- * <p>
- * 槽位里的物品按配置的基准时间(普通电炉是 100)算一轮, 顶上的方块按配方本身的时间算,
- * 两者都先过一遍机器自己的速度倍率, 加速插件在基类里再乘一次.
+ * 配方用本模组自己的粉碎配方({@link DTRecipes#CRUSHING}), 一轮的时间和能耗都按配方来,
+ * 所以并行时每条线各自算自己那份能耗.
  */
-public class AdvancedSculkFurnaceBlockEntity extends ParallelBionicMachineBlockEntity<AdvancedSculkFurnaceBlockEntity> {
-	public AdvancedSculkFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+public class AdvancedCrusherBlockEntity extends ParallelBionicMachineBlockEntity<AdvancedCrusherBlockEntity> {
+	public AdvancedCrusherBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
 		super(type, pos, state);
 	}
 
 	@Override
 	public int getMachineMaxEnergy() {
-		return AdvancedSculkFurnaceConfig.MAX_ENERGY.get();
+		return AdvancedCrusherConfig.MAX_ENERGY.get();
 	}
 
 	@Override
 	public int getMaxReceive() {
-		return AdvancedSculkFurnaceConfig.MAX_RECEIVE.get();
+		return AdvancedCrusherConfig.MAX_RECEIVE.get();
 	}
 
 	@Override
@@ -64,32 +61,19 @@ public class AdvancedSculkFurnaceBlockEntity extends ParallelBionicMachineBlockE
 
 	@Override
 	protected @Nullable LaneRecipe findRecipe(Level level, ItemStack input, boolean fromBlock) {
-		SmeltingRecipe recipe = getRecipe(RecipeType.SMELTING, level, input);
+		CrushingRecipe recipe = getRecipe(DTRecipes.CRUSHING.getRecipeType(), level, input);
 		if (recipe == null) {
 			return null;
 		}
 
-		// 槽位里的物品按配置的基准时间, 顶上的方块按配方本身的时间
-		int base = fromBlock
-				? recipe.getCookingTime()
-				: AdvancedSculkFurnaceConfig.PROCESS_TIME.get();
-
-		int machineSpeed = Math.max(1, AdvancedSculkFurnaceConfig.SPEED_MULTIPLIER.get());
+		int machineSpeed = Math.max(1, AdvancedCrusherConfig.SPEED_MULTIPLIER.get());
 
 		return new LaneRecipe(
 				recipe.getId(),
-				recipe.getResultItem(level.registryAccess()),
-				Math.max(1, base / machineSpeed),
-				AdvancedSculkFurnaceConfig.ENERGY_PER_TICK.get()
+				recipe.getOutput(),
+				Math.max(1, recipe.getProcessingTime() / machineSpeed),
+				recipe.getEnergyCost()
 		);
-	}
-
-	/**
-	 * 空转时进度条按物品的基准时间显示.
-	 */
-	@Override
-	protected int getIdleProcessTime() {
-		return AdvancedSculkFurnaceConfig.PROCESS_TIME.get();
 	}
 
 	@Override
@@ -101,13 +85,13 @@ public class AdvancedSculkFurnaceBlockEntity extends ParallelBionicMachineBlockE
 
 	private WidgetGroup createUIWidget(Player player) {
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
-		// 暂时借用普通幽匿电炉的 GUI 贴图
-		group.setBackground(new ResourceTexture(DeepTech.loadGui("sculk_furnace")));
+		// 暂时借用普通粉碎机的 GUI 贴图
+		group.setBackground(new ResourceTexture(DeepTech.loadGui("crusher")));
 
 		LabelWidget title = new LabelWidget(
 				8,
 				8,
-				MachineBlocks.ADVANCED_SCULK_FURNACE.get().getName()
+				MachineBlocks.ADVANCED_CRUSHER.get().getName()
 		);
 		title.setColor(0xFF5D5F60);
 		group.addWidget(title);
@@ -119,12 +103,12 @@ public class AdvancedSculkFurnaceBlockEntity extends ParallelBionicMachineBlockE
 				getMaxEnergyStored()
 		));
 
-		group.addWidget(new VerticalProgressBarWidget(
-				68, 40, 14, 14,
+		group.addWidget(new ProgressBarWidget(
+				68, 39, 16, 16,
 				this::getProgress,
 				this::getMaxProgress,
-				new ResourceTexture(DeepTech.loadGui("elements/progress_furnace_back")),
-				new ResourceTexture(DeepTech.loadGui("elements/progress_furnace_front"))
+				new ResourceTexture(DeepTech.loadGui("elements/progress_crusher_back")),
+				new ResourceTexture(DeepTech.loadGui("elements/progress_crusher_front"))
 		));
 
 		/*

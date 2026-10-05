@@ -5,6 +5,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.basic.alloy_furnace.Allo
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.assembler.AssemblerBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.crusher.CrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.furnace.SculkFurnaceBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_crusher.AdvancedCrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_sculk_furnace.AdvancedSculkFurnaceBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.processor.ProcessorBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.advanced.sculk_nursery.SculkNurseryBlockEntity;
@@ -29,6 +30,7 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 		register(AlloyFurnaceBlockEntity.class, this::alloyFurnace);
 		register(SculkFurnaceBlockEntity.class, this::sculkFurnace);
 		register(AdvancedSculkFurnaceBlockEntity.class, this::advancedSculkFurnace);
+		register(AdvancedCrusherBlockEntity.class, this::advancedCrusher);
 		register(SculkNurseryBlockEntity.class, this::sculkNursery);
 		register(ProcessorBlockEntity.class, this::processor);
 		register(AssemblerBlockEntity.class, this::assembler);
@@ -93,6 +95,19 @@ public class MachineGuiHandler implements IGuiContainerHandler<ModularUIGuiConta
 				RecipeTypes.SMELTING,
 				RecipeTypes.BLASTING,
 				RecipeTypes.SMOKING
+		));
+	}
+
+	/**
+	 * 高级粉碎机的进度条和普通粉碎机在同一个位置(它暂时借用普通粉碎机的 GUI), 配方类型也一样.
+	 */
+	private Collection<IGuiClickableArea> advancedCrusher(ModularUIGuiContainer screen) {
+		return List.of(IGuiClickableArea.createBasic(
+				68,
+				39,
+				16,
+				16,
+				DTJeiRecipeType.CRUSHING
 		));
 	}
 

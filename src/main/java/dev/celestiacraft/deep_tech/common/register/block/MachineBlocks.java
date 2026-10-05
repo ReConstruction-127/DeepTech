@@ -11,6 +11,7 @@ import dev.celestiacraft.deep_tech.common.block.machine.advanced.collector.Sculk
 import dev.celestiacraft.deep_tech.common.block.machine.other.energy_cell.EnergyCellBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.exp_generator.EXPGeneratorBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.basic.furnace.SculkFurnaceBlock;
+import dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_crusher.AdvancedCrusherBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_sculk_furnace.AdvancedSculkFurnaceBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.bionic.docking_station.DockingStationBlock;
 import dev.celestiacraft.deep_tech.common.block.machine.other.resonance_node.ResonanceNodeBlock;
@@ -51,6 +52,7 @@ public class MachineBlocks {
 	public static final BlockEntry<SNFluidOutputPortBlock> SN_FLUID_OUTPUT_PORT;
 	public static final BlockEntry<DockingStationBlock> DOCKING_STATION;
 	public static final BlockEntry<AdvancedSculkFurnaceBlock> ADVANCED_SCULK_FURNACE;
+	public static final BlockEntry<AdvancedCrusherBlock> ADVANCED_CRUSHER;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.block("crusher", CrusherBlock::new)
@@ -249,8 +251,18 @@ public class MachineBlocks {
 				.item()
 				.tab(DTCreativeTabs.MACHINE.getKey())
 				.tag(DeepTechItemTags.MACHINES)
-				// 暂时借普通幽匿电炉的模型当物品模型
 				.model(ItemModelGen.withModel("block/machine/advanced_sculk_furnace/on"))
+				.build()
+				.register();
+
+		ADVANCED_CRUSHER = DeepTech.REGISTRATE.block("advanced_crusher", AdvancedCrusherBlock::new)
+				.blockstate(AdvancedCrusherBlock.genBlockState())
+				.tag(DeepTechBlockTags.MACHINES)
+				.item()
+				.tab(DTCreativeTabs.MACHINE.getKey())
+				.tag(DeepTechItemTags.MACHINES)
+				// 暂时借普通粉碎机的模型当物品模型
+				.model(ItemModelGen.withModel("block/machine/advanced_crusher/on"))
 				.build()
 				.register();
 	}

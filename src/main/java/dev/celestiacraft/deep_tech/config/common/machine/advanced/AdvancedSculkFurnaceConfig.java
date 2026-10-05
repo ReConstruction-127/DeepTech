@@ -29,7 +29,8 @@ public class AdvancedSculkFurnaceConfig extends ConfigModule {
 
 		ENERGY_PER_TICK = builder.translation(ConfigLang.addConfigTranslationKey("advanced_sculk_furnace.energy_per_tick"))
 				.comment("type: int")
-				.comment("energy cost while working, per tick")
+				.comment("energy cost per working parallel lane, per tick")
+				.comment("two input slots smelting in parallel therefore cost twice as much")
 				.comment("default: 20")
 				.defineInRange("advanced_sculk_furnace_energy_per_tick", 20, 1, Integer.MAX_VALUE);
 

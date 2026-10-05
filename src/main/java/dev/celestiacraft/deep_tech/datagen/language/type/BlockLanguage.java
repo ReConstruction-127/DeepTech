@@ -125,6 +125,11 @@ public class BlockLanguage extends LanguageGenerate {
 				"高级幽匿电炉"
 		);
 		addBlockLanguage(
+				"advanced_crusher",
+				"Advanced Crusher",
+				"高级粉碎机"
+		);
+		addBlockLanguage(
 				"speed_plugin",
 				"Speed Plugin",
 				"加速插件"

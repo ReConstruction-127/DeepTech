@@ -25,6 +25,7 @@ public class ConfigLanguage extends LanguageGenerate {
 		addProcessor();
 		addAssembler();
 		addAdvancedSculkFurnace();
+		addAdvancedCrusher();
 		addOther();
 		addRender();
 	}
@@ -311,8 +312,8 @@ public class ConfigLanguage extends LanguageGenerate {
 		);
 		addConfigLang(
 				"advanced_sculk_furnace.energy_per_tick",
-				"Energy consumed per tick while working",
-				"工作时每 tick 消耗的能量 (FE/t)"
+				"Energy consumed per tick for each working parallel lane",
+				"工作时每条并行线每 tick 消耗的能量 (FE/t)"
 		);
 		addConfigLang(
 				"advanced_sculk_furnace.process_time",
@@ -323,6 +324,29 @@ public class ConfigLanguage extends LanguageGenerate {
 				"advanced_sculk_furnace.speed_multiplier",
 				"How many times faster than the sculk furnace",
 				"相对普通幽匿电炉的速度倍率"
+		);
+	}
+
+	private static void addAdvancedCrusher() {
+		addConfigLang(
+				"module.advanced_crusher",
+				"Advanced Crusher",
+				"高级粉碎机"
+		);
+		addConfigLang(
+				"advanced_crusher.max_energy_stored",
+				"Advanced Crusher's max energy stored",
+				"高级粉碎机最大能量存储 (FE)"
+		);
+		addConfigLang(
+				"advanced_crusher.max_energy_receive",
+				"Advanced Crusher's max energy receive",
+				"高级粉碎机最大能量接收速率 (FE/t)"
+		);
+		addConfigLang(
+				"advanced_crusher.speed_multiplier",
+				"How many times faster than the crusher",
+				"相对普通粉碎机的速度倍率"
 		);
 	}
 
