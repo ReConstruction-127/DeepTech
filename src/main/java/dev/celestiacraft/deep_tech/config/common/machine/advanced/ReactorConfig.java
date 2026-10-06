@@ -32,10 +32,6 @@ public class ReactorConfig extends ConfigModule {
 	/** 扩散阶段: 每多少 tick 蔓延一步, 以及每步最多处理几格(防止一次铺太多卡顿) */
 	public static ForgeConfigSpec.IntValue DISPERSAL_INTERVAL;
 	public static ForgeConfigSpec.IntValue DISPERSAL_STEP_LIMIT;
-	/** 装饰(脉络等)上生成感染效果云的概率(百分比, 可以是小数), 以及效果云持续时间(tick) */
-	public static ForgeConfigSpec.DoubleValue CLOUD_CHANCE;
-	public static ForgeConfigSpec.IntValue CLOUD_DURATION;
-	public static ForgeConfigSpec.IntValue INFECTION_DURATION;
 
 	/** 能量接收器: 每破坏一个幽匿块获得的 FE */
 	public static ForgeConfigSpec.IntValue ENERGY_PER_SCULK;
@@ -155,23 +151,5 @@ public class ReactorConfig extends ConfigModule {
 				.comment("每步最多蔓延几格. 洪水没有边界, 只受惰性方块与不可破坏方块阻挡, 用这个值把单步的量摊开免得卡顿")
 				.comment("default: 512")
 				.defineInRange("sculk_reactor_dispersal_step_limit", 512, 1, 65536);
-
-		CLOUD_CHANCE = builder.translation(ConfigLang.addConfigTranslationKey("sculk_reactor.cloud_chance"))
-				.comment("type: double")
-				.comment("只有幽匿脉络会生成效果云, 这是它的概率(百分比, 可以是小数)")
-				.comment("default: 0.001 (= 十万分之一)")
-				.defineInRange("sculk_reactor_cloud_chance", 0.001D, 0.0D, 100.0D);
-
-		CLOUD_DURATION = builder.translation(ConfigLang.addConfigTranslationKey("sculk_reactor.cloud_duration"))
-				.comment("type: int")
-				.comment("效果云存在时长(tick), 6000 = 5 分钟")
-				.comment("default: 6000")
-				.defineInRange("sculk_reactor_cloud_duration", 6000, 20, 240000);
-
-		INFECTION_DURATION = builder.translation(ConfigLang.addConfigTranslationKey("sculk_reactor.infection_duration"))
-				.comment("type: int")
-				.comment("效果云施加的感染效果持续时间(tick)")
-				.comment("default: 600")
-				.defineInRange("sculk_reactor_infection_duration", 600, 20, 72000);
 	}
 }

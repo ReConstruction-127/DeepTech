@@ -231,19 +231,16 @@ public final class ReactorMeltdown {
 	/**
 	 * 从这一格幽匿块挑一个合法的面扩散一次.
 	 * <p>
-	 * 方向池不是固定权重, 而是每次现算:
-	 * <ul>
-	 *     <li>水平方向 3~4 份、垂直方向 1~2 份 —— 权重随机, 所以不会压出平整的上下平面;</li>
-	 *     <li>再往池子里多塞几份 {@code heading}(这一块"来时的方向"), 让它倾向于顺着原走向继续爬,
-	 *     长成枝蔓而不是一层层规则地往外糊。</li>
-	 * </ul>
+	 * 方向池每次现算: 水平四个方向权重相同(3~4 份), 垂直方向 1~2 份。
+	 * <b>不做"顺着来向"的偏置</b> —— 那样会让每条枝蔓走成直线, 导致东南西北覆盖不均;
+	 * 现在每条枝蔓都是无偏的随机游走, 四个水平方向机会均等。
+	 * <p>
 	 * <b>没有半径边界</b>: 只有惰性方块、硬度 -1 的方块, 以及没加载的区块能挡住它。
 	 *
-	 * @param heading 这一块是从哪个方向长过来的, 可为 null
 	 * @return 新长出来的幽匿块坐标, 没长出来返回 null
 	 */
-	public static BlockPos growOneFace(Level level, BlockPos from, @Nullable Direction heading) {
-		for (Direction direction : shuffledFloodDirections(level.random, heading)) {
+	public static BlockPos growOneFace(Level level, BlockPos from) {
+		for (Direction direction : shuffledFloodDirections(level.random)) {
 			BlockPos target = from.relative(direction);
 
 			if (!level.hasChunkAt(target) || !canCover(level, target)) {
@@ -261,10 +258,10 @@ public final class ReactorMeltdown {
 	/**
 	 * 现算一张乱序方向表当扩散方向池.
 	 * <p>
-	 * 水平方向 3~4 份、垂直方向 1~2 份(每次随机), 再额外塞入若干份 {@code heading},
-	 * 于是既保留"横向铺开"的倾向, 又不会长出平整的上下平面, 还会顺着来向爬出枝蔓。
+	 * 水平四个方向<b>权重完全一致</b>(3~4 份, 每次随机), 垂直方向 1~2 份:
+	 * 既保留"横向铺开"的倾向, 又不会长出平整的上下平面, 也不会偏袒东南西北中的任何一个。
 	 */
-	private static Direction[] shuffledFloodDirections(RandomSource random, @Nullable Direction heading) {
+	private static Direction[] shuffledFloodDirections(RandomSource random) {
 		List<Direction> pool = new ArrayList<>();
 		int horizontalWeight = 3 + random.nextInt(2);
 		int verticalWeight = 1 + random.nextInt(2);
@@ -274,12 +271,6 @@ public final class ReactorMeltdown {
 
 			for (int i = 0; i < weight; i++) {
 				pool.add(direction);
-			}
-		}
-
-		if (heading != null) {
-			for (int i = 0; i < 4; i++) {
-				pool.add(heading);
 			}
 		}
 

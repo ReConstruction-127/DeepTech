@@ -447,21 +447,6 @@ public class ConfigLanguage extends LanguageGenerate {
 				"Ticks between each contiguous dispersal step",
 				"连续扩散每多少 tick 蔓延一步"
 		);
-		addConfigLang(
-				"sculk_reactor.cloud_chance",
-				"Chance (percent, decimals allowed) for a sculk vein to spawn an infection effect cloud",
-				"幽匿脉络生成感染效果云的概率 (百分比, 可填小数)"
-		);
-		addConfigLang(
-				"sculk_reactor.cloud_duration",
-				"Effect cloud lifetime in ticks (6000 = 5 minutes)",
-				"效果云存在时长 (tick, 6000 = 5 分钟)"
-		);
-		addConfigLang(
-				"sculk_reactor.infection_duration",
-				"Duration of the infection effect applied by the clouds (ticks)",
-				"效果云施加的感染效果持续时间 (tick)"
-		);
 	}
 
 	private static void addOther() {

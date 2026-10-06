@@ -13,7 +13,6 @@ import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.ProportionalTankWidget;
 import dev.celestiacraft.deep_tech.api.fluid.SingleTankFluidTransfer;
-import dev.celestiacraft.deep_tech.common.register.DTEffects;
 import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.ReactorBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.ReactorConfig;
@@ -24,8 +23,6 @@ import dev.celestiacraft.libs.compat.patchouli.multiblock.MultiblockHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -78,12 +75,11 @@ import java.util.Map;
  *     <br><b>野蛮生长, 而不是糊成一块实心团</b>: 每个幽匿块只有 {@code SPREAD_BUDGET_MIN}~{@code SPREAD_BUDGET_MAX}
  *     次扩散额度, 用完就退出活跃集 —— 长出来的是一丛"会死的枝蔓"(自避 + 断路, 带大量空洞),
  *     而不是把可达区域填满的实心团(后者外表面必然又平又滑)。
- *     方向池每次现算(水平 3~4 份、垂直 1~2 份), 并额外偏向"来时的方向"让它顺着原走向爬;
- *     每步还有 30% 概率"先不长", 各枝蔓推进不同步。于是既没有平滑的面, 也没有平整的棱角。
+ *     方向池每次现算, 四个水平方向<b>权重完全一致</b>(3~4 份) —— 不做"顺着来向"的偏置,
+ *     否则每条枝蔓会走成直线、导致东南西北覆盖不均; 每步还有 30% 概率"先不长", 各枝蔓推进不同步。
+ *     于是既没有平滑的面, 也没有平整的棱角, 四个水平方向机会均等。
  *     <br><b>装饰只发生在这个阶段</b>: 每个长出来的幽匿块挂一个表面装饰
- *     (97% 脉络 / 1% 感测体 / 1% 尖啸体 / 1% 催发体),
- *     其中<b>只有幽匿脉络</b>有 {@code CLOUD_CHANCE}(默认 0.001%)的概率生成持续
- *     {@code CLOUD_DURATION}(默认 6000 tick = 5 分钟)的感染效果云。</li>
+ *     (97% 脉络 / 1% 感测体 / 1% 尖啸体 / 1% 催发体)。</li>
  *     <li>扩散结束 → <b>两次爆炸</b>: 先在机器正中央, 再在控制器处, 威力为 {@code EXPLOSION_POWER}(默认 4, 与 TNT 一致)。</li>
  * </ol>
  *
@@ -120,11 +116,6 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 	private static final float TNT_POWER = 4.0F;
 
 	/**
-	 * 效果云自身的半径(格)
-	 */
-	private static final int CLOUD_RADIUS_BLOCKS = 3;
-
-	/**
 	 * 扩散每一步里"这一步先不长"的概率(百分比).
 	 * <p>
 	 * 让各条枝蔓的推进不同步, 外形才不会是平滑的一层壳。
@@ -134,11 +125,12 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 	/**
 	 * 每个幽匿块还能再扩散几次(在这个区间里随机).
 	 * <p>
-	 * 这是"野蛮生长"的关键: 每块长够次数就退出, 于是整体是一丛会死的枝蔓,
-	 * 而不是把可达区域填满的实心团 —— 后者外表面必然又平又滑。
+	 * 现在是 1~1: 每块只长一次就"死", 于是每个种子长出一条不断游走的枝蔓,
+	 * 整体是一丛分叉、断头、带大量空洞的枝蔓, 而不是把可达区域填满的实心团。
+	 * 想更密就往大调。
 	 */
-	private static final int SPREAD_BUDGET_MIN = 2;
-	private static final int SPREAD_BUDGET_MAX = 3;
+	private static final int SPREAD_BUDGET_MIN = 1;
+	private static final int SPREAD_BUDGET_MAX = 1;
 
 	/**
 	 * 扩散开始时原地扫描幽匿块的半径 —— 只是找种子, 与洪水范围无关
@@ -187,7 +179,7 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 	private BlockPos overloadCenter;
 
 	/**
-	 * 扩散阶段的活跃幽匿块: 坐标 -> 这一块还能再扩散几次 + 它是从哪个方向长过来的.
+	 * 扩散阶段的活跃幽匿块: 坐标 -> 这一块还能再扩散几次.
 	 * <p>
 	 * 只放内存: 存档重载后在 {@link #onLoad()} 里按世界里的幽匿块重建。
 	 */
@@ -196,12 +188,11 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 	/**
 	 * 活跃幽匿块的扩散状态
 	 *
-	 * @param budget  还能再扩散几次
-	 * @param heading 来时的方向, 用来倾向于顺着原走向继续爬
+	 * @param budget 还能再扩散几次
 	 */
-	private record Frontier(int budget, @Nullable Direction heading) {
+	private record Frontier(int budget) {
 		Frontier spent() {
-			return new Frontier(budget - 1, heading);
+			return new Frontier(budget - 1);
 		}
 	}
 
@@ -526,31 +517,17 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 				center.offset(-radius, -radius, -radius),
 				center.offset(radius, radius, radius))) {
 			if (level.getBlockState(cell).is(Blocks.SCULK)) {
-				activeSculk.put(cell.immutable(), newFrontier(level, null));
+				activeSculk.put(cell.immutable(), newFrontier(level));
 			}
 		}
 	}
 
 	/**
-	 * 给一个新长出来的幽匿块发一张额度卡: 随机 2~3 次扩散机会, 并记住它是从哪个方向长过来的。
+	 * 给一个新长出来的幽匿块发一张额度卡
 	 */
-	private static Frontier newFrontier(Level level, @Nullable Direction heading) {
+	private static Frontier newFrontier(Level level) {
 		int budget = SPREAD_BUDGET_MIN + level.random.nextInt(SPREAD_BUDGET_MAX - SPREAD_BUDGET_MIN + 1);
-		return new Frontier(budget, heading);
-	}
-
-	/**
-	 * {@code from} 朝哪个方向一步能到 {@code to} —— 用来记住枝蔓的走向
-	 */
-	@Nullable
-	private static Direction directionOf(BlockPos from, BlockPos to) {
-		for (Direction direction : Direction.values()) {
-			if (from.relative(direction).equals(to)) {
-				return direction;
-			}
-		}
-
-		return null;
+		return new Frontier(budget);
 	}
 
 	/**
@@ -582,20 +559,20 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 				continue;
 			}
 
-			BlockPos created = ReactorMeltdown.growOneFace(level, from, frontier.heading());
+			BlockPos created = ReactorMeltdown.growOneFace(level, from);
 
 			if (created == null) {
 				iterator.remove();
 				continue;
 			}
 
-			grown.put(created, newFrontier(level, directionOf(from, created)));
+			grown.put(created, newFrontier(level));
 
 			// 每长一格扣 1 mB 额度(额度 = 第一格储罐的培养液量)
 			dispersalsLeft--;
 
 			// 每个幽匿块上都要挂一个表面装饰
-			decorate(level, created);
+			ReactorMeltdown.decorateAround(level, created);
 
 			// 这一块的额度用完就退出活跃集: 枝蔓长到头就"死", 不会把周围填满
 			if (frontier.budget() <= 1) {
@@ -611,43 +588,6 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 		if (activeSculk.isEmpty() || dispersalsLeft <= 0) {
 			finishMeltdown(level, pos, center);
 		}
-	}
-
-	/**
-	 * 给一个幽匿块挂表面装饰; 只有挂成幽匿脉络时才可能生成感染效果云。
-	 */
-	private void decorate(Level level, BlockPos sculkPos) {
-		BlockPos decoration = ReactorMeltdown.decorateAround(level, sculkPos);
-
-		if (decoration != null) {
-			maybeSpawnCloud(level, decoration);
-		}
-	}
-
-	/**
-	 * 只有幽匿脉络会生成效果云: 按 {@code CLOUD_CHANCE}(默认 25%)的概率, 在这一格生成一朵
-	 * 存在 {@code CLOUD_DURATION}(默认 5 分钟)、带感染效果的区域效果云。
-	 */
-	private void maybeSpawnCloud(Level level, BlockPos pos) {
-		if (!level.getBlockState(pos).is(Blocks.SCULK_VEIN)) {
-			return;
-		}
-
-		if (level.random.nextDouble() * 100.0D >= ReactorConfig.CLOUD_CHANCE.get()) {
-			return;
-		}
-
-		AreaEffectCloud cloud = new AreaEffectCloud(level, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
-		cloud.setRadius(CLOUD_RADIUS_BLOCKS);
-		cloud.setDuration(ReactorConfig.CLOUD_DURATION.get());
-		cloud.setWaitTime(10);
-		cloud.addEffect(new MobEffectInstance(
-				DTEffects.INFECTION.get(),
-				ReactorConfig.INFECTION_DURATION.get(),
-				0
-		));
-
-		level.addFreshEntity(cloud);
 	}
 
 	/**
