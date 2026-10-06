@@ -70,7 +70,7 @@ import java.util.Map;
  *     装 8000 就一共长 8000 格, 装 1 就只有 1 格)。先记下这个量并<b>作废机器内全部流体</b>,
  *     然后面贴面连续扩散 —— 每个幽匿块挑一个合法的面把邻居变成幽匿块, 新块与旧块下一轮继续各自扩散,
  *     直到额度用完或者六面都不满足条件。<b>没有半径边界</b>: 只有惰性方块、硬度 -1 的方块和未加载区块能挡住它。
- *     每 {@code DISPERSAL_INTERVAL}(默认 10 tick)蔓延一步, 每步最多
+ *     每 {@code DISPERSAL_INTERVAL}(默认 1 tick)蔓延一步, 每步最多
  *     {@code DISPERSAL_STEP_LIMIT}(默认 512)格。
  *     <br><b>野蛮生长, 而不是糊成一块实心团</b>: 每个幽匿块只有 {@code SPREAD_BUDGET_MIN}~{@code SPREAD_BUDGET_MAX}
  *     次扩散额度, 用完就退出活跃集 —— 长出来的是一丛"会死的枝蔓"(自避 + 断路, 带大量空洞),

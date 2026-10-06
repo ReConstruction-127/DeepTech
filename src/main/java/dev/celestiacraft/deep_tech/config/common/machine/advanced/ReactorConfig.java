@@ -142,9 +142,9 @@ public class ReactorConfig extends ConfigModule {
 
 		DISPERSAL_INTERVAL = builder.translation(ConfigLang.addConfigTranslationKey("sculk_reactor.dispersal_interval"))
 				.comment("type: int")
-				.comment("连续扩散每多少 tick 蔓延一步, 10 = 每半秒一步")
-				.comment("default: 10")
-				.defineInRange("sculk_reactor_dispersal_interval", 10, 1, 72000);
+				.comment("连续扩散每多少 tick 蔓延一步, 1 = 每 tick 一步")
+				.comment("default: 1")
+				.defineInRange("sculk_reactor_dispersal_interval", 1, 1, 72000);
 
 		DISPERSAL_STEP_LIMIT = builder.translation(ConfigLang.addConfigTranslationKey("sculk_reactor.dispersal_step_limit"))
 				.comment("type: int")
