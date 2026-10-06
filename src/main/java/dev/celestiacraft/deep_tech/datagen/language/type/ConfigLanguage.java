@@ -26,6 +26,7 @@ public class ConfigLanguage extends LanguageGenerate {
 		addAssembler();
 		addAdvancedSculkFurnace();
 		addAdvancedCrusher();
+		addReactor();
 		addOther();
 		addRender();
 	}
@@ -347,6 +348,119 @@ public class ConfigLanguage extends LanguageGenerate {
 				"advanced_crusher.speed_multiplier",
 				"How many times faster than the crusher",
 				"相对普通粉碎机的速度倍率"
+		);
+	}
+
+	private static void addReactor() {
+		addConfigLang(
+				"module.sculk_reactor",
+				"Sculk Reactor",
+				"幽匿反应堆"
+		);
+		addConfigLang(
+				"sculk_reactor.max_energy_stored",
+				"Reactor Controller's max energy stored (FE)",
+				"反应堆控制器最大能量存储 (FE)"
+		);
+		addConfigLang(
+				"sculk_reactor.max_energy_receive",
+				"Reactor Controller's max energy receive rate (FE/t)",
+				"反应堆控制器最大能量接收速率 (FE/t)"
+		);
+		addConfigLang(
+				"sculk_reactor.mb_per_sculk",
+				"Sculk culture consumed per sculk block grown (mB)",
+				"每生成一个幽匿块消耗的幽匿培养液 (mB)"
+		);
+		addConfigLang(
+				"sculk_reactor.grow_interval",
+				"Ticks between growth attempts (5 = four times per second)",
+				"生长尝试间隔 (tick, 5 = 每秒四次)"
+		);
+		addConfigLang(
+				"sculk_reactor.explosion_power",
+				"Power of each of the two final explosions (4 = TNT)",
+				"失控结束时两次爆炸的威力 (4 = TNT)"
+		);
+		addConfigLang(
+				"sculk_reactor.energy_per_sculk",
+				"FE gained by the energy receiver per sculk block",
+				"能量接收器每破坏一个幽匿块获得的 FE"
+		);
+		addConfigLang(
+				"sculk_reactor.receiver_radius",
+				"Max distance between the energy receiver and the reactor centre (blocks)",
+				"能量接收器与反应堆中心的最大距离 (格)"
+		);
+		addConfigLang(
+				"sculk_reactor.receiver_max_energy",
+				"Energy receiver's internal energy buffer (FE)",
+				"能量接收器内部能量缓存 (FE)"
+		);
+		addConfigLang(
+				"sculk_reactor.receiver_max_extract",
+				"Energy receiver's max output rate (FE/t)",
+				"能量接收器最大输出速率 (FE/t)"
+		);
+		addConfigLang(
+				"sculk_reactor.sculk_per_cycle_min",
+				"Min sculk blocks placed per growth cycle",
+				"每个生长周期最少放置几个幽匿块"
+		);
+		addConfigLang(
+				"sculk_reactor.sculk_per_cycle_max",
+				"Max sculk blocks placed per growth cycle",
+				"每个生长周期最多放置几个幽匿块"
+		);
+		addConfigLang(
+				"sculk_reactor.spread_min",
+				"Min blocks covered per peripheral spread",
+				"外围蔓延时每次最少覆盖几格"
+		);
+		addConfigLang(
+				"sculk_reactor.spread_max",
+				"Max blocks covered per peripheral spread",
+				"外围蔓延时每次最多覆盖几格"
+		);
+		addConfigLang(
+				"sculk_reactor.spread_operations",
+				"Peripheral spreads before the dispersal phase starts",
+				"进入扩散阶段前的外围蔓延次数"
+		);
+		addConfigLang(
+				"sculk_reactor.spread_interval",
+				"Ticks between peripheral spreads (20 = once per second)",
+				"外围蔓延间隔 (tick, 20 = 每秒一次)"
+		);
+		addConfigLang(
+				"sculk_reactor.spread_radius",
+				"Peripheral spread radius (blocks)",
+				"外围蔓延半径 (格)"
+		);
+		addConfigLang(
+				"sculk_reactor.dispersal_step_limit",
+				"Max blocks dispersed per step (spreads the work out to avoid lag)",
+				"每步最多蔓延几格 (把单步的量摊开, 避免卡顿)"
+		);
+		addConfigLang(
+				"sculk_reactor.dispersal_interval",
+				"Ticks between each contiguous dispersal step",
+				"连续扩散每多少 tick 蔓延一步"
+		);
+		addConfigLang(
+				"sculk_reactor.cloud_chance",
+				"Chance (percent, decimals allowed) for a sculk vein to spawn an infection effect cloud",
+				"幽匿脉络生成感染效果云的概率 (百分比, 可填小数)"
+		);
+		addConfigLang(
+				"sculk_reactor.cloud_duration",
+				"Effect cloud lifetime in ticks (6000 = 5 minutes)",
+				"效果云存在时长 (tick, 6000 = 5 分钟)"
+		);
+		addConfigLang(
+				"sculk_reactor.infection_duration",
+				"Duration of the infection effect applied by the clouds (ticks)",
+				"效果云施加的感染效果持续时间 (tick)"
 		);
 	}
 

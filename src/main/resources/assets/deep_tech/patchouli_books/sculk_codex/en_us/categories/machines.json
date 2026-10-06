@@ -1,0 +1,6 @@
+{
+	"name": "Machines",
+	"description": "Deep Tech machinery, including the Sculk Reactor multiblock.",
+	"icon": "deep_tech:reactor_controller",
+	"sortnum": 0
+}

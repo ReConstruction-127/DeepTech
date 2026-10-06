@@ -23,7 +23,10 @@ import dev.celestiacraft.deep_tech.common.block.machine.advanced.assembler.Assem
 import dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_crusher.AdvancedCrusherBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.bionic.advanced_sculk_furnace.AdvancedSculkFurnaceBlockEntity;
 import dev.celestiacraft.deep_tech.common.block.machine.bionic.docking_station.DockingStationBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.reactor.ReactorControllerBlockEntity;
+import dev.celestiacraft.deep_tech.common.block.machine.reactor.ReactorEnergyReceiverBlockEntity;
 import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
+import dev.celestiacraft.deep_tech.common.register.block.ReactorBlocks;
 
 public class DTBlockEntities {
 	public static final BlockEntityEntry<CrusherBlockEntity> CRUSHER;
@@ -48,6 +51,8 @@ public class DTBlockEntities {
 	public static final BlockEntityEntry<DockingStationBlockEntity> DOCKING_STATION;
 	public static final BlockEntityEntry<AdvancedSculkFurnaceBlockEntity> ADVANCED_SCULK_FURNACE;
 	public static final BlockEntityEntry<AdvancedCrusherBlockEntity> ADVANCED_CRUSHER;
+	public static final BlockEntityEntry<ReactorControllerBlockEntity> REACTOR_CONTROLLER;
+	public static final BlockEntityEntry<ReactorEnergyReceiverBlockEntity> REACTOR_ENERGY_RECEIVER;
 
 	static {
 		CRUSHER = DeepTech.REGISTRATE.blockEntity("crusher", CrusherBlockEntity::new)
@@ -103,6 +108,14 @@ public class DTBlockEntities {
 
 		ADVANCED_CRUSHER = DeepTech.REGISTRATE.blockEntity("advanced_crusher", AdvancedCrusherBlockEntity::new)
 				.validBlock(MachineBlocks.ADVANCED_CRUSHER)
+				.register();
+
+		REACTOR_CONTROLLER = DeepTech.REGISTRATE.blockEntity("reactor_controller", ReactorControllerBlockEntity::new)
+				.validBlock(ReactorBlocks.REACTOR_CONTROLLER)
+				.register();
+
+		REACTOR_ENERGY_RECEIVER = DeepTech.REGISTRATE.blockEntity("reactor_energy_receiver", ReactorEnergyReceiverBlockEntity::new)
+				.validBlock(ReactorBlocks.REACTOR_ENERGY_RECEIVER)
 				.register();
 
 		SN_CENTER = DeepTech.REGISTRATE.blockEntity("sculk_network_center", SNCenterBlockEntity::new)

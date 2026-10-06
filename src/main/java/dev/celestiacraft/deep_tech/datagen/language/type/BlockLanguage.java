@@ -134,5 +134,26 @@ public class BlockLanguage extends LanguageGenerate {
 				"Speed Plugin",
 				"加速插件"
 		);
+		addBlockLanguage(
+				"reactor_casing",
+				"Reactor Casing",
+				"反应堆外壳"
+		);
+		addBlockLanguage(
+				"reactor_controller",
+				"Reactor Controller",
+				"反应堆控制器"
+		);
+		addBlockLanguage(
+				"reactor_energy_receiver",
+				"Reactor Energy Receiver",
+				"反应堆能量接收器"
+		);
+		// nebula_libs 多方块可视化用的结构名(键由 MultiblockHandler.Builder#translationKey 指定)
+		addCustomLang(
+				"multiblock.deep_tech.sculk_reactor",
+				"Sculk Reactor",
+				"幽匿反应堆"
+		);
 	}
 }

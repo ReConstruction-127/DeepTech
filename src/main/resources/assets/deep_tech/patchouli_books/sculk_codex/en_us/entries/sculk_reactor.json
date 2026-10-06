@@ -1,0 +1,51 @@
+{
+	"name": "Sculk Reactor",
+	"category": "deep_tech:machines",
+	"icon": "deep_tech:reactor_controller",
+	"sortnum": 0,
+	"pages": [
+		{
+			"type": "patchouli:text",
+			"title": "Sculk Reactor",
+			"text": "The Sculk Reactor is a $(l)5x5x5$() multiblock that turns $(item)sculk culture$() into raw sculk - and, if you let it run away, into a crater.$(br2)Place the $(item)reactor controller$() in the bottom layer, build the shell around it, and pump sculk culture into the controller."
+		},
+		{
+			"type": "patchouli:multiblock",
+			"name": "Sculk Reactor",
+			"multiblock": {
+				"pattern": [
+					[ "22222", "22222", "22222", "22222", "22222" ],
+					[ "22222", "2CCC2", "2CCC2", "2CCC2", "22222" ],
+					[ "22222", "2CCC2", "2CCC2", "2CCC2", "22222" ],
+					[ "22222", "24442", "24442", "24442", "22222" ],
+					[ "11111", "11111", "11111", "11111", "11011" ]
+				],
+				"mapping": {
+					"0": "deep_tech:reactor_controller",
+					"1": "#deep_tech:reactor_casing",
+					"2": "minecraft:tinted_glass",
+					"4": "minecraft:sculk_catalyst",
+					"C": "#deep_tech:reactor_cavity"
+				},
+				"symmetrical": false
+			},
+			"enable_visualize": true,
+			"text": "Layer 1 (bottom) is the reactor shell - every shell block may be replaced by a $(item)docking station$(). Layer 2 holds the sculk catalysts. Layers 3 and 4 are the growth chamber, and layer 5 is the glass lid."
+		},
+		{
+			"type": "patchouli:text",
+			"title": "Growing Sculk",
+			"text": "$(li)Every 100 mB of sculk culture grows $(l)1 to 3$() sculk blocks in the chamber. Culture is drawn from the $(l)first input tank$() only; that tank accepts nothing but sculk culture, and the other two input tanks refuse it.$()$(li)It tries every 5 ticks (four times a second), and the blocks land in random cells.$()$(li)A $(item)speed plugin$() on the controller (up to 2) makes normal operation faster - it does not speed up a meltdown.$()$(br2)Only the reactor filling its own chamber triggers what comes next. Stuffing the chamber by hand does nothing, and dismantling an idle reactor is perfectly safe.$(br2)But taking a reactor apart $(l)while it is running$() pushes it straight into a meltdown - the test is whether the reactor grew the sculk itself and it is still sitting in there. Hand-stuffed chambers, and structures emptied by an emergency stop, are safe to dismantle."
+		},
+		{
+			"type": "patchouli:text",
+			"title": "Overload",
+			"text": "Once the chamber is full the reactor does $(l)not$() explode right away. It starts to run away:$(br2)$(li)$(l)Coating.$() Twenty times over, it works on the layer hugging the structure: air gets a plain $(item)sculk vein$() (no decoration roll and no clouds in this step), and a cell that already has one becomes a $(item)sculk block$(). Blocks are never picked again.$()$(li)$(l)Dispersal.$() $(l)How far it spreads depends entirely on how much culture sits in the first tank$(): 1 mB grows 1 block, so 8000 mB covers 8000 blocks and 1 mB covers exactly one. It records that amount, voids its own fluid, then grows $(l)outward face by face$() - each sculk block converts one neighbour, and both keep going until the budget runs out or no face is left. There is $(l)no radius limit$(): only inert blocks, hardness -1 blocks and unloaded chunks stop it. One step every 10 ticks.$(br)It grows as $(l)wild tendrils$(), not as a tidy solid mass: every sculk block gets only 2-3 spreads before it dies, so the growth keeps forking, dead-ending and leaving large voids behind. The direction pool is rolled fresh each time (3-4 parts horizontal to 1-2 vertical) and is biased toward the direction the block came from, so tendrils keep crawling the way they were already going; on top of that, each block sits out a step 30% of the time, so tendrils advance out of step with each other. The result has neither smooth faces nor flat angles.$()$(li)$(l)Decoration and clouds.$() $(l)Only in this stage$() does each new sculk block get a decoration: 97% $(item)sculk vein$(), 1% $(item)sculk sensor$(), 1% $(item)sculk shrieker$(), 1% $(item)sculk catalyst$(). Only veins have a $(l)0.001%$() chance to spawn an $(item)infection$() cloud that lingers for $(l)5 minutes$().$()$(li)$(l)Detonation.$() Twice: once at the centre of the machine, once at the controller, power 4 (TNT).$()$(li)$(l)Breaking the controller.$() While the machine is $(l)hot$() - mid-meltdown, or running with its own sculk still in the chamber - digging out the controller $(l)detonates it on the spot$(): TNT power, centre first then controller. A cold machine comes apart harmlessly.$()$(br2)Bedrock and $(l)inert$() blocks are never covered - reactor casings, the controller, the energy receiver, every bionic machine, and $(l)vanilla sculk blocks, veins excepted$(). Anything with an inventory drops its contents when it is covered.$(br2)Clear the chamber out before the twentieth coating and the overload gives up and resets."
+		},
+		{
+			"type": "patchouli:text",
+			"title": "Emergency Stop",
+			"text": "Feed the controller a $(l)redstone signal$() to slam the brakes. It will:$(br2)$(li)void every item, drop of fluid and unit of energy it holds;$()$(li)clear every sculk block inside the structure, catalysts included;$()$(li)abort an overload that is already running.$()$(br2)Afterwards the chamber has to be rebuilt - that is the price of stopping a meltdown."
+		}
+	]
+}

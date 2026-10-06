@@ -6,6 +6,7 @@ import dev.celestiacraft.deep_tech.config.common.machine.advanced.AdvancedCrushe
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.AdvancedSculkFurnaceConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.AssemblerConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.ProcessorConfig;
+import dev.celestiacraft.deep_tech.config.common.machine.advanced.ReactorConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.SculkCollectorConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.SculkNurseryConfig;
 import dev.celestiacraft.deep_tech.config.common.machine.basic.AlloyFurnaceConfig;
@@ -30,6 +31,9 @@ public class CommonConfig {
 	public static final AssemblerConfig ASSEMBLER;
 	public static final AdvancedSculkFurnaceConfig ADVANCED_SCULK_FURNACE;
 	public static final AdvancedCrusherConfig ADVANCED_CRUSHER;
+
+	/** 幽匿反应堆(控制器 + 能量接收器)相关配置 */
+	public static final ReactorConfig SCULK_REACTOR;
 
 	public static final OtherConfig OTHER;
 
@@ -60,6 +64,8 @@ public class CommonConfig {
 		ADVANCED_SCULK_FURNACE = new AdvancedSculkFurnaceConfig(BUILDER);
 		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.advanced_crusher"));
 		ADVANCED_CRUSHER = new AdvancedCrusherConfig(BUILDER);
+		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.sculk_reactor"));
+		SCULK_REACTOR = new ReactorConfig(BUILDER);
 
 		BUILDER.translation(ConfigLang.addConfigTranslationKey("module.other"));
 		OTHER = new OtherConfig(BUILDER);
