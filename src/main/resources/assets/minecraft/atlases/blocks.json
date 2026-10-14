@@ -1,9 +1,9 @@
 {
-  "sources": [
-    {
-      "type": "minecraft:directory",
-      "prefix": "fluid/",
-      "source": "fluid"
-    }
-  ]
+	"sources": [
+		{
+			"type": "minecraft:directory",
+			"prefix": "fluid/",
+			"source": "fluid"
+		}
+	]
 }
