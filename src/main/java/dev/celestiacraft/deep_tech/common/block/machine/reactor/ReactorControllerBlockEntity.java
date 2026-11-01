@@ -21,7 +21,6 @@ import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import dev.celestiacraft.libs.compat.patchouli.multiblock.IMultiblockProvider;
 import dev.celestiacraft.libs.compat.patchouli.multiblock.MultiblockHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -865,6 +864,7 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 	// GUI: 3 个物品槽 + 5 个流体罐, 一行排开
 	// ------------------------------------------------------------------
 
+
 	@Override
 	public ModularUI createUI(Player player) {
 		ModularUI ui = new ModularUI(176, 166, this, player);
@@ -873,6 +873,7 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 	}
 
 	private WidgetGroup createUIWidget(Player player) {
+
 		WidgetGroup group = new WidgetGroup(0, 0, 176, 166);
 
 		group.addWidget(new LabelWidget(8, 6, ReactorBlocks.REACTOR_CONTROLLER.get().getName()));

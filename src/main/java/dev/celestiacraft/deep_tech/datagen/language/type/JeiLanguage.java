@@ -23,7 +23,7 @@ public class JeiLanguage extends LanguageGenerate {
 		);
 		addCustomLang(
 				"jei.deep_tech.catalyst_no_consume",
-				"(does not consume)",
+				"(Does not consume)",
 				"(不消耗)"
 		);
 	}
