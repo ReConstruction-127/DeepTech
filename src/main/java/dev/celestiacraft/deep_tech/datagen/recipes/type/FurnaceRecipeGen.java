@@ -3,6 +3,7 @@ package dev.celestiacraft.deep_tech.datagen.recipes.type;
 import dev.celestiacraft.deep_tech.common.register.DTMaterials;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
+import dev.celestiacraft.libs.common.material.MaterialTypes;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -26,66 +27,66 @@ public class FurnaceRecipeGen extends DTRecipeProvider {
 
 	private static void smelting(Consumer<FinishedRecipe> consumer) {
 		SimpleCookingRecipeBuilder.smelting(
-						Ingredient.of(DTMaterials.IRON.getDust()),
+						Ingredient.of(DTMaterials.IRON.getSpecificTag(MaterialTypes.DUST)),
 						RecipeCategory.MISC,
 						Items.IRON_INGOT,
 						0.7F,
 						200
 				)
-				.unlockedBy("has_iron_dust", has(DTMaterials.IRON.getDust()))
+				.unlockedBy("has_iron_dust", has(DTMaterials.IRON.getSpecificTag(MaterialTypes.DUST)))
 				.save(consumer, save("smelting/iron_ingot_from_dust"));
 
 		SimpleCookingRecipeBuilder.smelting(
-						Ingredient.of(DTMaterials.COPPER.getDust()),
+						Ingredient.of(DTMaterials.COPPER.getSpecificTag(MaterialTypes.DUST)),
 						RecipeCategory.MISC,
 						Items.COPPER_INGOT,
 						0.7F,
 						200
 				)
-				.unlockedBy("has_copper_dust", has(DTMaterials.COPPER.getDust()))
+				.unlockedBy("has_copper_dust", has(DTMaterials.COPPER.getSpecificTag(MaterialTypes.DUST)))
 				.save(consumer, save("smelting/copper_ingot_from_dust"));
 
 		SimpleCookingRecipeBuilder.smelting(
-						Ingredient.of(DTMaterials.GOLD.getDust()),
+						Ingredient.of(DTMaterials.GOLD.getSpecificTag(MaterialTypes.DUST)),
 						RecipeCategory.MISC,
 						Items.GOLD_INGOT,
 						0.7F,
 						200
 				)
-				.unlockedBy("has_gold_dust", has(DTMaterials.GOLD.getDust()))
+				.unlockedBy("has_gold_dust", has(DTMaterials.GOLD.getSpecificTag(MaterialTypes.DUST)))
 				.save(consumer, save("smelting/gold_ingot_from_dust"));
 
 	}
 
 	private static void blasting(Consumer<FinishedRecipe> consumer) {
 		SimpleCookingRecipeBuilder.blasting(
-						Ingredient.of(DTMaterials.COPPER.getDust()),
+						Ingredient.of(DTMaterials.COPPER.getSpecificTag(MaterialTypes.DUST)),
 						RecipeCategory.MISC,
 						Items.COPPER_INGOT,
 						0.7F,
 						100
 				)
-				.unlockedBy("has_copper_dust", has(DTMaterials.COPPER.getDust()))
+				.unlockedBy("has_copper_dust", has(DTMaterials.COPPER.getSpecificTag(MaterialTypes.DUST)))
 				.save(consumer, save("blasting/copper_ingot_from_dust"));
 
 		SimpleCookingRecipeBuilder.blasting(
-						Ingredient.of(DTMaterials.IRON.getDust()),
+						Ingredient.of(DTMaterials.IRON.getSpecificTag(MaterialTypes.DUST)),
 						RecipeCategory.MISC,
 						Items.IRON_INGOT,
 						0.7F,
 						100
 				)
-				.unlockedBy("has_iron_dust", has(DTMaterials.IRON.getDust()))
+				.unlockedBy("has_iron_dust", has(DTMaterials.IRON.getSpecificTag(MaterialTypes.DUST)))
 				.save(consumer, save("blasting/iron_ingot_from_dust"));
 
 		SimpleCookingRecipeBuilder.blasting(
-						Ingredient.of(DTMaterials.GOLD.getDust()),
+						Ingredient.of(DTMaterials.GOLD.getSpecificTag(MaterialTypes.DUST)),
 						RecipeCategory.MISC,
 						Items.GOLD_INGOT,
 						0.7F,
 						100
 				)
-				.unlockedBy("has_gold_dust", has(DTMaterials.GOLD.getDust()))
+				.unlockedBy("has_gold_dust", has(DTMaterials.GOLD.getSpecificTag(MaterialTypes.DUST)))
 				.save(consumer, save("blasting/gold_ingot_from_dust"));
 	}
 

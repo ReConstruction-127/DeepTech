@@ -9,6 +9,7 @@ import dev.celestiacraft.deep_tech.common.register.block.MachineBlocks;
 import dev.celestiacraft.deep_tech.common.register.item.MaterialItems;
 import dev.celestiacraft.deep_tech.common.register.item.ToolItems;
 import dev.celestiacraft.deep_tech.datagen.recipes.DTRecipeProvider;
+import dev.celestiacraft.libs.common.material.MaterialTypes;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -44,7 +45,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern("BCB")
 				.pattern(" D ")
 				.define('A', MaterialItems.SCULK_CIRCUIT)
-				.define('B', DTMaterials.IRON.getPlate())
+				.define('B', DTMaterials.IRON.getSpecificTag(MaterialTypes.PLATE))
 				.define('C', FrameBlocks.MACHINE_FRAME)
 				.define('D', Items.PISTON)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -88,7 +89,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern("BCB")
 				.pattern(" D ")
 				.define('A', MaterialItems.SCULK_CIRCUIT)
-				.define('B', DTMaterials.SCULK_ALLOY.getIngot())
+				.define('B', DTMaterials.SCULK_ALLOY.getSpecificTag(MaterialTypes.INGOT))
 				.define('C', FrameBlocks.MACHINE_FRAME)
 				.define('D', Items.SCULK)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -110,7 +111,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.define('A', MaterialItems.SCULK_BONE)
 				.define('B', Items.REDSTONE)
 				.define('C', MaterialItems.SCULK_CHUNK)
-				.define('D', DTMaterials.GOLD.getPlate())
+				.define('D', DTMaterials.GOLD.getSpecificTag(MaterialTypes.PLATE))
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/basic_circuit"));
 
@@ -118,7 +119,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern(" A ")
 				.pattern(" AA")
 				.pattern("A  ")
-				.define('A', DTMaterials.SCULK_ALLOY.getIngot())
+				.define('A', DTMaterials.SCULK_ALLOY.getSpecificTag(MaterialTypes.INGOT))
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/wrench"));
 
@@ -149,7 +150,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern("ABA")
 				.pattern("AAA")
 				.define('A', Items.SCULK_VEIN)
-				.define('B', DTMaterials.SCULK_ALLOY.getIngot())
+				.define('B', DTMaterials.SCULK_ALLOY.getSpecificTag(MaterialTypes.INGOT))
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/sn/vein"));
 
@@ -158,7 +159,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern("CBC")
 				.pattern("ACA")
 				.define('A', Items.SCULK)
-				.define('B', DTMaterials.SCULK_ALLOY.getIngot())
+				.define('B', DTMaterials.SCULK_ALLOY.getSpecificTag(MaterialTypes.INGOT))
 				.define('C', MaterialItems.SCULK_BONE)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/sn/block"));
@@ -187,7 +188,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MachineBlocks.SN_FLUID_INPUT_PORT)
 				.pattern("A ")
 				.pattern("BC")
-				.define('A', DTMaterials.SCULK_ALLOY.getIngot())
+				.define('A', DTMaterials.SCULK_ALLOY.getSpecificTag(MaterialTypes.INGOT))
 				.define('B', MaterialItems.SCULK_BONE)
 				.define('C', BasicBlocks.SCULK_NETWORK_VEIN)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -201,7 +202,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MachineBlocks.SN_FLUID_OUTPUT_PORT)
 				.pattern(" A")
 				.pattern("CB")
-				.define('A', DTMaterials.SCULK_ALLOY.getIngot())
+				.define('A', DTMaterials.SCULK_ALLOY.getSpecificTag(MaterialTypes.INGOT))
 				.define('B', MaterialItems.SCULK_BONE)
 				.define('C', BasicBlocks.SCULK_NETWORK_VEIN)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -215,7 +216,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MachineBlocks.SN_ITEM_INPUT_PORT)
 				.pattern("A ")
 				.pattern("BC")
-				.define('A', DTMaterials.SCULK_STEEL.getIngot())
+				.define('A', DTMaterials.SCULK_STEEL.getSpecificTag(MaterialTypes.INGOT))
 				.define('B', MaterialItems.SCULK_BONE)
 				.define('C', BasicBlocks.SCULK_NETWORK_VEIN)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -229,7 +230,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 		ShapedRecipeBuilder.shaped(RecipeCategory.MISC, MachineBlocks.SN_ITEM_OUTPUT_PORT)
 				.pattern(" A")
 				.pattern("CB")
-				.define('A', DTMaterials.SCULK_STEEL.getIngot())
+				.define('A', DTMaterials.SCULK_STEEL.getSpecificTag(MaterialTypes.INGOT))
 				.define('B', MaterialItems.SCULK_BONE)
 				.define('C', BasicBlocks.SCULK_NETWORK_VEIN)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -244,7 +245,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern("A")
 				.pattern("B")
 				.pattern("C")
-				.define('A', DTMaterials.SCULK_STEEL.getIngot())
+				.define('A', DTMaterials.SCULK_STEEL.getSpecificTag(MaterialTypes.INGOT))
 				.define('B', FrameBlocks.REINFORCED_MACHINE_FRAME)
 				.define('C', BasicBlocks.SCULK_NETWORK_BLOCK)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -254,7 +255,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern("A")
 				.pattern("B")
 				.pattern("C")
-				.define('A', DTMaterials.SCULK_ALLOY.getIngot())
+				.define('A', DTMaterials.SCULK_ALLOY.getSpecificTag(MaterialTypes.INGOT))
 				.define('B', FrameBlocks.REINFORCED_MACHINE_FRAME)
 				.define('C', BasicBlocks.SCULK_NETWORK_BLOCK)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
@@ -299,7 +300,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.define('A', MaterialItems.SCULK_CIRCUIT)
 				.define('B', FrameBlocks.REINFORCED_MACHINE_FRAME)
 				.define('C', MaterialItems.DENSE_SCULK_CHUNK)
-				.define('D', DTMaterials.SCULK_ALLOY.getIngot())
+				.define('D', DTMaterials.SCULK_ALLOY.getSpecificTag(MaterialTypes.INGOT))
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/processor"));
 
@@ -308,7 +309,7 @@ public class CraftingRecipeGen extends DTRecipeProvider {
 				.pattern("BCB")
 				.pattern("ABA")
 				.define('A', MaterialItems.SCULK_BONE)
-				.define('B', DTMaterials.SCULK_STEEL.getIngot())
+				.define('B', DTMaterials.SCULK_STEEL.getSpecificTag(MaterialTypes.INGOT))
 				.define('C', MaterialItems.SCULK_CHUNK)
 				.unlockedBy("crafting_table", has(Items.CRAFTING_TABLE))
 				.save(consumer, save("shaped/frame_reinforced"));

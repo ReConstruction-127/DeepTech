@@ -31,18 +31,48 @@ import vazkii.patchouli.api.IMultiblock;
  * 层内是 {@code pattern[y][x].charAt(z)}(x 西→东, z 北→南)。
  * 注意 {@code StructureBuilder} 预置的 {@code ' '} 是 anyMatcher 而不是空气, 所以本结构里不使用空格。
  */
-public final class ReactorStructure {
+public class ReactorStructure {
 	/**
 	 * 生长腔格数: 第 3、4 层内部 3×3×2 = 18 格, 填满即爆炸
 	 */
 	public static final int CAVITY_SIZE = 18;
 
 	public static final String[][] PATTERN = {
-			{ "22222", "22222", "22222", "22222", "22222" },
-			{ "22222", "2CCC2", "2CCC2", "2CCC2", "22222" },
-			{ "22222", "2CCC2", "2CCC2", "2CCC2", "22222" },
-			{ "22222", "24442", "24442", "24442", "22222" },
-			{ "11111", "11111", "11111", "11111", "11011" }
+			{
+					"22222",
+					"22222",
+					"22222",
+					"22222",
+					"22222"
+			},
+			{
+					"22222",
+					"2CCC2",
+					"2CCC2",
+					"2CCC2",
+					"22222"
+			},
+			{
+					"22222",
+					"2CCC2",
+					"2CCC2",
+					"2CCC2",
+					"22222"
+			},
+			{
+					"22222",
+					"24442",
+					"24442",
+					"24442",
+					"22222"
+			},
+			{
+					"11111",
+					"11111",
+					"11111",
+					"11111",
+					"11011"
+			}
 	};
 
 	/**
@@ -52,20 +82,27 @@ public final class ReactorStructure {
 
 	private static IMultiblock instance;
 
-	private ReactorStructure() {
-	}
-
 	/**
 	 * 懒构建结构: 不能在静态块里直接 build, 否则会提前触发 {@link ReactorBlocks} 的类初始化。
 	 */
 	public static IMultiblock structure() {
 		if (instance == null) {
 			instance = StructureBuilder.create(PATTERN)
-					.define('0', builder -> builder.block(ReactorBlocks.REACTOR_CONTROLLER.get()))
-					.define('1', builder -> builder.tag(DeepTechBlockTags.REACTOR_CASING))
-					.define('2', builder -> builder.block(Blocks.TINTED_GLASS))
-					.define('4', builder -> builder.block(Blocks.SCULK_CATALYST))
-					.define('C', builder -> builder.tag(DeepTechBlockTags.REACTOR_CAVITY))
+					.define('0', (builder) -> {
+						builder.block(ReactorBlocks.REACTOR_CONTROLLER.get());
+					})
+					.define('1', (builder) -> {
+						builder.tag(DeepTechBlockTags.REACTOR_CASING);
+					})
+					.define('2', (builder) -> {
+						builder.block(Blocks.TINTED_GLASS);
+					})
+					.define('4', (builder) -> {
+						builder.block(Blocks.SCULK_CATALYST);
+					})
+					.define('C', (builder) -> {
+						builder.tag(DeepTechBlockTags.REACTOR_CAVITY);
+					})
 					.build();
 		}
 

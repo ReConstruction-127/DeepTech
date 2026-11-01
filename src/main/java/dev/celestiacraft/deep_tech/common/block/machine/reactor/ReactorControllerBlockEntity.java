@@ -9,15 +9,14 @@ import com.lowdragmc.lowdraglib.utils.Position;
 import dev.celestiacraft.deep_tech.DeepTech;
 import dev.celestiacraft.deep_tech.api.block.machine.MachineBlockEntity;
 import dev.celestiacraft.deep_tech.api.block.machine.plugin.MachinePlugins;
+import dev.celestiacraft.deep_tech.api.fluid.SingleTankFluidTransfer;
 import dev.celestiacraft.deep_tech.api.gui.MachineItemSlots;
 import dev.celestiacraft.deep_tech.api.gui.widget.EnergyBarWidget;
 import dev.celestiacraft.deep_tech.api.gui.widget.ProportionalTankWidget;
-import dev.celestiacraft.deep_tech.api.fluid.SingleTankFluidTransfer;
 import dev.celestiacraft.deep_tech.common.register.DTFluids;
 import dev.celestiacraft.deep_tech.common.register.block.ReactorBlocks;
 import dev.celestiacraft.deep_tech.config.common.machine.advanced.ReactorConfig;
 import dev.celestiacraft.libs.api.register.block.BasicBlock;
-import dev.celestiacraft.libs.api.register.block.ITickableBlockEntity;
 import dev.celestiacraft.libs.compat.patchouli.multiblock.IMultiblockProvider;
 import dev.celestiacraft.libs.compat.patchouli.multiblock.MultiblockHandler;
 import net.minecraft.core.BlockPos;
@@ -32,13 +31,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 反应堆控制器.
@@ -91,8 +87,9 @@ import java.util.Map;
  * 收到红石信号时: 作废内部全部物品 / 流体 / 能量, 清除结构内所有幽匿系方块(含催发体),
  * 并中止正在进行的过载 —— 这是唯一的"刹车"。
  */
-public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorControllerBlockEntity>
-		implements ITickableBlockEntity<ReactorControllerBlockEntity>, IUIHolder.BlockEntityUI, IMultiblockProvider {
+public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorControllerBlockEntity> implements
+		IUIHolder.BlockEntityUI,
+		IMultiblockProvider {
 
 	public static final int ITEM_INPUT_SLOTS = 2;
 	public static final int ITEM_OUTPUT_SLOTS = 1;
@@ -227,7 +224,9 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 		return this;
 	}
 
-	/** 内部统一入口, 省得每处都写 getMultiblockHandler() */
+	/**
+	 * 内部统一入口, 省得每处都写 getMultiblockHandler()
+	 */
 	private MultiblockHandler multiblock() {
 		return getMultiblockHandler();
 	}
@@ -805,7 +804,7 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 	}
 
 	@Override
-	protected void saveAdditional(CompoundTag tag) {
+	protected void saveAdditional(@NotNull CompoundTag tag) {
 		super.saveAdditional(tag);
 		tag.putInt("OverloadStage", overloadStage);
 		tag.putInt("SpreadCount", spreadCount);
@@ -826,7 +825,7 @@ public class ReactorControllerBlockEntity extends MachineBlockEntity<ReactorCont
 	}
 
 	@Override
-	public void load(CompoundTag tag) {
+	public void load(@NotNull CompoundTag tag) {
 		super.load(tag);
 		overloadStage = tag.getInt("OverloadStage");
 		spreadCount = tag.getInt("SpreadCount");
